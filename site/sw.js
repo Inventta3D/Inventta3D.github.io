@@ -1,4 +1,4 @@
-const CACHE_NAME='inventta3d-v22';
+const CACHE_NAME='inventta3d-v23';
 const APP_SHELL=[
   './',
   './index.html',
