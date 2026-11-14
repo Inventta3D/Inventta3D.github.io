@@ -8,6 +8,13 @@
     const match = /^(\d{2}):([0-5]\d)$/.exec(String(value || ''));
     return match ? (Number(match[1]) * 60 + Number(match[2])) / 60 : NaN;
   }
+  // Aceita horas decimais do fatiador ("3,7" ou "3.7" = 3h42) e devolve "HH:MM"; vazio se inválido.
+  function decimalToHHMM(value) {
+    const h = Number(String(value || '').trim().replace(',', '.'));
+    if (!Number.isFinite(h) || h <= 0 || h >= 100) return '';
+    const total = Math.round(h * 60), p = n => String(n).padStart(2, '0');
+    return `${p(Math.floor(total / 60))}:${p(total % 60)}`;
+  }
   function calculate(d) {
     const q = Math.max(1, Math.floor(Number(d.quantity) || 1));
     const amount = Number(d.amount) || 0;
@@ -34,5 +41,5 @@
     const profit = finalPrice - fees - cost;
     return { q, material, energy, machine, labor, packaging, failureCost, cost, fees, profit, price: finalPrice, unitPrice };
   }
-  return { calculate, printDurationHours };
+  return { calculate, printDurationHours, decimalToHHMM };
 });
