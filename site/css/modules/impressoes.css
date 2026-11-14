@@ -1,0 +1,21 @@
+/* Inventta 3D · módulo Impressões (usa só tokens; lista e vazio reaproveitam as classes de orçamentos salvos) */
+.print-dialog .preview-body{display:grid;gap:16px;align-content:start}
+.print-dialog h3{margin:8px 0 0;font:var(--md-sys-typescale-title-medium)}
+.print-intro{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.print-save-list{display:grid;gap:12px}
+.print-save-item{display:grid;gap:8px;padding:16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--shape-nested)}
+.print-save-item small{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.print-save-check{display:flex;align-items:center;gap:12px;font:var(--md-sys-typescale-title-small)}
+.print-save-check input{width:20px;height:20px;accent-color:var(--md-sys-color-primary)}
+.print-file-label{font:var(--md-sys-typescale-body-medium)}
+.print-file{min-height:48px;padding:10px 16px;font:var(--md-sys-typescale-body-medium)}
+.print-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0}
+.print-facts div{padding:12px 16px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container-low)}
+.print-facts dt{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.print-facts dd{margin:2px 0 0;font:var(--md-sys-typescale-title-small)}
+.print-file-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font:var(--md-sys-typescale-body-medium);overflow-wrap:anywhere}
+.print-file-box span{flex:1 1 200px}
+.print-requests{display:grid;margin:0;padding:0;list-style:none}
+.print-requests li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;padding:12px 0;border-bottom:1px solid var(--md-sys-color-outline-variant);font:var(--md-sys-typescale-body-medium)}
+.print-requests li span:last-child{grid-column:2;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.print-detail-msg{margin:0 24px}

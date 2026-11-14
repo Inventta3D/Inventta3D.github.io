@@ -117,6 +117,7 @@
     finally{btn.disabled=false}
   });
 
+  window.InventtaCustomers={list:()=>customers};
   document.addEventListener('inventta:auth',()=>{loaded=false;load()});
   window.addEventListener('hashchange',()=>{if(location.hash==='#/clientes')load(true)});
   load();

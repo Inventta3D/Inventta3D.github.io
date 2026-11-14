@@ -13,6 +13,7 @@ Situação: pendente · em andamento · aguardando usuário · concluída. Toda 
 | P6 | Teste de ponta a ponta automatizado (login simulado → 5 etapas → "Gerar orçamento" → desconto → salvar) | Um comando roda o fluxo e falha se algo quebrar (evita repetir o bug do "Gerar orçamento") | proposta, precisa de aprovação |
 | P7 | Backup da chave de assinatura (`.jks`) em local seguro fora do GitHub | Usuário confirma que guardou | aguardando usuário |
 | P8 | Atualizar ações do GitHub (aviso de Node 20 e setup-java v4) | Workflows sem avisos de descontinuação | baixa prioridade |
+| P9 | Histórico de impressões (tela, "Salvar no histórico" com anexo STL/3MF, tabelas e bucket privado) | Migração aplicada no Supabase, site publicado, e o usuário salva uma peça com e sem arquivo, vê na tela Impressões, baixa o arquivo e exclui | construído e testado com banco simulado; aguardando migração e publicação |
 
 ## Concluídas
 - Site publicado no Cloudflare e depois no GitHub Pages; APK assinado v1.0.0 e v1.0.1 em Releases.

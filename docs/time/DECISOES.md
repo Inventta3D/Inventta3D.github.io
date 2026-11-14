@@ -11,4 +11,6 @@
 | D7 | Tempo de impressão aceita horas decimais (3,7) e converte para HH:MM | Fatiadores mostram decimal; o cálculo continua em HH:MM |
 | D8 | Mudança em cálculo ou resultado do orçamento só é publicada depois de testar o fluxo completo | O bug do "Gerar orçamento" chegou ao ar por falta desse teste |
 | D9 | Toda publicação (push, tag, banco) exige confirmação explícita do usuário | Regra de segurança; o site é público |
+| D11 | Histórico de impressões: uma linha por peça e material (único por usuário) e uma linha por pedido (cliente, data, quantidade, custo de impressão da época). Valores guardados são só de impressão, por peça: material, energia e máquina. Ficam de fora mão de obra, embalagem, taxas e lucro | Pedido do usuário ("valores somente voltados à impressão"); a falha depende da mão de obra, por isso não entra |
+| D12 | Arquivos STL/3MF em bucket privado `inventta3d-models`, até 50 MB, pasta por usuário, baixados por link temporário de 60 s; o app pergunta no diálogo de salvar se quer anexar | Arquivo de modelo é do usuário; nada público |
 | D10 | Operações do GitHub usam o terminal do usuário | O shell do agente enxerga outra conta do `gh` |
