@@ -1,0 +1,75 @@
+/* Inventta 3D · casca do app
+   Barra lateral (navigation rail) a partir de 720px; no celular, barra superior + barra de navegação inferior.
+   A navegação é montada por js/shell.js a partir de js/modules.js. */
+
+.app-bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;height:var(--appbar-h);padding:0 4px 0 var(--gutter);background:var(--md-sys-color-surface)}
+.brand{display:flex;align-items:center;flex:none;border-radius:var(--md-sys-shape-corner-small)}
+.brand img{display:block;width:auto}
+.brand .brand-full{height:26px}
+
+/* navegação (itens gerados) */
+.main-nav{display:flex}
+.main-nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-label-medium);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.main-nav .nav-indicator{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;width:56px;height:32px;border-radius:var(--md-sys-shape-corner-full);transition:background-color var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized),width var(--md-sys-motion-duration-medium) var(--md-sys-motion-spring-fast-spatial)}
+.main-nav .nav-indicator::after{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:currentColor;opacity:0;transition:opacity var(--md-sys-motion-duration-short)}
+.main-nav a:hover .nav-indicator::after{opacity:var(--md-sys-state-hover)}
+.main-nav .icon{width:24px;height:24px}
+.main-nav .nav-on{display:none}
+.main-nav a[aria-current="page"]{color:var(--md-sys-color-on-surface)}
+.main-nav a[aria-current="page"] .nav-indicator{background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)}
+.main-nav a[aria-current="page"] .nav-on{display:block}
+.main-nav a[aria-current="page"] .nav-off{display:none}
+.main-nav a:focus-visible{outline-offset:-2px;border-radius:var(--md-sys-shape-corner-medium)}
+
+/* menu da conta: conta, tema, instalar, sair */
+.account-menu{position:relative;flex:none;margin-left:auto}
+.account-menu>summary{list-style:none}
+.account-menu>summary::-webkit-details-marker{display:none}
+.account-trigger{--btn-h:48px}
+.account-menu[open] .account-trigger{--bg:var(--md-sys-color-secondary-container);--fg:var(--md-sys-color-on-secondary-container)}
+.account-menu-panel{position:absolute;z-index:40;top:calc(100% + 4px);right:4px;display:grid;gap:2px;width:264px;padding:8px;border-radius:var(--md-sys-shape-corner-large);background:var(--md-sys-color-surface-container);box-shadow:var(--md-sys-elevation-2);transform-origin:top right;animation:menu-in var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized-decelerate)}
+.account-user{display:block;padding:8px 12px 10px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium);overflow-wrap:anywhere}
+.account-signout{color:var(--md-sys-color-error)}
+.account-signout .icon{color:inherit}
+@keyframes menu-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+/* conteúdo */
+.app-content{min-width:0}
+.page{padding:8px 0 48px}
+
+/* status global como snackbar */
+.app-status{position:fixed;left:50%;bottom:24px;z-index:55;max-width:min(520px,calc(100vw - 24px));margin:0;padding:14px 16px;border-radius:var(--md-sys-shape-corner-small);background:var(--md-sys-color-inverse-surface);color:var(--md-sys-color-inverse-on-surface);box-shadow:var(--md-sys-elevation-3);font:var(--md-sys-typescale-body-medium);transform:translateX(-50%);animation:snack-in var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized-decelerate)}
+.app-status:empty{display:none}
+.app-status.error{background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container)}
+
+/* rodapé discreto */
+.site-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(100% - var(--gutter)*2,var(--content-max));margin:0 auto;padding:16px 0 24px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.foot-brand{display:inline-flex;align-items:center;gap:8px;font:var(--md-sys-typescale-label-medium)}
+.foot-brand img{height:16px;width:auto}
+.site-footer-link{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:var(--md-sys-shape-corner-full);color:inherit;font:var(--md-sys-typescale-label-medium);text-decoration:none}
+.site-footer-link:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 8%,transparent);color:var(--md-sys-color-on-surface)}
+.site-footer-link svg{width:16px;height:16px}
+
+/* ---------- celular: barra de navegação inferior ---------- */
+@media(max-width:719px){
+  .app-bar .brand img.brand-mark{display:none!important}
+  #appShell{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .main-nav{position:fixed;left:0;right:0;bottom:0;z-index:35;display:grid;grid-auto-columns:1fr;grid-auto-flow:column;padding:12px 8px calc(12px + env(safe-area-inset-bottom));background:var(--md-sys-color-surface-container)}
+  .main-nav .nav-indicator{width:64px}
+  .app-status,.toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+  .site-footer{flex-direction:column;align-items:flex-start;gap:0}
+}
+
+/* ---------- tablet e computador: navigation rail ---------- */
+@media(min-width:720px){
+  :root{--appbar-h:0px}
+  .app-bar{position:fixed;inset:0 auto 0 0;z-index:30;flex-direction:column;align-items:center;gap:0;width:var(--rail-w);height:auto;padding:20px 0 16px;background:var(--md-sys-color-surface-container-low)}
+  .app-bar .brand img.brand-full{display:none!important}
+  .brand .brand-mark{height:36px}
+  .main-nav{flex-direction:column;gap:12px;margin-top:40px}
+  .main-nav a{width:80px}
+  .account-menu{margin:auto 0 0}
+  .account-menu-panel{top:auto;bottom:0;right:auto;left:calc(100% + 8px);transform-origin:bottom left}
+  .app-content{margin-left:var(--rail-w)}
+  .app-status,.toast{left:calc(50% + var(--rail-w)/2)}
+}

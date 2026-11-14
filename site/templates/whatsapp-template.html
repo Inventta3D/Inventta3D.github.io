@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Orçamento Inventta 3D – {{cliente.nome}}</title>
+<!--
+  MODELO DE ORÇAMENTO PARA WHATSAPP (imagem) – INVENTTA 3D · layout v2
+  Largura fixa de 540px, exportada em escala 2x (1080px). A altura acompanha o conteúdo.
+  O exportador desenha cores de fundo, bordas retas, textos e imagens: sem gradientes, sombras ou pseudo-elementos.
+  Marcadores: {{cliente.nome}} {{cliente.email}} {{cliente.telefone}} {{contagem_itens}} {{emissao}}
+              {{subtotal_fmt}} {{desconto_fmt}} {{total_fmt}}
+              {{#itens}} nome, material, cor, qtd, valor_unit_fmt, total_fmt {{/itens}}
+              {{#desconto}}…{{/desconto}} {{^desconto}}…{{/desconto}} {{#tem_cliente}}…{{/tem_cliente}} {{#tem_validade}}{{validade_ate}}{{/tem_validade}}
+  Estrutura mantida para o código do app: .resumo, .linha-resumo, .rot, .desc, .total, .tela.
+  Imagens (pasta img): logo-inventta-3d-colorido.svg, logo-3d-uma-cor-grafite.svg, qrcode-pix.png, qrcode-instagram.png
+-->
+<style>
+  :root {
+    --papel: #F7F0E4; --creme: #FBF7EE; --bege: #F3E8D5; --fundo: #FFFBF4;
+    --vermelho: #E63B2E; --vermelho-escuro: #B8281D;
+    --azul: #1F5FD6; --verde: #0F9D4B; --verde-texto: #0B7A3A; --verde-suave: #E3F3E8;
+    --grafite: #1B1B1B; --linha: #E6DCC9; --texto-2: #5C554C; --rotulo: #6B6257;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--fundo); }
+  body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--grafite); }
+  .tela { width: 540px; display: flex; flex-direction: column; background: var(--fundo); }
+
+  .faixa { display: flex; height: 6px; }
+  .faixa div { flex: 1; }
+  .faixa .r { background: var(--vermelho); } .faixa .b { background: var(--azul); } .faixa .g { background: var(--verde); }
+
+  header { padding: 22px 24px 4px; display: flex; justify-content: space-between; align-items: center; }
+  header img { width: 188px; height: 42px; object-fit: contain; display: block; }
+  .doc { text-align: right; display: flex; flex-direction: column; gap: 3px; }
+  .doc .t { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; line-height: 1; }
+  .doc .d { font-size: 11px; color: var(--rotulo); }
+
+  main { display: flex; flex-direction: column; gap: 22px; padding: 18px 24px 22px; }
+  section { display: flex; flex-direction: column; gap: 10px; }
+  h2 { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.8px; color: var(--grafite); }
+  .cabeca { display: flex; justify-content: space-between; align-items: baseline; }
+  .contagem { font-size: 11px; color: var(--rotulo); }
+
+  .destaque { background: var(--bege); border-radius: 16px; padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 6px; }
+  .destaque .rot { font-size: 11px; font-weight: 700; letter-spacing: 1.8px; color: var(--vermelho-escuro); }
+  .destaque .valor { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 50px; line-height: 1.05; white-space: nowrap; }
+  .economia { align-self: flex-start; margin-top: 6px; background: var(--verde-suave); color: #0B6B33; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+  .sem-desc { font-size: 12px; color: var(--texto-2); margin-top: 2px; }
+
+  .cliente { background: var(--creme); border-radius: 14px; padding: 14px 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .campo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .campo .rot { font-size: 11px; color: var(--rotulo); }
+  .campo .val { font-size: 14px; font-weight: 500; }
+  .campo .val.forte { font-weight: 700; }
+  .campo.inteiro { grid-column: span 2; }
+
+  .lista { display: flex; flex-direction: column; }
+  .item { padding: 13px 0; border-bottom: 1px solid var(--linha); display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+  .item:first-child { padding-top: 4px; }
+  .item .esq, .item .dir { display: flex; flex-direction: column; gap: 3px; }
+  .item .dir { align-items: flex-end; flex-shrink: 0; }
+  .item .nome, .item .tot { font-size: 15px; font-weight: 700; }
+  .item .spec, .item .unit { font-size: 12px; color: var(--texto-2); }
+
+  .resumo { background: var(--creme); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; }
+  .linha-resumo { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; }
+  .linha-resumo .rot { color: var(--texto-2); }
+  .desc { font-weight: 700; color: var(--verde-texto); }
+  .total { background: var(--bege); border-radius: 10px; padding: 12px 14px; margin-top: 3px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 700; }
+  .total .rot { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--vermelho-escuro); }
+  .total .v { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 22px; white-space: nowrap; }
+
+  .pagamento { background: var(--creme); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .pix { display: flex; align-items: center; gap: 16px; }
+  .pix img { width: 118px; height: 118px; display: block; flex-shrink: 0; }
+  .pix-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .pix-info .rot { font-size: 11px; color: var(--rotulo); }
+  .pix-info .chave { font-size: 15px; font-weight: 700; }
+  .pix-info .dica { font-size: 12px; color: var(--texto-2); }
+  .pix-valor { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+  .pix-valor span:first-child { font-size: 12px; color: var(--texto-2); }
+  .pix-valor span:last-child { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; }
+  .insta { border-top: 1px solid var(--linha); padding-top: 14px; display: flex; align-items: center; gap: 16px; }
+  .insta img { width: 150px; height: 150px; object-fit: contain; display: block; flex-shrink: 0; }
+  .insta .t1 { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--azul); }
+  .insta .t2 { font-size: 15px; font-weight: 700; margin-top: 3px; }
+  .insta .t3 { font-size: 12px; color: var(--azul); margin-top: 3px; }
+
+  footer { margin: 0 24px; border-top: 1px solid var(--linha); padding: 14px 0 22px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--texto-2); }
+  footer .marca { display: flex; align-items: center; gap: 8px; }
+  footer .marca img { width: 22px; height: 18px; object-fit: contain; display: block; }
+</style>
+</head>
+<body>
+<div class="tela">
+
+  <div class="faixa" aria-hidden="true"><div class="r"></div><div class="b"></div><div class="g"></div></div>
+
+  <header>
+    <img src="logo-inventta-3d-colorido.svg" alt="Inventta 3D">
+    <div class="doc"><div class="t">Orçamento</div><div class="d">Impressão 3D · {{emissao}}</div>{{#tem_validade}}<div class="d">Válido até {{validade_ate}}</div>{{/tem_validade}}</div>
+  </header>
+
+  <main>
+    <section>
+      <div class="destaque">
+        <div class="rot">{{#desconto}}TOTAL COM DESCONTO{{/desconto}}{{^desconto}}TOTAL DO PEDIDO{{/desconto}}</div>
+        <div class="valor">{{total_fmt}}</div>
+        {{#desconto}}<div class="economia">Você economiza {{desconto_fmt}}</div>{{/desconto}}
+      </div>
+    </section>
+
+    {{#tem_cliente}}
+    <section>
+      <h2>CLIENTE</h2>
+      <div class="cliente">
+        <div class="campo"><div class="rot">Nome</div><div class="val forte">{{cliente.nome}}</div></div>
+        <div class="campo"><div class="rot">Telefone</div><div class="val">{{cliente.telefone}}</div></div>
+        <div class="campo inteiro"><div class="rot">E-mail</div><div class="val">{{cliente.email}}</div></div>
+      </div>
+    </section>
+    {{/tem_cliente}}
+
+    <section>
+      <div class="cabeca"><h2>ITENS DO PEDIDO</h2><div class="contagem">{{contagem_itens}}</div></div>
+      <div class="lista">
+        {{#itens}}
+        <div class="item">
+          <div class="esq"><div class="nome">{{nome}}</div><div class="spec">{{material}} · Cor: {{cor}}</div></div>
+          <div class="dir"><div class="tot">{{total_fmt}}</div><div class="unit">{{qtd}} × {{valor_unit_fmt}}</div></div>
+        </div>
+        {{/itens}}
+      </div>
+    </section>
+
+    <section>
+      <h2>RESUMO DO VALOR</h2>
+      <div class="resumo">
+        <div class="linha-resumo"><span class="rot">Subtotal dos itens</span><span>{{subtotal_fmt}}</span></div>
+        {{#desconto}}
+        <div class="linha-resumo"><span class="rot">Desconto do pedido</span><span class="desc">− {{desconto_fmt}}</span></div>
+        {{/desconto}}
+        <div class="total"><span class="rot">TOTAL DO PEDIDO</span><span class="v">{{total_fmt}}</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>PAGAMENTO VIA PIX</h2>
+      <div class="pagamento">
+        <div class="pix">
+          <img src="qrcode-pix.png" alt="QR Code Pix">
+          <div class="pix-info">
+            <div class="rot">Chave Pix (e-mail)</div>
+            <div class="chave">3d.inventta@gmail.com</div>
+            <div class="dica">Escaneie o QR Code ou copie a chave.</div>
+            <div class="pix-valor"><span>Valor do Pix</span><span>{{total_fmt}}</span></div>
+          </div>
+        </div>
+        <div class="insta">
+          <img src="qrcode-instagram.png" alt="QR Code Instagram @3d.inventta">
+          <div><div class="t1">SIGA NO INSTAGRAM</div><div class="t2">@3d.inventta</div><div class="t3">instagram.com/3d.inventta</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="marca"><img src="logo-3d-uma-cor-grafite.svg" alt=""><span>Invenções que ganham forma.</span></div>
+    <div>@3d.inventta · 3d.inventta@gmail.com</div>
+  </footer>
+
+</div>
+</body>
+</html>

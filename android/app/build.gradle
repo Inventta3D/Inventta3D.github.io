@@ -1,0 +1,64 @@
+// App Android da Inventta 3D (Trusted Web Activity).
+// O app abre o site publicado em tela cheia, usando o Chrome do aparelho.
+// Endereço, versão e assinatura vêm de variáveis de ambiente (definidas no GitHub Actions).
+plugins {
+    id 'com.android.application'
+}
+
+def env = { String name, String fallback -> System.getenv(name) ?: fallback }
+def twaHost = env('TWA_HOST', 'example.github.io')          // ex.: lucas.github.io
+def twaPath = env('TWA_PATH', '/')                           // ex.: /inventta3d/
+def launchUrl = "https://${twaHost}${twaPath}"
+
+android {
+    namespace 'br.com.inventta3d.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'br.com.inventta3d.app'
+        minSdk 21
+        targetSdk 35
+        versionCode env('VERSION_CODE', '1').toInteger()
+        versionName env('VERSION_NAME', '1.0.0')
+
+        manifestPlaceholders = [
+            hostName       : twaHost,
+            launchUrl      : launchUrl,
+            launcherName   : 'Inventta 3D',
+            themeColor     : '#FFF8EF',
+            themeColorDark : '#16130B',
+            backgroundColor: '#FFF8EF'
+        ]
+        resValue 'string', 'assetStatements', """[{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], \\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://${twaHost}\\"}}]"""
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv('KEYSTORE_PATH')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig System.getenv('KEYSTORE_PATH') ? signingConfigs.release : null
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures { resValues true }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.4.0'
+}

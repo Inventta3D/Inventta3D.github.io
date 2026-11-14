@@ -1,0 +1,78 @@
+# Gera o APK assinado da Inventta 3D (Trusted Web Activity).
+# Rode manualmente em Actions > "Gerar APK" ou crie uma tag v1.2.3 para publicar uma versão em Releases.
+name: Gerar APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Endereço do site
+        id: site
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+          HOST="${{ vars.TWA_HOST }}"
+          PATHNAME="${{ vars.TWA_PATH }}"
+          if [ -z "$HOST" ]; then
+            HOST="$OWNER.github.io"
+            if [ "${REPO,,}" = "$HOST" ]; then PATHNAME="${PATHNAME:-/}"; else PATHNAME="${PATHNAME:-/$REPO/}"; fi
+          fi
+          echo "host=$HOST" >> "$GITHUB_OUTPUT"
+          echo "path=${PATHNAME:-/}" >> "$GITHUB_OUTPUT"
+          echo "O app vai abrir https://$HOST${PATHNAME:-/}"
+
+      - name: Conferir chave de assinatura
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KS" ]; then
+            echo "::error::Cadastre os segredos ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS e ANDROID_KEY_PASSWORD em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.10.2' }
+
+      - name: Compilar APK
+        env:
+          TWA_HOST: ${{ steps.site.outputs.host }}
+          TWA_PATH: ${{ steps.site.outputs.path }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('1.0.{0}', github.run_number) }}
+          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          gradle -p android assembleRelease bundleRelease --no-daemon
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk dist/inventta3d.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab dist/inventta3d.aab
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inventta3d-android
+          path: dist/*
+
+      - name: Publicar versão (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

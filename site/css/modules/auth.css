@@ -1,0 +1,52 @@
+/* Inventta 3D · módulo de acesso (login, criação de conta, recuperação de senha) */
+
+.login-screen{min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);background:var(--md-sys-color-surface)}
+.login-aside{display:none}
+.login-main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-width:0;padding:clamp(16px,4vw,40px) 16px}
+.login-tools{align-self:flex-end;display:flex;justify-content:flex-end;width:min(100%,420px)}
+.login-tools .btn-icon{--bd:transparent}
+.login-card{width:min(100%,420px);animation:rise var(--md-sys-motion-duration-long) var(--md-sys-motion-easing-emphasized-decelerate) both}
+.login-brand{display:flex;justify-content:center}
+.login-brand img{display:block;width:min(100%,200px);height:auto}
+.login-card #loginTitle{margin:24px 0 0;text-align:center;font:var(--md-sys-typescale-headline-medium)}
+.login-intro{margin:6px 0 28px;text-align:center;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.login-card label{display:block;margin:0 0 6px;font:var(--md-sys-typescale-title-small)}
+.login-card input{display:block;width:100%;min-height:56px;padding:0 16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);background:transparent;font:var(--md-sys-typescale-body-large);caret-color:var(--md-sys-color-primary);transition:border-color var(--md-sys-motion-duration-short),box-shadow var(--md-sys-motion-duration-short)}
+.login-card input::placeholder{color:var(--md-sys-color-on-surface-variant);opacity:.6}
+.login-card input:hover{border-color:var(--md-sys-color-outline)}
+.login-card input:focus{outline:0;border-color:var(--md-sys-color-primary);box-shadow:inset 0 0 0 1px var(--md-sys-color-primary)}
+.login-password-label,.login-confirm label{margin-top:16px!important}
+.pw-field{position:relative}
+.pw-field input{padding-right:56px!important}
+.pw-toggle{position:absolute;right:4px;top:4px;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:var(--md-sys-color-on-surface-variant)}
+.pw-toggle .icon{width:24px;height:24px}
+.login-submit,.login-google{--btn-h:52px;font-size:1rem}
+.login-submit{margin-top:24px}
+.login-google{--fg:var(--md-sys-color-on-surface)}
+.login-google svg{width:20px;height:20px;flex:none}
+.login-divider{display:flex;align-items:center;gap:12px;margin:12px 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-label-medium)}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--md-sys-color-outline-variant)}
+.login-status{min-height:22px;margin:12px 0 0;color:var(--md-ext-success);font:var(--md-sys-typescale-body-medium);font-weight:600;text-align:center}
+.login-status.error{color:var(--md-sys-color-error)}
+.login-links{display:flex;justify-content:space-between;gap:8px;margin:0 -12px}
+.login-link{min-height:48px;padding:0 12px;border:0;border-radius:var(--md-sys-shape-corner-full);background:none;color:var(--md-sys-color-primary);font:var(--md-sys-typescale-label-large)}
+.login-link:hover{background:color-mix(in srgb,var(--md-sys-color-primary) 8%,transparent)}
+.login-footnote{margin:16px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small);text-align:center}
+.login-footer{display:flex;justify-content:center}
+.login-footer a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:var(--md-sys-shape-corner-full);color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-label-medium);text-decoration:none}
+.login-footer a:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 8%,transparent)}
+.login-footer svg{width:16px;height:16px}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+@media(min-width:960px){
+  .login-screen{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .login-aside{display:flex;flex-direction:column;justify-content:space-between;gap:40px;margin:12px 0 12px 12px;padding:clamp(40px,5vw,64px);border-radius:var(--md-sys-shape-corner-extra-large);background:var(--md-sys-color-surface-container-low)}
+  .login-aside .aside-logo{width:min(220px,100%)}
+  .aside-logo img{width:100%;height:auto}
+  .login-aside h2{max-width:12ch;margin:0;font:var(--md-sys-typescale-display-medium);font-size:clamp(2.25rem,3.8vw,3rem);line-height:1.05;letter-spacing:-.02em}
+  .login-aside p.lead{max-width:34ch;margin:16px 0 0;color:var(--md-sys-color-on-surface-variant)}
+  .login-aside ul{display:grid;gap:14px;margin:0;padding:0;list-style:none;max-width:40ch}
+  .login-aside li{display:flex;gap:12px;align-items:flex-start;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+  .login-aside li::before{content:'';flex:none;width:20px;height:20px;background:var(--md-ext-success);-webkit-mask:var(--check-mask) center/20px no-repeat;mask:var(--check-mask) center/20px no-repeat}
+  .login-brand{display:none}
+}
