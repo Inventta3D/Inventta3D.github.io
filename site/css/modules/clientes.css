@@ -1,0 +1,9 @@
+/* Inventta 3D · módulo Clientes (usa só tokens; lista e vazio reaproveitam as classes de orçamentos salvos) */
+@media (min-width:720px){.customer-tools{grid-template-columns:minmax(0,1fr) auto}}
+.customer-row-actions{flex-wrap:wrap}
+.customer-dialog form{display:contents}
+.customer-fields{display:grid;gap:16px}
+.customer-fields textarea.control{min-height:96px;padding:14px 20px;border-radius:var(--shape-nested);resize:vertical;font:inherit}
+.customer-fields .message{margin:0}
+#saveCustomerBtn{margin-inline:auto}
+@media (max-width:719px){#saveCustomerBtn{margin-inline:0}}

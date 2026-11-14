@@ -11,5 +11,6 @@
      hidden      true para registrar a rota sem mostrar na navegação */
 window.INVENTTA_MODULES = [
   { id: 'novo-orcamento', label: 'Novo orçamento', short: 'Novo', route: '#top', icon: 'i-calc', iconActive: 'i-calc-fill', default: true },
-  { id: 'orcamentos-salvos', label: 'Orçamentos salvos', short: 'Salvos', route: '#/orcamentos-salvos', icon: 'i-list', iconActive: 'i-list-fill' }
+  { id: 'orcamentos-salvos', label: 'Orçamentos salvos', short: 'Salvos', route: '#/orcamentos-salvos', icon: 'i-list', iconActive: 'i-list-fill' },
+  { id: 'clientes', label: 'Clientes', short: 'Clientes', route: '#/clientes', icon: 'i-group', iconActive: 'i-group-fill' }
 ];

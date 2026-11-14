@@ -1,4 +1,4 @@
-const CACHE_NAME='inventta3d-v29';
+const CACHE_NAME='inventta3d-v31';
 const APP_SHELL=[
   './',
   './index.html',
@@ -9,6 +9,7 @@ const APP_SHELL=[
   './css/shell.css',
   './css/modules/auth.css',
   './css/modules/orcamentos.css',
+  './css/modules/clientes.css',
   './css/print.css',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -32,6 +33,7 @@ const APP_SHELL=[
   './js/shell.js',
   './js/app.js',
   './js/orcamentos-ui.js',
+  './js/clientes.js',
   './js/recap.js',
   './js/theme.js',
   './js/password-toggle.js',
