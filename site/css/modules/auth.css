@@ -1,6 +1,6 @@
 /* Inventta 3D · módulo de acesso (login, criação de conta, recuperação de senha) */
 
-.login-screen{--login-inset:16px;--login-pad:48px;--login-h:760px;--login-extra:max(0px,calc((100svh - var(--login-h)) / 2));--aside-w:760px;--form-w:400px;--login-gap:48px;--login-bottom:calc(var(--login-pad) + 102px);position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);background:var(--md-sys-color-surface)}
+.login-screen{--login-inset:16px;--login-pad:48px;--login-h:760px;--login-extra:max(0px,calc((100svh - var(--login-h)) / 2));--login-bottom:calc(var(--login-pad) + 102px);position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);background:var(--md-sys-color-surface)}
 .login-aside{display:none}
 .login-main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-width:0;padding:72px var(--login-inset) 24px}
 .login-tools{position:absolute;top:var(--login-inset);right:var(--login-inset);z-index:2}
@@ -39,9 +39,9 @@
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 @media(min-width:960px){
-  .login-screen{grid-template-columns:minmax(0,var(--aside-w)) var(--form-w);grid-template-rows:minmax(100svh,auto);justify-content:center;column-gap:var(--login-gap);padding:0 var(--login-inset)}
+  .login-screen{grid-template-columns:minmax(0,58fr) minmax(0,42fr);grid-template-rows:minmax(100svh,auto)}
   .login-aside{display:flex;flex-direction:column;justify-content:space-between;gap:40px;margin:0;padding:calc(var(--login-pad) + var(--login-extra)) var(--login-pad) calc(var(--login-extra) + var(--login-bottom));border-radius:0;background:var(--md-sys-color-surface-container-low)}
-  .login-main{justify-content:flex-start;padding:calc(var(--login-extra) + var(--login-pad)) 0}
+  .login-main{justify-content:flex-start;padding:calc(var(--login-extra) + var(--login-pad)) var(--login-pad)}
   .login-card{flex:1;display:flex;flex-direction:column;margin-block:0}
   .login-card #loginTitle{display:flex;align-items:center;justify-content:center;height:72px;margin:0;font:var(--md-sys-typescale-headline-large)}
   .login-intro{margin:0 0 24px;font:var(--md-sys-typescale-body-large)}
@@ -49,7 +49,7 @@
   .login-tools{top:24px;right:24px}
   .login-aside .aside-logo{display:flex;align-items:center;justify-content:center;width:100%;height:72px}
   .aside-logo img{display:block;width:min(260px,100%);height:auto}
-  .login-aside h2{max-width:14ch;margin:0 auto;text-align:center;font:var(--md-sys-typescale-display-small);letter-spacing:-.015em}
+  .login-aside h2{max-width:20ch;margin:0 auto;text-align:center;text-wrap:balance;font:var(--md-sys-typescale-display-small);letter-spacing:-.015em}
   .login-aside p.lead{max-width:36ch;margin:16px auto 0;text-align:center;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-large);font-size:1.125rem;line-height:1.5}
   .login-aside ul{display:grid;gap:14px;width:fit-content;max-width:40ch;margin:0 auto;padding:0;list-style:none}
   .login-aside li{display:flex;gap:12px;align-items:flex-start;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium);font-size:.9375rem}
