@@ -1,6 +1,6 @@
 /* Inventta 3D · módulo de acesso (login, criação de conta, recuperação de senha) */
 
-.login-screen{--login-inset:16px;--login-pad:48px;position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);background:var(--md-sys-color-surface)}
+.login-screen{--login-inset:16px;--login-pad:48px;--login-h:760px;--login-extra:max(0px,calc((100svh - var(--login-h)) / 2));--aside-w:760px;--form-w:400px;--login-gap:48px;--login-bottom:calc(var(--login-pad) + 102px);position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);background:var(--md-sys-color-surface)}
 .login-aside{display:none}
 .login-main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-width:0;padding:72px var(--login-inset) 24px}
 .login-tools{position:absolute;top:var(--login-inset);right:var(--login-inset);z-index:2}
@@ -11,14 +11,14 @@
 .login-card #loginTitle{margin:24px 0 0;text-align:center;font:var(--md-sys-typescale-headline-medium)}
 .login-intro{margin:8px 0 32px;text-align:center;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
 .login-card label{display:block;margin:0 0 8px;font:var(--md-sys-typescale-title-small)}
-.login-card input{display:block;width:100%;min-height:56px;padding:0 20px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--shape-control);background:transparent;font:var(--md-sys-typescale-body-large);caret-color:var(--md-sys-color-primary);transition:border-color var(--md-sys-motion-duration-short),box-shadow var(--md-sys-motion-duration-short)}
+.login-card input{display:block;width:100%;min-height:52px;padding:0 20px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--shape-control);background:transparent;font:var(--md-sys-typescale-body-large);caret-color:var(--md-sys-color-primary);transition:border-color var(--md-sys-motion-duration-short),box-shadow var(--md-sys-motion-duration-short)}
 .login-card input::placeholder{color:var(--md-sys-color-on-surface-variant);opacity:.6}
 .login-card input:hover{border-color:var(--md-sys-color-outline)}
 .login-card input:focus{outline:0;border-color:var(--md-sys-color-primary);box-shadow:inset 0 0 0 1px var(--md-sys-color-primary)}
 .login-password-label,.login-confirm label{margin-top:16px!important}
 .pw-field{position:relative}
 .pw-field input{padding-right:56px!important}
-.pw-toggle{position:absolute;right:4px;top:4px;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:var(--md-sys-color-on-surface-variant)}
+.pw-toggle{position:absolute;right:4px;top:2px;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:var(--md-sys-color-on-surface-variant)}
 .pw-toggle .icon{width:24px;height:24px}
 .login-submit,.login-google{--btn-h:52px;font-size:1rem}
 .login-submit{margin-top:24px}
@@ -39,16 +39,21 @@
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 @media(min-width:960px){
-  .login-screen{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .login-aside{display:flex;flex-direction:column;justify-content:space-between;gap:40px;margin:var(--login-inset) 0 var(--login-inset) var(--login-inset);padding:var(--login-pad);border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-low)}
-  .login-main{padding:var(--login-inset) var(--login-inset) calc(var(--login-inset) + var(--login-pad) - 8px)}
-  .login-tools{top:calc(var(--login-inset) + var(--login-pad) + 12px);right:calc(var(--login-inset) + var(--login-pad))}
-  .login-aside .aside-logo{display:flex;justify-content:center;width:100%}
-  .aside-logo img{display:block;width:min(320px,100%);height:auto}
-  .login-aside h2{max-width:12ch;margin:0;font:var(--md-sys-typescale-display-medium);font-size:clamp(2.25rem,3.8vw,3rem);line-height:1.05;letter-spacing:-.02em}
-  .login-aside p.lead{max-width:34ch;margin:16px 0 0;color:var(--md-sys-color-on-surface-variant)}
-  .login-aside ul{display:grid;gap:14px;margin:0;padding:0;list-style:none;max-width:40ch}
-  .login-aside li{display:flex;gap:12px;align-items:flex-start;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+  .login-screen{grid-template-columns:minmax(0,var(--aside-w)) var(--form-w);grid-template-rows:minmax(100svh,auto);justify-content:center;column-gap:var(--login-gap);padding:0 var(--login-inset)}
+  .login-aside{display:flex;flex-direction:column;justify-content:space-between;gap:40px;margin:0;padding:calc(var(--login-pad) + var(--login-extra)) var(--login-pad) calc(var(--login-extra) + var(--login-bottom));border-radius:0;background:var(--md-sys-color-surface-container-low)}
+  .login-main{justify-content:flex-start;padding:calc(var(--login-extra) + var(--login-pad)) 0}
+  .login-card{flex:1;display:flex;flex-direction:column;margin-block:0}
+  .login-card #loginTitle{display:flex;align-items:center;justify-content:center;height:72px;margin:0;font:var(--md-sys-typescale-headline-large)}
+  .login-intro{margin:0 0 24px;font:var(--md-sys-typescale-body-large)}
+  .login-links{margin-top:auto}
+  .login-tools{top:24px;right:24px}
+  .login-aside .aside-logo{display:flex;align-items:center;justify-content:center;width:100%;height:72px}
+  .aside-logo img{display:block;width:min(260px,100%);height:auto}
+  .login-aside h2{max-width:14ch;margin:0 auto;text-align:center;font:var(--md-sys-typescale-display-small);letter-spacing:-.015em}
+  .login-aside p.lead{max-width:36ch;margin:16px auto 0;text-align:center;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-large);font-size:1.125rem;line-height:1.5}
+  .login-aside ul{display:grid;gap:14px;width:fit-content;max-width:40ch;margin:0 auto;padding:0;list-style:none}
+  .login-aside li{display:flex;gap:12px;align-items:flex-start;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium);font-size:.9375rem}
   .login-aside li::before{content:'';flex:none;width:20px;height:20px;background:var(--md-ext-success);-webkit-mask:var(--check-mask) center/20px no-repeat;mask:var(--check-mask) center/20px no-repeat}
   .login-brand{display:none}
 }
+@media(min-width:960px) and (max-height:800px){.login-screen{--login-pad:24px}}
