@@ -50,6 +50,11 @@
   --md-sys-shape-corner-extra-small:4px;--md-sys-shape-corner-small:8px;--md-sys-shape-corner-medium:12px;
   --md-sys-shape-corner-large:16px;--md-sys-shape-corner-large-increased:20px;--md-sys-shape-corner-extra-large:28px;
   --md-sys-shape-corner-extra-large-increased:32px;--md-sys-shape-corner-full:999px;
+  /* padrão de bordas por papel (use estes, não os valores soltos):
+     superfície = cartões, painéis, diálogos · aninhado = menus, faixas, linhas, opções, imagens
+     campo = inputs, avisos · controle = botões, chips, abas, navegação, passos, interruptores */
+  --shape-surface:var(--md-sys-shape-corner-extra-large);--shape-nested:var(--md-sys-shape-corner-large);
+  --shape-field:var(--md-sys-shape-corner-small);--shape-control:var(--md-sys-shape-corner-full);
 
   /* elevação */
   --md-sys-elevation-1:0 1px 2px rgb(0 0 0/.18),0 1px 3px 1px rgb(0 0 0/.08);
