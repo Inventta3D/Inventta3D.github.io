@@ -3,6 +3,7 @@
 Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou pendente. Mais recente em cima.
 
 ## Ciclo atual
+- Avaliação e endurecimento do banco: migrações `20261117000000_harden_inventta3d_schema.sql` e `20261117000100_index_inventta3d_composite_fks.sql` aplicadas no Supabase. Verificado com transação desfeita (nada ficou gravado): usuário B não vê nem referencia dados de A; gatilho de `updated_at`; apagar cliente zera `customer_id` e mantém o pedido; apagar peça remove os pedidos. Alertas de desempenho das políticas resolvidos; sobram só índices "não usados" (tabelas vazias).
 - Histórico de impressões: migração `20261116000000_create_inventta3d_prints.sql`, módulo `impressoes.js`, botão "Salvar no histórico" no fim do orçamento. Testado no navegador com banco e armazenamento simulados (salvar com e sem arquivo, mesma peça em novo pedido, aviso de duplicado, trocar, remover e baixar arquivo, extensão inválida, exclusão em cascata). Ainda sem teste com Supabase real.
 - Organização do projeto: criados `SPEC`, `PLANO`, `DECISOES`, `CONTEXTO` e este `LOG` em `docs/time/`. Pendências levantadas no PLANO (P1 a P8).
 
