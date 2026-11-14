@@ -52,7 +52,7 @@
   --md-sys-shape-corner-extra-large-increased:32px;--md-sys-shape-corner-full:999px;
   /* padrão de bordas por papel (use estes, não os valores soltos):
      superfície = cartões, painéis, diálogos · aninhado = menus, faixas, linhas, opções, imagens
-     campo = inputs, avisos · controle = botões, chips, abas, navegação, passos, interruptores */
+     campo = avisos e feedback · controle = botões, campos de texto, chips, abas, navegação, passos, interruptores */
   --shape-surface:var(--md-sys-shape-corner-extra-large);--shape-nested:var(--md-sys-shape-corner-large);
   --shape-field:var(--md-sys-shape-corner-small);--shape-control:var(--md-sys-shape-corner-full);
 
