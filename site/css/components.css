@@ -143,6 +143,8 @@ select.control option,select.control optgroup{background:var(--md-sys-color-surf
 /* ---------- ajuda contextual (rich tooltip) ---------- */
 .field-label-row{display:flex;align-items:center;flex-wrap:wrap;gap:0 2px;min-height:40px;margin:0 0 2px}
 .field-label-row>label,.field-label-row>.field-label{margin:0!important}
+/* campo sem balão "?" (ex.: Cliente salvo) ocupa a mesma altura de rótulo dos vizinhos, para o controle alinhar */
+#customerPickField>label{display:flex;align-items:center;min-height:40px;margin:0 0 2px}
 .field-help-trigger{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--md-sys-color-outline);cursor:help}
 .field-help-trigger>span{display:grid;place-items:center;width:18px;height:18px;border:1.5px solid currentColor;border-radius:50%;font:700 10px/1 var(--md-ref-typeface-plain)}
 .field-help-trigger:hover,.field-help-trigger[aria-expanded="true"]{color:var(--md-sys-color-tertiary)}

@@ -765,6 +765,11 @@ test.describe('clientes', () => {
     await page.locator('#saveCustomerBtn').click();
     await expect.poll(() => banco.db.inventta3d_customers[0].name).toBe('Ana Lima Santos');
     expect(banco.db.inventta3d_customers).toHaveLength(1);
+    // com cliente salvo, o seletor "Cliente salvo" alinha com o campo Telefone ao lado
+    await expect(page.locator('#customerPick')).toBeVisible();
+    const topo = (sel) => page.locator(sel).evaluate((e) => Math.round(e.getBoundingClientRect().top));
+    const [tel, sel] = [await topo('#clientPhone'), await topo('#customerPick')];
+    if (Math.abs(tel - sel) < 100) expect(sel).toBe(tel); // só compara quando estão na mesma linha (telas largas)
   });
 });
 
