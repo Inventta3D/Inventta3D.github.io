@@ -683,21 +683,28 @@ test.describe('vitrine pública', () => {
 });
 
 test.describe('telas (módulos)', () => {
-  test('botões do resultado: mesma altura, os secundários com o mesmo estilo e o destrutivo ao fim', async ({ page }, info) => {
+  test('botões do resultado: 4 iguais em 2 por linha, na ordem pedida; lixeira no cartão do pedido limpa tudo', async ({ page }) => {
     await entrar(page);
     await gerarOrcamento(page);
     const r = await page.evaluate(() => {
       const b = [...document.querySelectorAll('.result-actions .btn')].filter((e) => e.getClientRects().length);
-      const cl = (id) => document.getElementById(id).className;
-      return { alturas: [...new Set(b.map((e) => Math.round(e.getBoundingClientRect().height)))], sec: ['savePrintBtn', 'adjustPricesBtn', 'addQuoteBtn'].map(cl), nomes: b.sort((x, y) => (+getComputedStyle(x).order) - (+getComputedStyle(y).order)).map((e) => e.id) };
+      const pos = (e) => e.getBoundingClientRect();
+      return { nomes: b.map((e) => e.id), alturas: [...new Set(b.map((e) => Math.round(pos(e).height)))], larguras: [...new Set(b.map((e) => Math.round(pos(e).width)))], classes: [...new Set(b.map((e) => e.className))], linhas: [pos(b[0]).top === pos(b[1]).top, pos(b[2]).top === pos(b[3]).top, pos(b[2]).top > pos(b[0]).bottom], limparNoCartao: !!document.querySelector('.batch-summary #newBtn'), limparNasAcoes: !!document.querySelector('.result-actions #newBtn') };
     });
+    expect(r.nomes).toEqual(['addQuoteBtn', 'adjustPricesBtn', 'saveQuoteBtn', 'savePrintBtn']);
     expect(r.alturas).toHaveLength(1);
-    expect(new Set(r.sec).size).toBe(1);
-    expect(r.nomes).toEqual(['saveQuoteBtn', 'savePrintBtn', 'adjustPricesBtn', 'addQuoteBtn', 'newBtn']);
-    if (!info.project.name.startsWith('celular')) { // computador: salvar na 1ª linha; editar + limpar na 2ª, com "Limpar pedido" encostado à direita
-      const linhas = await page.evaluate(() => { const t = (id) => document.getElementById(id).getBoundingClientRect(); const c = document.querySelector('.result-actions').getBoundingClientRect(); return { salvar: t('saveQuoteBtn').top === t('savePrintBtn').top, editar: t('adjustPricesBtn').top === t('addQuoteBtn').top && t('addQuoteBtn').top === t('newBtn').top, duas: t('adjustPricesBtn').top > t('saveQuoteBtn').bottom, direita: Math.abs(t('newBtn').right - c.right) < 2 }; });
-      expect(linhas).toEqual({ salvar: true, editar: true, duas: true, direita: true });
-    }
+    expect(r.larguras).toHaveLength(1);
+    expect(r.classes).toHaveLength(1);
+    expect(r.linhas).toEqual([true, true, true]);
+    expect(r.limparNoCartao).toBe(true);
+    expect(r.limparNasAcoes).toBe(false);
+    // a lixeira fica no canto superior direito do cartão e pede confirmação antes de limpar
+    const canto = await page.evaluate(() => { const c = document.querySelector('.batch-summary').getBoundingClientRect(), l = document.getElementById('newBtn').getBoundingClientRect(); return { dir: c.right - l.right, topo: l.top - c.top }; });
+    expect(canto.dir).toBeLessThan(24); expect(canto.topo).toBeLessThan(24);
+    await expect(page.getByRole('button', { name: 'Limpar pedido' })).toBeVisible();
+    page.once('dialog', (d) => d.accept());
+    await page.getByRole('button', { name: 'Limpar pedido' }).click();
+    await expect(page.locator('#result')).not.toHaveClass(/show/);
   });
 
   test('"Composição do preço" e "Preço para marketplace" são cartões iguais e seguem arredondados ao passar o mouse', async ({ page }, info) => {

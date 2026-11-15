@@ -104,13 +104,12 @@
 .batch-total span{font:var(--md-sys-typescale-title-medium);color:var(--md-sys-color-on-surface-variant)}
 .batch-total strong{font:var(--md-sys-typescale-headline-small);font-variant-numeric:tabular-nums}
 
-.result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-/* principal, depois os secundários iguais (contorno); o botão destrutivo fica separado, ao fim */
-/* duas linhas: salvar (orçamento, histórico) e depois editar o pedido (preços, item) com o destrutivo à direita */
-.result-actions #saveQuoteBtn{order:1}.result-actions #savePrintBtn{order:2}
-.result-actions::after{content:'';order:3;flex-basis:100%;height:0}
-.result-actions #adjustPricesBtn{order:4}.result-actions #addQuoteBtn{order:5}
-.result-actions #newBtn{order:6;margin-inline-start:auto}
+/* 4 botões iguais, 2 por linha: adicionar, ajustar, salvar orçamento, salvar no histórico */
+.result-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.result-actions .btn{width:100%;justify-content:center}
+.batch-summary{position:relative}
+.batch-clear{position:absolute;top:12px;right:12px;--fg:var(--md-sys-color-error)}
+.batch-summary h2{padding-right:48px}
 
 :is(.internal,.market) summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 24px;font:var(--md-sys-typescale-title-small);cursor:pointer;list-style:none;border-radius:var(--shape-surface)}
 :is(.internal,.market) summary:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 4%,transparent)}
@@ -196,11 +195,6 @@
   .discount-mode legend{grid-column:1/-1}
   .discount-choice span{width:100%;padding:0 6px;font-size:.8125rem;white-space:nowrap}
   .discount-choice span::before{display:none}
-  .result-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .result-actions .btn{width:100%;justify-content:center}
-  .result-actions #saveQuoteBtn,.result-actions #savePrintBtn,.result-actions #newBtn{grid-column:1/-1}
-  .result-actions::after{display:none}
-  .result-actions #newBtn{margin:0}
   .price-editor-row{grid-template-columns:1fr}
   .price-editor-footer{flex-direction:column;align-items:stretch}
   .saved-tools{grid-template-columns:1fr}
