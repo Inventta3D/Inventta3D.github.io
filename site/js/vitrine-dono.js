@@ -37,6 +37,7 @@
     const dados = { name: $('shopName').value.trim().slice(0, 60), slug: $('shopSlug').value.trim(), whatsapp: $('shopWhats').value.replace(/\D/g, '').slice(0, 15), intro: $('shopIntro').value.trim().slice(0, 300), enabled: $('shopEnabled').checked };
     if (!V.slugValido(dados.slug)) { $('shopMsg').textContent = 'Escolha um endereço com 3 a 40 letras minúsculas, números ou hífen.'; $('shopSlug').focus(); return; }
     if (dados.enabled && dados.whatsapp.length < 10) { $('shopMsg').textContent = 'Informe o WhatsApp com DDD para receber os pedidos.'; $('shopWhats').focus(); return; }
+    if (!confirm('Salvar as configurações da vitrine?')) return;
     const t = app().client().from('inventta3d_shop');
     const r = loja ? await t.update(dados).eq('owner_id', loja.owner_id).select().single() : await t.insert(dados).select().single();
     if (r.error) { $('shopMsg').textContent = /duplicate|unique|23505/i.test(r.error.message || r.error.code || '') ? 'Esse endereço já está em uso. Escolha outro.' : 'Não foi possível salvar. Tente novamente.'; return; }
@@ -62,6 +63,7 @@
       const f = foto.files[0], valor = preco.value.trim() === '' ? null : num(preco.value);
       if (valor != null && !(valor >= 0)) { msg.textContent = 'Informe o preço em reais.'; return; }
       if (f && (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > MAX_FOTO)) { msg.textContent = 'Use uma foto JPG, PNG ou WebP de até 5 MB.'; return; }
+      if (!confirm('Salvar as alterações desta peça na vitrine?')) return;
       msg.textContent = 'Salvando…'; salvarBtn.disabled = true;
       const c = app().client(), campos = { showcase: chk.checked, showcase_price: valor, showcase_text: texto.value.trim().slice(0, 300) };
       try {

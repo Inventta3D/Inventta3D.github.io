@@ -109,6 +109,9 @@ async function entrar(page) {
   const banco = bancoFalso();
   await page.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
   await page.addInitScript(([chave, valor]) => localStorage.setItem(chave, valor), [`sb-${ref}-auth-token`, JSON.stringify(sessao())]);
+  // confirmações (window.confirm): por padrão o teste responde "OK"; page.responder = false cancela. As mensagens ficam em page.confirmacoes.
+  page.confirmacoes = []; page.responder = true;
+  page.on('dialog', async (d) => { if (d.type() !== 'confirm') return; page.confirmacoes.push(d.message()); await (page.responder ? d.accept() : d.dismiss()); });
   await page.goto('/');
   await page.locator('#appShell').waitFor({ state: 'visible' });
   return banco;

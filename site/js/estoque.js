@@ -92,6 +92,7 @@
     const dados = { material: $('spoolMaterial').value.trim(), color: $('spoolColor').value.trim(), brand: $('spoolBrand').value.trim(), weight_g: num($('spoolWeight').value), remaining_g: num($('spoolRemaining').value), price: num($('spoolPrice').value || 0) };
     if (!dados.material) { $('spoolMsg').textContent = 'Informe o material.'; $('spoolMaterial').focus(); return; }
     if (!(dados.weight_g > 0) || !(dados.remaining_g >= 0) || dados.remaining_g > dados.weight_g || !(dados.price >= 0)) { $('spoolMsg').textContent = 'Confira os pesos: o restante não pode passar do peso do rolo.'; return; }
+    if (!confirm(editando ? 'Salvar as alterações deste rolo?' : 'Salvar este novo rolo?')) return;
     const c = app().client().from('inventta3d_spools');
     const r = editando ? await c.update(dados).eq('id', editando.id).select(COLS).single() : await c.insert(dados).select(COLS).single();
     if (r.error) { $('spoolMsg').textContent = 'Não foi possível salvar. Tente novamente.'; return; }

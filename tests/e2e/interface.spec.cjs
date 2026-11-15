@@ -702,7 +702,6 @@ test.describe('telas (módulos)', () => {
     const canto = await page.evaluate(() => { const c = document.querySelector('.batch-summary').getBoundingClientRect(), l = document.getElementById('newBtn').getBoundingClientRect(); return { dir: c.right - l.right, topo: l.top - c.top }; });
     expect(canto.dir).toBeLessThan(24); expect(canto.topo).toBeLessThan(24);
     await expect(page.getByRole('button', { name: 'Limpar pedido' })).toBeVisible();
-    page.once('dialog', (d) => d.accept());
     await page.getByRole('button', { name: 'Limpar pedido' }).click();
     await expect(page.locator('#result')).not.toHaveClass(/show/);
   });
@@ -789,7 +788,6 @@ test.describe('clientes', () => {
     await page.locator('#customerSearch').fill('zzz');
     await expect(page.locator('#customerStatus')).toContainText('Nenhum cliente encontrado');
     await page.locator('#customerSearch').fill('');
-    page.once('dialog', (d) => d.accept());
     await page.locator('#customerList').getByRole('button', { name: 'Excluir' }).click();
     await expect(page.getByText('Nenhum cliente salvo ainda').first()).toBeVisible();
     expect(banco.db.inventta3d_customers).toHaveLength(0);
@@ -831,7 +829,6 @@ test.describe('histórico de impressões', () => {
     await page.locator('#printList').getByRole('button', { name: 'Detalhes' }).click();
     await expect(page.locator('#printDetailDialog')).toContainText('Pedidos (1)');
     await expect(page.locator('#printDetailDialog').getByRole('button', { name: 'Baixar' })).toBeVisible();
-    page.once('dialog', (d) => d.accept());
     await page.locator('#printDetailDelete').click();
     await expect(page.locator('#printStatus')).toContainText('Nenhuma impressão salva');
     expect(banco.db.inventta3d_prints).toHaveLength(0);
@@ -889,5 +886,57 @@ test.describe('conta', () => {
     await page.locator('#accountSignOut').click();
     await expect(page.locator('#loginScreen')).toBeVisible();
     await expect(page.locator('#loginStatus')).toContainText('Você saiu da sua conta');
+    expect(page.confirmacoes[0]).toContain('Sair da conta');
+  });
+
+  test('sair da conta: cancelar na confirmação mantém a sessão e o pedido em andamento', async ({ page }) => {
+    await entrar(page);
+    await page.getByRole('textbox', { name: 'Nome da peça' }).fill('Peça em andamento');
+    page.responder = false;
+    await page.locator('summary[aria-label*="menu da conta"]').click();
+    await page.locator('#accountSignOut').click();
+    await expect.poll(() => page.confirmacoes.length).toBe(1);
+    await expect(page.locator('#appShell')).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Nome da peça' })).toHaveValue('Peça em andamento');
+  });
+});
+
+test.describe('confirmação antes de salvar e excluir', () => {
+  test('salvar orçamento: cancelar não grava; confirmar grava', async ({ page }) => {
+    const banco = await entrar(page);
+    await gerarOrcamento(page);
+    page.responder = false;
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => page.confirmacoes.length).toBe(1);
+    expect(page.confirmacoes[0]).toContain('Salvar este orçamento');
+    expect(banco.db.inventta3d_quotes).toHaveLength(0);
+    page.responder = true;
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(1);
+  });
+
+  test('salvar cliente a partir do orçamento: cancelar não grava', async ({ page }) => {
+    const banco = await entrar(page);
+    await page.locator('#clientName').fill('Ana Lima');
+    page.responder = false;
+    await page.locator('#saveCustomerBtn').click();
+    await expect.poll(() => page.confirmacoes.length).toBe(1);
+    expect(page.confirmacoes[0]).toContain('Salvar este cliente');
+    expect(banco.db.inventta3d_customers).toHaveLength(0);
+  });
+
+  test('excluir cliente e rolo: cancelar mantém o registro', async ({ page }) => {
+    const banco = await entrar(page);
+    await page.evaluate(() => { location.hash = '#/clientes'; });
+    await page.locator('#newCustomerBtn').click();
+    await page.locator('#customerName').fill('Maria Souza');
+    await page.locator('#customerSave').click();
+    await expect.poll(() => banco.db.inventta3d_customers.length).toBe(1);
+    expect(page.confirmacoes[0]).toContain('Salvar este novo cliente');
+    page.responder = false;
+    await page.locator('#customerList').getByRole('button', { name: 'Excluir' }).click();
+    await expect.poll(() => page.confirmacoes.length).toBe(2);
+    expect(page.confirmacoes[1]).toContain('Excluir');
+    expect(banco.db.inventta3d_customers).toHaveLength(1);
   });
 });

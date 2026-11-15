@@ -84,3 +84,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Desktop: botões do resultado em duas linhas (salvar / editar + Limpar à direita); Composição e Marketplace como cartões iguais, arredondados também no hover (summary não herda raio do details). Testes novos. CACHE v82.
 
 - Resultado: Limpar pedido virou lixeira no canto do cartão "Itens do pedido"; 4 botões iguais (contorno), 2 por linha: Adicionar item, Ajustar preços, Salvar orçamento, Salvar no histórico. Teste novo de balões de ajuda (mouse e toque). CACHE v83.
+
+- Confirmação (window.confirm) antes de: salvar orçamento, salvar cliente (2 lugares), salvar rolo, salvar impressora, salvar no histórico, salvar vitrine e peça da vitrine, excluir orçamento salvo (mantém o desfazer) e sair da conta (o clearDraft solto no clique foi removido). Já existiam nos demais excluir. Testes: apoio.entrar responde OK por padrão; page.responder=false cancela. CACHE v84.

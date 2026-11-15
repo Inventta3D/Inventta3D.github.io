@@ -143,6 +143,7 @@
     const name = $('printerName').value.trim(), model = $('printerModelSel').value, hours = num($('printerHours').value || 0);
     if (!name) { $('printerMsg').textContent = 'Dê um nome à impressora (ex.: A1 da bancada).'; $('printerName').focus(); return; }
     if (!(hours >= 0)) { $('printerMsg').textContent = 'Informe as horas como número.'; return; }
+    if (!confirm(editando ? 'Salvar as alterações desta impressora?' : 'Salvar esta nova impressora?')) return;
     const c = app().client().from('inventta3d_printers');
     const dados = editando ? { name, model, ...(Number(editando.hours) !== hours ? { hours, hours_at: new Date().toISOString() } : {}) } : { name, model, hours, hours_at: new Date().toISOString(), tasks: N.novasTarefas(hours), log: [] };
     const r = editando ? await c.update(dados).eq('id', editando.id).select(COLS).single() : await c.insert(dados).select(COLS).single();

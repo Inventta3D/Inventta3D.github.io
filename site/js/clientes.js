@@ -90,6 +90,7 @@
     if(!name){msg.textContent='Informe o nome do cliente.';$('customerName').focus();return}
     if(email.value&&!email.validity.valid){msg.textContent='Informe um e-mail válido, por exemplo nome@exemplo.com.';email.focus();return}
     if(!ready()){msg.textContent='Entre na sua conta para salvar clientes.';return}
+    if(!window.confirm(editingId?'Salvar as alterações deste cliente?':'Salvar este novo cliente?'))return;
     const btn=$('customerSave');btn.disabled=true;
     try{await upsert({name,email:email.value.trim(),phone:$('customerPhone').value,notes:$('customerNotes').value.trim()},editingId);closeDialog();app().status('Cliente salvo.')}
     catch{msg.textContent='Não foi possível salvar. Confira sua conexão e tente novamente.'}
@@ -107,6 +108,7 @@
     if(!ready()){app().status('Entre na sua conta para salvar clientes.',true);return}
     if(!name){app().status('Informe o nome do cliente para salvar.',true);$('clientName').focus();return}
     if(email&&!$('clientEmail').validity.valid){app().status('Informe um e-mail válido para salvar o cliente.',true);$('clientEmail').focus();return}
+    if(!window.confirm('Salvar este cliente?'))return;
     const btn=$('saveCustomerBtn');btn.disabled=true;
     try{
       await load();

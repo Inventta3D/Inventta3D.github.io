@@ -96,6 +96,7 @@
     for(const c of boxes){const f=$('printFile'+c.dataset.i).files[0];if(!f)continue;
       if(!EXT.test(f.name)){msg.textContent=`“${f.name}” não é um arquivo STL ou 3MF.`;return}
       if(f.size>MAX_FILE){msg.textContent=`“${f.name}” passa de 50 MB.`;return}}
+    if(!window.confirm('Salvar no histórico de impressões?'))return;
     const btn=$('printSaveBtn');btn.disabled=true;msg.textContent='Salvando…';
     const c=app().client(),uid=app().user().id,quoteId=app().quoteId()||null;let saved=0,dup=0,fileFail=0,estoqueMsg='';
     try{
