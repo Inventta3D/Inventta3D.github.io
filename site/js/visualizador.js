@@ -199,6 +199,7 @@
     ajuste.observe(caixa);
 
     return {
+      imagem,
       cor: (c) => { marcar(c); material.color.set(corDe(c)); },
       fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
     };

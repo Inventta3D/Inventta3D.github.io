@@ -72,3 +72,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - 3MF fatiado também mostra a peça em 3D (além de peso, tempo e material). Teste e2e novo. CACHE v75.
 
 - Visualizador 3D com ícones sobre a peça: tela cheia (topo), cores (base esquerda, abre painel) e compartilhar (base direita, abre imagem/GIF). Altura 300 px. CACHE v76.
+
+- WhatsApp do orçamento envia também o PNG da peça em 3D (peca-3d.png) quando há 3D na tela; sem 3D, só o orçamento. CACHE v78.

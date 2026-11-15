@@ -389,6 +389,24 @@ test.describe('importar STL para ver em 3D', () => {
     await expect(page.getByRole('button', { name: 'Compartilhar GIF' })).toBeEnabled();
   });
 
+  test('WhatsApp do orçamento leva junto o PNG da peça em 3D', async ({ page }) => {
+    await page.addInitScript(() => { window.__envio = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__envio = d.files.map((f) => f.name); }; });
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await gerarOrcamento(page);
+    await page.locator('#shareMain').click();
+    await expect.poll(() => page.evaluate(() => window.__envio), { timeout: 30000 }).toEqual(['orcamento-inventta-3d.png', 'peca-3d.png']);
+  });
+
+  test('WhatsApp do orçamento sem peça em 3D leva só o orçamento', async ({ page }) => {
+    await page.addInitScript(() => { window.__envio = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__envio = d.files.map((f) => f.name); }; });
+    await entrar(page);
+    await gerarOrcamento(page);
+    await page.locator('#shareMain').click();
+    await expect.poll(() => page.evaluate(() => window.__envio), { timeout: 30000 }).toEqual(['orcamento-inventta-3d.png']);
+  });
+
   test('etapa 3 tem o campo Impressora, com a A1 como padrão', async ({ page }) => {
     await entrar(page);
     await expect(page.locator('#printerModel')).toHaveValue('Bambu Lab A1');

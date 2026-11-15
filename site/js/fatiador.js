@@ -243,6 +243,7 @@
   const BORDA = 512 * 1024, aviso = (m) => Object.assign(new Error(m), { aviso: true });
   const g1 = (g) => String(Math.round(g * 10) / 10).replace('.', ',');
   let vis = null;
+  window.InventtaPecaImagem = () => (vis ? vis.imagem() : null); // PNG da peça em 3D, para o envio do orçamento (app.js)
   async function mostrarPeca(placas) { // junta as placas e mostra em 3D, se o visualizador estiver no app
     const caixa = $('slicerView');
     vis?.fechar(); vis = null; caixa.hidden = true;
