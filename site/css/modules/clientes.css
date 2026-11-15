@@ -5,9 +5,6 @@
 .customer-fields{display:grid;gap:16px}
 .customer-fields textarea.control{min-height:96px;padding:14px 20px;border-radius:var(--shape-nested);resize:vertical;font:inherit}
 .customer-fields .message{margin:0}
-#saveCustomerBtn{margin-inline:auto}
-@media (max-width:719px){
-  #saveCustomerBtn{margin-inline:0}
-  .actions:has(#saveCustomerBtn){grid-template-columns:1fr}
-  .actions:has(#saveCustomerBtn) .btn-back{display:none}
-}
+/* etapa 1: o "Voltar" desabilitado não ocupa espaço; Salvar cliente alinha à esquerda dos campos, Continuar à direita */
+.actions:has(#saveCustomerBtn) .btn-back{display:none}
+@media (max-width:719px){.actions:has(#saveCustomerBtn){grid-template-columns:1fr}}

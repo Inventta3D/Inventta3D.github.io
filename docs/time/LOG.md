@@ -47,3 +47,17 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Verificado no banco real (bloco com rollback, papel anon): link de aprovação devolve só campos públicos, token errado = nulo, anon não lê tabelas, ajuste/aprovação/repetição/decisão inválida corretos; vitrine ativa lista itens sem custo, desativada = nulo. Nada ficou gravado.
 - Advisors: 3 avisos esperados (funções públicas por desenho, D17), índices novos ainda sem uso, proteção de senha vazada desligada (pré-existente).
 - Site ainda NÃO publicado.
+
+- 2026-11-15: site publicado (commit d6a873d, CACHE v66); arquivos novos servindo 200, módulos carregam sem erro no console.
+
+## 2026-11-15 — ajustes pós-publicação (ainda não publicados, CACHE v67)
+- Etapa 1: botões "Salvar cliente" (esquerda) e "Continuar" (direita) alinhados às bordas dos campos no computador (clientes.css; o "Voltar" desabilitado não ocupa espaço).
+- Etapas: com o preço na tela, clicar nos números do topo reabria só o número, não a tela. Agora reabre o formulário na etapa clicada (edita o último item, sem duplicar). Teste novo tests/e2e/etapas.spec.cjs; confirmado por mutação que falha sem a correção.
+
+## 2026-11-15 — fatiamento removido; cores no 3D (local, CACHE v69, não publicado)
+- Removidos da tela: estimativa rápida, fatiamento preciso (Kiri), Preenchimento, Suporte e "Calcular com precisão". Motivo: lento em aparelhos fracos e a rápida erra o tempo em 33–49% em peças orgânicas (medido em 4 arquivos do usuário).
+- Mantido: ler peso/tempo de G-code e 3MF já fatiado; STL e 3MF agora só mostram a peça em 3D.
+- Novo: paleta de 15 cores sobre o 3D (etapa 1 e histórico); na etapa 1, trocar a cor preenche "Cor do filamento".
+- Funções puras do fatiador (estimarRapido, processoKiri, tempoGcode) e site/lib/kiri ficaram no repositório, sem uso, para voltar depois.
+- Novo (CACHE v70, não publicado): botão "Compartilhar imagem" no 3D (etapa 1 e histórico). PNG 1200×900 com fundo claro na cor escolhida; no celular abre o compartilhamento do sistema (WhatsApp), no computador baixa o arquivo. Vídeo giratório e link interativo ficam para depois.
+- Novo (CACHE v71, não publicado): botão "Compartilhar GIF" — peça girando uma volta (48 quadros 400×300, ~3 s, ~240 KB), gerada no navegador sem biblioteca (paleta única + LZW). Conferido decodificando os 48 quadros com ImageDecoder (erro médio 0,16/pixel). Mesmo caminho do PNG: celular compartilha, computador baixa.

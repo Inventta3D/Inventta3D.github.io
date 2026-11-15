@@ -100,7 +100,7 @@
     const row=document.createElement('span');row.className='field-label-row';
     label.parentNode.insertBefore(row,label);row.append(label);
     const trigger=document.createElement('button');
-    trigger.type='button';trigger.className='field-help-trigger';
+    trigger.type='button';trigger.className='field-help-trigger';trigger.tabIndex=-1;
     const mark=document.createElement('span');mark.setAttribute('aria-hidden','true');mark.textContent='?';trigger.append(mark);
     trigger.dataset.for=id;trigger.setAttribute('aria-label',`Explicação do campo: ${label.textContent.trim()}`);
     trigger.setAttribute('aria-expanded','false');

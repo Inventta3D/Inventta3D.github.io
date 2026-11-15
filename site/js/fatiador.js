@@ -238,13 +238,11 @@
 (() => {
   if (typeof document === 'undefined') return;
   const F = window.InventtaFatiador, $ = (id) => document.getElementById(id);
-  const entrada = $('slicerFile'), status = $('slicerStatus'), opcoes = $('slicerOptions');
+  const entrada = $('slicerFile'), status = $('slicerStatus');
   if (!entrada) return;
   const BORDA = 512 * 1024, aviso = (m) => Object.assign(new Error(m), { aviso: true });
-  const guardado = (k, padrao) => { try { return JSON.parse(localStorage.getItem(k)) ?? padrao; } catch { return padrao; } };
-  const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sem armazenamento: segue sem lembrar */ } };
   const g1 = (g) => String(Math.round(g * 10) / 10).replace('.', ',');
-  let atual = null, rodada = 0, motor = null, vis = null;
+  let vis = null;
   async function mostrarPeca(placas) { // junta as placas e mostra em 3D, se o visualizador estiver no app
     const caixa = $('slicerView');
     vis?.fechar(); vis = null; caixa.hidden = true;
@@ -252,7 +250,8 @@
     const tri = new Float32Array(placas.reduce((t, p) => t + p.tri.length, 0));
     let o = 0; for (const p of placas) { tri.set(p.tri, o); o += p.tri.length; }
     caixa.hidden = false;
-    try { vis = await window.InventtaVisualizador.mostrar(caixa, tri, { cor: $('filamentColor').value, nome: $('product').value || 'peça' }); } catch { caixa.hidden = true; }
+    // trocar a cor no 3D preenche "Cor do filamento", para o orçamento mostrar a mesma cor
+    try { vis = await window.InventtaVisualizador.mostrar(caixa, tri, { cor: $('filamentColor').value, nome: $('product').value || 'peça', aoTrocarCor: (nome) => preencher('filamentColor', nome) }); } catch { caixa.hidden = true; }
   }
 
   const preencher = (id, valor, evento = 'input') => { const el = $(id); el.value = valor; el.dispatchEvent(new Event(evento, { bubbles: true })); el.dispatchEvent(new Event('blur')); };
@@ -263,17 +262,7 @@
     return ops.find((o) => o.toLowerCase() === t) || ops.find((o) => o.toLowerCase().startsWith(t + ' ')) || '';
   }
   const nomeArquivo = (n) => n.replace(/(\.gcode)?\.(3mf|gcode|gco|stl)$/i, '').replace(/[_-]+/g, ' ').trim().slice(0, 70);
-  const maquina = () => { const nome = $('printerModel')?.value; return { nome, ...(F.IMPRESSORAS[nome] || F.IMPRESSORAS['Bambu Lab A1']) }; };
-  const config = () => ({ camada: 0.2, paredes: 2, preenchimento: Number($('slicerInfill').value) / 100 || 0.15, suporte: $('slicerSupport').checked });
-  const ritmo = (maq) => guardado('inventta3d-ritmo', {})[maq.nome] || maq.gph;
   const placaTxt = (placas, objetos) => (placas > 1 ? ` Soma de ${placas} placas; ajuste para uma peça se precisar.` : objetos > 1 ? ` Placa com ${objetos} objetos; ajuste para uma peça se precisar.` : '');
-
-  // Escreve peso e tempo; não sobrescreve o que a pessoa mudou à mão depois da última escrita do app.
-  function escrever(gramas, segundos) {
-    const g = g1(gramas), hm = F.paraHHMM(segundos);
-    for (const [id, v] of [['amount', g], ['printHours', hm]]) if (!atual.escrito[id] || $(id).value === atual.escrito[id]) { preencher(id, v); atual.escrito[id] = $(id).value; }
-    return `${g} g · ${hm}`;
-  }
 
   async function lerFatiado(arq) {
     if (/\.3mf$/i.test(arq.name)) return F.ler3mf(new Uint8Array(await arq.arrayBuffer()));
@@ -283,69 +272,16 @@
     return F.lerGcode(txt);
   }
 
-  async function fatiarKiri(placas, maq, cfg, progresso) {
-    const { Engine } = await (motor ??= import(new URL('lib/kiri/run/engine.js', document.baseURI).href));
-    let mm = 0, seg = 0;
-    for (let i = 0; i < placas.length; i++) {
-      const eng = new Engine({ workURL: new URL('lib/kiri/run/worker.js', document.baseURI).href })
-        .setListener((m) => { const u = m?.slice?.update; if (typeof u === 'number') progresso((i + u * 0.9) / placas.length); });
-      await eng.parse(F.paraSTL(placas[i].tri));
-      eng.setDevice({ gcodePre: [], gcodePost: [], gcodeLayer: [], gcodeTrack: [], bedWidth: maq.mesa, bedDepth: maq.mesa, maxHeight: 300 });
-      eng.setProcess(F.processoKiri(maq, cfg));
-      await eng.slice(); await eng.prepare();
-      const g = await eng.export();
-      mm += F.filamentoKiri(g); seg += F.tempoGcode(g, maq);
-    }
-    return { mm, seg };
-  }
-
-  async function calcularPreciso() {
-    const minha = ++rodada, maq = maquina(), cfg = config(), { placas, rapido } = atual;
-    const base = `Estimativa rápida: ${rapido}.`;
-    const mostrar = (p) => { if (minha === rodada) status.textContent = `${base} Fatiando com precisão… ${Math.round(p * 100)}%. Mantenha esta tela aberta.`; };
-    mostrar(0);
-    try {
-      const { mm, seg } = await fatiarKiri(placas, maq, cfg, mostrar);
-      if (minha !== rodada) return;
-      const gramas = F.gramasDeMm(mm, F.densidade($('filamentType').value));
-      if (!gramas) throw new Error('vazio');
-      const txt = escrever(gramas, seg);
-      const r = guardado('inventta3d-ritmo', {}), novo = gramas / (seg / 3600);
-      r[maq.nome] = r[maq.nome] ? r[maq.nome] * 0.7 + novo * 0.3 : novo; // o modo rápido aprende o ritmo desta impressora
-      guardar('inventta3d-ritmo', r);
-      status.textContent = `Fatiado automaticamente: ${txt} (${maq.nome}, ${Math.round(cfg.preenchimento * 100)}%${cfg.suporte ? ', com suporte' : ''}).${placaTxt(placas.length, atual.objetos)}`;
-    } catch (e) {
-      if (minha !== rodada || /cancel/i.test(String(e))) return;
-      status.textContent = `${base} Não consegui fatiar com precisão; confira os valores.`;
-    }
-  }
-
-  function estimar() {
-    const maq = maquina(), cfg = config(), dens = F.densidade($('filamentType').value);
-    let gramas = 0, segundos = 0;
-    for (const p of atual.placas) { const r = F.estimarRapido(F.medidas(p.tri), { ...cfg, dens, gph: ritmo(maq) }); gramas += r.gramas; segundos += r.segundos; }
-    atual.rapido = escrever(gramas, segundos);
-    const triangulos = atual.placas.reduce((t, p) => t + p.tri.length / 9, 0);
-    const pesada = triangulos > 150000 && matchMedia('(pointer: coarse)').matches; // celular com peça grande: só sob pedido
-    opcoes.hidden = false;
-    $('slicerPrecise').hidden = !pesada;
-    if (pesada) { rodada++; status.textContent = `Estimativa rápida: ${atual.rapido}. Peça grande: o cálculo preciso pode levar alguns minutos.`; }
-    else calcularPreciso();
-  }
-
   async function importar(arq) {
     if (!arq) return;
-    rodada++;
     status.classList.remove('erro');
     status.textContent = 'Lendo o arquivo…';
-    opcoes.hidden = true;
     mostrarPeca(null);
     try {
       const malha = /\.stl$/i.test(arq.name);
       let r = malha ? null : await lerFatiado(arq);
       if (!$('product').value.trim()) preencher('product', nomeArquivo(arq.name));
       if (r && (r.gramas || r.segundos)) { // arquivo já fatiado: números do fatiador
-        atual = null;
         const feito = [];
         if (r.gramas) { const g = g1(r.gramas); preencher('amount', g); feito.push(`${g} g${r.aproximado ? ' (aprox.)' : ''}`); }
         if (r.segundos) { const hm = F.paraHHMM(r.segundos); preencher('printHours', hm); feito.push(hm); }
@@ -358,8 +294,7 @@
       const bytes = new Uint8Array(await arq.arrayBuffer());
       const placas = malha ? [{ objetos: 1, tri: F.lerSTL(bytes) }] : await F.lerMalha3mf(bytes);
       if (!placas.length || !placas.some((p) => p.tri.length)) throw aviso('Não encontrei a peça neste arquivo.');
-      atual = { placas, objetos: placas.reduce((t, p) => t + p.objetos, 0), escrito: {} };
-      estimar();
+      status.textContent = 'Peça em 3D. Gire, aproxime e escolha a cor. Informe peso e tempo nas próximas etapas.';
       mostrarPeca(placas);
     } catch (e) {
       status.classList.add('erro');
@@ -367,15 +302,7 @@
     } finally { entrada.value = ''; }
   }
 
-  // preenchimento e suporte: lembrados neste aparelho; mudar recalcula
-  const pref = guardado('inventta3d-fatiamento', { preenchimento: 15, suporte: true });
-  $('slicerInfill').value = pref.preenchimento; $('slicerSupport').checked = pref.suporte;
-  const mudou = () => { guardar('inventta3d-fatiamento', { preenchimento: Number($('slicerInfill').value) || 15, suporte: $('slicerSupport').checked }); if (atual) estimar(); };
-  $('slicerInfill').addEventListener('change', mudou);
-  $('slicerSupport').addEventListener('change', mudou);
   $('filamentColor').addEventListener('input', () => vis?.cor($('filamentColor').value));
-  $('slicerPrecise').addEventListener('click', () => { $('slicerPrecise').hidden = true; calcularPreciso(); });
-
   entrada.addEventListener('change', () => importar(entrada.files[0]));
   const alvo = entrada.closest('.panel');
   alvo.addEventListener('dragover', (e) => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); alvo.classList.add('soltar'); } });

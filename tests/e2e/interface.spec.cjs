@@ -315,42 +315,63 @@ test.describe('importar do fatiador', () => {
   });
 });
 
-test.describe('importar STL e fatiar automaticamente', () => {
-  const gramas = async (page) => Number((await page.locator('#amount').inputValue()).replace(',', '.'));
-
-  test('STL: estimativa rápida na hora, depois o Kiri fatia e troca pelos valores precisos', async ({ page }, info) => {
-    test.skip(!info.project.name.startsWith('computador'), 'fatiamento completo só no computador (mais lento no emulador de celular)');
-    test.setTimeout(180000);
+test.describe('importar STL para ver em 3D', () => {
+  test('STL: mostra a peça em 3D, sem estimar peso nem tempo; trocar a cor preenche a cor do filamento', async ({ page }) => {
     await entrar(page);
     await page.locator('#slicerFile').setInputFiles(cuboSTL());
-    await expect(page.locator('#slicerStatus')).toContainText('Estimativa rápida');
+    await expect(page.locator('#slicerStatus')).toContainText('Peça em 3D');
     await expect(page.locator('#product')).toHaveValue('cubo teste');
-    const rapido = await gramas(page);
-    expect(rapido).toBeGreaterThan(2);
-    await expect(page.locator('#slicerOptions')).toBeVisible();
     await expect(page.locator('#slicerView canvas')).toBeVisible();
     await expect(page.locator('#slicerView canvas')).toHaveAttribute('aria-label', /cubo teste/);
-    await expect(page.locator('#slicerStatus')).toContainText('Fatiado automaticamente', { timeout: 150000 });
-    const preciso = await gramas(page);
-    expect(preciso).toBeGreaterThan(2);
-    expect(preciso).toBeLessThan(8); // cubo de 20 mm, 15%: alguns gramas
-    await expect(page.locator('#printHours')).toHaveValue(/^\d{2}:\d{2}$/);
+    await expect(page.locator('#amount')).toHaveValue('');
+    await expect(page.locator('#printHours')).toHaveValue('');
+    await page.locator('#slicerView').getByRole('button', { name: 'Azul' }).click();
+    await expect(page.locator('#filamentColor')).toHaveValue('Azul');
+    await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('.panel[data-panel="0"] .btn-next').click();
+    await page.locator('#filamentColor').fill('Vermelho fosco');
+    await page.locator('.panel[data-panel="1"] .btn-back').click();
+    await expect(page.locator('#slicerView').getByRole('button', { name: 'Vermelho' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  test('STL: preenchimento muda a estimativa; valor digitado à mão não é sobrescrito', async ({ page }) => {
+  test('STL: compartilhar imagem da peça (celular abre o compartilhamento, computador baixa o PNG)', async ({ page }, info) => {
+    const celular = info.project.name.startsWith('celular');
+    await page.addInitScript(() => { window.__enviado = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__enviado = d.files.map((f) => `${f.name}:${f.type}:${f.size}`); }; });
     await entrar(page);
-    await page.locator('#slicerFile').setInputFiles(cuboSTL(40));
-    await expect(page.locator('#slicerStatus')).toContainText('Estimativa rápida');
-    const g15 = await gramas(page);
-    await page.locator('#slicerInfill').fill('60');
-    await page.locator('#slicerInfill').dispatchEvent('change');
-    await expect.poll(() => gramas(page)).toBeGreaterThan(g15);
-    await page.locator('.panel[data-panel="0"] .btn-next').click();
-    await page.locator('#amount').fill('99');
-    await page.locator('#amount').blur();
-    await page.locator('.panel[data-panel="1"] .btn-back').click();
-    await page.locator('#slicerSupport').uncheck();
-    await expect(page.locator('#amount')).toHaveValue('99');
+    await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    if (celular) {
+      await page.getByRole('button', { name: 'Compartilhar imagem' }).click();
+      await expect.poll(() => page.evaluate(() => window.__enviado?.[0])).toMatch(/^cubo-teste\.png:image\/png:\d{4,}/);
+    } else {
+      const [baixou] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Compartilhar imagem' }).click()]);
+      expect(baixou.suggestedFilename()).toBe('cubo-teste.png');
+    }
+  });
+
+  test('STL: compartilhar GIF girando; o arquivo tem 48 quadros de 400×300', async ({ page }, info) => {
+    const celular = info.project.name.startsWith('celular');
+    await page.addInitScript(() => { window.__gif = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__gif = new Uint8Array(await d.files[0].arrayBuffer()); }; });
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    let bytes;
+    if (celular) {
+      await page.getByRole('button', { name: 'Compartilhar GIF' }).click();
+      await expect.poll(() => page.evaluate(() => !!window.__gif), { timeout: 30000 }).toBe(true);
+      bytes = Buffer.from(await page.evaluate(() => [...window.__gif]));
+    } else {
+      const [baixou] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), page.getByRole('button', { name: 'Compartilhar GIF' }).click()]);
+      expect(baixou.suggestedFilename()).toBe('cubo-teste.gif');
+      bytes = require('fs').readFileSync(await baixou.path());
+    }
+    expect(bytes.subarray(0, 6).toString()).toBe('GIF89a');
+    expect(bytes.readUInt16LE(6)).toBe(400);
+    expect(bytes.readUInt16LE(8)).toBe(300);
+    expect(bytes.toString('latin1').split('!ù').length - 1).toBe(48); // um bloco de controle por quadro
+    expect(bytes.at(-1)).toBe(0x3b);
+    await expect(page.getByRole('button', { name: 'Compartilhar GIF' })).toBeEnabled();
   });
 
   test('etapa 3 tem o campo Impressora, com a A1 como padrão', async ({ page }) => {
