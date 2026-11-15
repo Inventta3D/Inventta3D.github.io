@@ -138,12 +138,13 @@ test('acessibilidade: botões que abrem menu apontam para o menu e iniciam fecha
   }
 });
 
-test('cliente: o que é compartilhado (texto, imagem e PDF) não mostra lucro', () => {
+test('cliente: texto, imagem e PDF compartilhados nunca trazem custos nem lucro', () => {
   const src = read('site/js/app.js');
-  const inicio = src.indexOf('function sharedCosts');
-  assert.ok(inicio > 0);
-  const corpo = src.slice(inicio, src.indexOf('function crc16Pix', inicio));
-  assert.doesNotMatch(corpo, /lucro/i, 'sharedCosts alimenta texto, imagem e PDF: lucro é só da visão interna');
+  for (const proibido of ['sharedCosts', "'detailed'", 'DETALHAMENTO', 'COMPOSIÇÃO DO VALOR']) {
+    assert.ok(!src.includes(proibido), `app.js não pode ter "${proibido}": custos e lucro ficam só na visão interna`);
+  }
+  assert.ok(!html.includes('name="shareMode"'), 'não há mais escolha de detalhamento para o envio');
+  assert.ok(html.includes('id="profitValue"'), 'a visão interna (Composição do preço) continua com o lucro');
 });
 
 test('CSS: sem cores soltas fora dos tokens (módulos, componentes e shell)', () => {

@@ -66,3 +66,23 @@
   document.addEventListener('pointerdown', (e) => { if (!split.contains(e.target)) fechar(false); });
   pintar();
 })();
+
+/* Copiar detalhamento: leva para a área de transferência a composição que aparece na tela ("Composição do preço").
+   É de uso interno; nada disso entra no orçamento enviado ao cliente. */
+(() => {
+  const botao = document.getElementById('copyDetailBtn');
+  if (!botao) return;
+  const rotulo = botao.querySelector('.lbl'), aviso = document.getElementById('copyDetailStatus');
+  const original = rotulo.textContent;
+  botao.addEventListener('click', async () => {
+    const linhas = ['DETALHAMENTO DO ORÇAMENTO · USO INTERNO (não enviar ao cliente)', ''];
+    document.querySelectorAll('details.internal .cost-row').forEach((l) => linhas.push(`${l.querySelector('span').textContent}: ${l.querySelector('strong').textContent}`));
+    const total = document.getElementById('batchTotal');
+    if (total) linhas.push('', `Total do pedido: ${total.textContent}`);
+    let msg;
+    try { await navigator.clipboard.writeText(linhas.join('\n')); msg = 'Detalhamento copiado'; } catch { msg = 'Não foi possível copiar'; }
+    rotulo.textContent = msg;
+    aviso.textContent = msg;
+    setTimeout(() => { rotulo.textContent = original; aviso.textContent = ''; }, 3000);
+  });
+})();

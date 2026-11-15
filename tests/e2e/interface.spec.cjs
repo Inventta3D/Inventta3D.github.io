@@ -93,6 +93,7 @@ test.describe('orçamento', () => {
     achados.push(...(await auditar(page, '.panel[data-panel="4"]')));
     await proximo(4);
     await page.locator('#result.show').waitFor();
+    await page.locator('details.internal > summary').click();
     achados.push(...(await auditar(page, '#result')));
     await page.locator('#savePrintBtn').click();
     achados.push(...(await auditar(page, '#printSaveDialog')));
@@ -164,22 +165,45 @@ test.describe('enviar por e-mail', () => {
   });
 });
 
-test.describe('detalhamento para o cliente', () => {
-  test('orçamento detalhado mostra custos e taxas, mas nunca o lucro', async ({ page }) => {
+test.describe('o que vai para o cliente', () => {
+  test('o texto enviado mostra itens, desconto e total, nunca custos nem lucro', async ({ page }) => {
     await page.addInitScript(() => {
       window.__copiado = '';
       Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__copiado = t; } }, configurable: true });
     });
     await entrar(page);
     await gerarOrcamento(page);
-    await page.locator('input[name="shareMode"][value="detailed"]').check({ force: true });
+    await expect(page.locator('input[name="shareMode"]')).toHaveCount(0);
     await escolherEnvio(page, 'Copiar texto');
-    await expect.poll(() => page.evaluate(() => window.__copiado)).toContain('DETALHAMENTO DO ORÇAMENTO');
+    await expect.poll(() => page.evaluate(() => window.__copiado)).toContain('TOTAL DO PEDIDO');
     const texto = await page.evaluate(() => window.__copiado);
-    expect(texto).toContain('Custo estimado');
-    expect(texto).toContain('Taxas e tributos');
-    expect(texto.toLowerCase()).not.toContain('lucro');
-    await expect(page.locator('.share-panel')).toContainText('O lucro nunca vai para o cliente.');
+    expect(texto).toContain('Suporte de teste');
+    for (const proibido of ['DETALHAMENTO', 'Custo estimado', 'Material e desperdício', 'Taxas e tributos', 'lucro']) {
+      expect(texto.toLowerCase()).not.toContain(proibido.toLowerCase());
+    }
+  });
+
+  test('copiar detalhamento leva a composição interna para a área de transferência', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__copiado = '';
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__copiado = t; } }, configurable: true });
+    });
+    await entrar(page);
+    await gerarOrcamento(page);
+    await page.locator('details.internal > summary').click();
+    await page.getByRole('button', { name: 'Copiar detalhamento' }).click();
+    await expect(page.locator('#copyDetailBtn')).toContainText('Detalhamento copiado');
+    const texto = await page.evaluate(() => window.__copiado);
+    for (const esperado of ['USO INTERNO', 'Material e desperdício', 'Custo estimado', 'Taxas e tributos', 'Lucro estimado após taxas', 'Total do pedido']) expect(texto).toContain(esperado);
+    await expect(page.locator('#copyDetailBtn')).toContainText('Copiar detalhamento', { timeout: 6000 });
+  });
+
+  test('a visão interna continua com composição e lucro, só na tela', async ({ page }) => {
+    await entrar(page);
+    await gerarOrcamento(page);
+    await page.locator('details.internal > summary').click();
+    await expect(page.locator('details.internal')).toContainText('Lucro estimado após taxas');
+    await expect(page.locator('details.internal')).toContainText('privados e não aparecem no orçamento compartilhado');
   });
 });
 
