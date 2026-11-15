@@ -78,3 +78,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Auditoria de UI: rótulos do passo a passo e do menu inferior cabiam mal em 320 px (corrigido); 3D enquadra a peça inteira (câmera por esfera); viewport das etapas com overflow:clip e rolagem zerada (falha só no CI); testes em 10 telas incl. 1366, 1920 e A56 (411). CACHE v79.
 
 - Cliente salvo (seletor) alinhado com o campo Telefone: rótulo com a mesma altura dos campos com balão. Teste de alinhamento. CACHE v80.
+
+- Botões do resultado padronizados (principal + 3 secundários com contorno + Limpar pedido à direita); rótulos das etapas cabem em 360–399 px. Testes novos. CACHE v81.

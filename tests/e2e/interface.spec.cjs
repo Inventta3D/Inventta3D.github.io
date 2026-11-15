@@ -683,6 +683,19 @@ test.describe('vitrine pública', () => {
 });
 
 test.describe('telas (módulos)', () => {
+  test('botões do resultado: mesma altura, os secundários com o mesmo estilo e o destrutivo ao fim', async ({ page }) => {
+    await entrar(page);
+    await gerarOrcamento(page);
+    const r = await page.evaluate(() => {
+      const b = [...document.querySelectorAll('.result-actions .btn')].filter((e) => e.getClientRects().length);
+      const cl = (id) => document.getElementById(id).className;
+      return { alturas: [...new Set(b.map((e) => Math.round(e.getBoundingClientRect().height)))], sec: ['savePrintBtn', 'adjustPricesBtn', 'addQuoteBtn'].map(cl), nomes: b.sort((x, y) => (+getComputedStyle(x).order) - (+getComputedStyle(y).order)).map((e) => e.id) };
+    });
+    expect(r.alturas).toHaveLength(1);
+    expect(new Set(r.sec).size).toBe(1);
+    expect(r.nomes).toEqual(['saveQuoteBtn', 'savePrintBtn', 'adjustPricesBtn', 'addQuoteBtn', 'newBtn']);
+  });
+
   test('rótulos do menu e das etapas cabem na tela, sem cortar nem sobrepor', async ({ page }) => {
     await entrar(page);
     const falhas = await page.evaluate(() => {
@@ -691,7 +704,11 @@ test.describe('telas (módulos)', () => {
         const b = e.getBoundingClientRect(), nome = e.textContent.trim();
         if (b.left < -1 || b.right > innerWidth + 1) out.push(`fora da tela: ${nome}`);
         if (e.scrollWidth > e.clientWidth + 1) out.push(`item mais largo que a coluna: ${nome}`);
-        for (const t of e.querySelectorAll('span, strong')) if (visivel(t) && t.scrollWidth > t.clientWidth + 1) out.push(`texto cortado: ${t.textContent.trim()}`);
+        for (const t of e.querySelectorAll('span, strong')) {
+          if (!visivel(t) || !t.textContent.trim()) continue;
+          const r = document.createRange(); r.selectNodeContents(t); // largura real do texto x largura da caixa
+          if (r.getBoundingClientRect().width > t.getBoundingClientRect().width + 1 || t.scrollWidth > t.clientWidth + 1) out.push(`texto cortado: ${t.textContent.trim()}`);
+        }
       }
       for (const g of ['.main-nav', '.stepper']) {
         const l = [...document.querySelectorAll(`${g} > *`)].filter(visivel).map((e) => e.getBoundingClientRect());

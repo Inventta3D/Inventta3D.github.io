@@ -104,8 +104,10 @@
 .batch-total span{font:var(--md-sys-typescale-title-medium);color:var(--md-sys-color-on-surface-variant)}
 .batch-total strong{font:var(--md-sys-typescale-headline-small);font-variant-numeric:tabular-nums}
 
-.result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
-.result-actions #saveQuoteBtn{order:-1;margin-right:8px}
+.result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+/* principal, depois os secundários iguais (contorno); o botão destrutivo fica separado, ao fim */
+.result-actions #saveQuoteBtn{order:1}.result-actions #savePrintBtn{order:2}.result-actions #adjustPricesBtn{order:3}.result-actions #addQuoteBtn{order:4}
+.result-actions #newBtn{order:5;margin-inline-start:auto}
 
 :is(.internal,.market) summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 24px;font:var(--md-sys-typescale-title-small);cursor:pointer;list-style:none;border-radius:inherit}
 :is(.internal,.market) summary:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 4%,transparent)}
@@ -192,9 +194,8 @@
   .discount-choice span::before{display:none}
   .result-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .result-actions .btn{width:100%;justify-content:center}
-  .result-actions #saveQuoteBtn{order:-3;margin:0;grid-column:1/-1}
-  .result-actions #savePrintBtn{order:-2;grid-column:1/-1}
-  .result-actions #newBtn{grid-column:1/-1}
+  .result-actions #saveQuoteBtn,.result-actions #savePrintBtn,.result-actions #newBtn{grid-column:1/-1}
+  .result-actions #newBtn{margin:0}
   .price-editor-row{grid-template-columns:1fr}
   .price-editor-footer{flex-direction:column;align-items:stretch}
   .saved-tools{grid-template-columns:1fr}
@@ -274,4 +275,5 @@
 .order-note{display:block;margin-top:6px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small);font-style:italic}
 @media (max-width:719px){.order-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-left:0}.order-actions>:last-child:nth-child(odd){grid-column:1/-1}.order-actions .btn{justify-content:center}}
 
+@media (max-width:399px){.step-btn{font-size:.6875rem}}
 @media (max-width:359px){.step-btn{font-size:.625rem}}
