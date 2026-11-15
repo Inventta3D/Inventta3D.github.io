@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "scripts": {
     "test": "node --test tests/*.test.cjs",
-    "check": "node --check site/js/calculations.js && node --check site/js/app.js && node --check site/js/recap.js && node --check site/js/theme.js && node --check site/js/password-toggle.js && node --check site/js/modules.js && node --check site/js/shell.js && node --check site/js/orcamentos-ui.js"
+    "check": "node --test tests/estrutura.test.cjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
   }
 }

@@ -1,0 +1,33 @@
+# Testes de interface no navegador (celular e computador). Não bloqueia a publicação do site:
+# se falhar, aparece em vermelho em Actions e o relatório fica salvo para consulta.
+name: Testes de interface
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'tests/**', 'playwright.config.cjs', 'package.json', '.github/workflows/testes.yml']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: resultados-dos-testes
+          path: test-results
+          retention-days: 7

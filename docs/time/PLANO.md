@@ -10,7 +10,7 @@ Situação: pendente · em andamento · aguardando usuário · concluída. Toda 
 | P3 | Testar com login real: clientes, "Valor final", sair da conta, foto do Google, "Gerar orçamento" | Cada item confirmado pelo usuário, ou erro reportado com print | aguardando usuário |
 | P4 | Decidir o destino do site antigo no Cloudflare (manter, atualizar com a versão nova ou desativar) | Decisão registrada em DECISOES.md | aguardando usuário |
 | P5 | Aplicar no site o rascunho do login feito no canvas de design, se o usuário aprovar alterações | Usuário aprova o desenho; mudança testada e publicada | aguardando usuário |
-| P6 | Teste de ponta a ponta automatizado (login simulado → 5 etapas → "Gerar orçamento" → desconto → salvar) | Um comando roda o fluxo e falha se algo quebrar (evita repetir o bug do "Gerar orçamento") | proposta, precisa de aprovação |
+| P6 | Teste de ponta a ponta automatizado | `npm run test:e2e` cobre login, 5 etapas, resultado, desconto, salvar, clientes, histórico, sair e o layout das telas em 6 tamanhos | concluído (falta rodar no GitHub) |
 | P7 | Backup da chave de assinatura (`.jks`) em local seguro fora do GitHub | Usuário confirma que guardou | aguardando usuário |
 | P8 | Atualizar ações do GitHub (aviso de Node 20 e setup-java v4) | Workflows sem avisos de descontinuação | baixa prioridade |
 | P10 | Banco: confirmar no painel do Supabase o plano e os backups (diário ou recuperação pontual) e ativar a proteção contra senhas vazadas, se o plano permitir | Usuário confirma os dois | aguardando usuário |

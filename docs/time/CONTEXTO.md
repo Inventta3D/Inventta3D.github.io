@@ -17,7 +17,8 @@
 - `android/`: app TWA (Gradle). Assinatura por segredos do GitHub.
 
 ## Comandos
-- Testes: `npm test` (devem passar antes de qualquer publicação)
+- Testes: `npm test` (cálculo e **estrutura**: ids, módulos, ícones, service worker, CSS só com tokens, bordas, RLS, segredos; roda no deploy e bloqueia se falhar)
+- Testes de navegador: `npm run test:e2e` (Playwright em 6 tamanhos: celular 320/360/390/412 e computador 1280/1440; usa o Edge instalado; no GitHub roda o workflow "Testes de interface", que não bloqueia a publicação). Os módulos vêm de `js/modules.js`: tela nova entra sozinha nos testes de navegação e de layout
 - Rodar local: `npx serve site -l 5174`
 - Publicar o site: `git push origin main` (workflow "Publicar site", ~1 min)
 - Gerar APK: workflow "Gerar APK"; release com tag `vX.Y.Z`
