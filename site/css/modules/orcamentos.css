@@ -70,7 +70,7 @@
 .result.show{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start;animation:rise var(--md-sys-motion-duration-long) var(--md-sys-motion-easing-emphasized-decelerate)}
 .result-main{display:grid;gap:16px;min-width:0}
 .result-side{display:grid;gap:16px;position:sticky;top:96px;min-width:0}
-.result-hero,.batch-summary,.share-panel,.internal,.price-editor{border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-lowest)}
+.result-hero,.batch-summary,.share-panel,.internal,.market,.price-editor{border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-lowest)}
 
 .result-hero{padding:24px}
 .result-brand{display:none}
@@ -106,14 +106,18 @@
 
 .result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 /* principal, depois os secundários iguais (contorno); o botão destrutivo fica separado, ao fim */
-.result-actions #saveQuoteBtn{order:1}.result-actions #savePrintBtn{order:2}.result-actions #adjustPricesBtn{order:3}.result-actions #addQuoteBtn{order:4}
-.result-actions #newBtn{order:5;margin-inline-start:auto}
+/* duas linhas: salvar (orçamento, histórico) e depois editar o pedido (preços, item) com o destrutivo à direita */
+.result-actions #saveQuoteBtn{order:1}.result-actions #savePrintBtn{order:2}
+.result-actions::after{content:'';order:3;flex-basis:100%;height:0}
+.result-actions #adjustPricesBtn{order:4}.result-actions #addQuoteBtn{order:5}
+.result-actions #newBtn{order:6;margin-inline-start:auto}
 
-:is(.internal,.market) summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 24px;font:var(--md-sys-typescale-title-small);cursor:pointer;list-style:none;border-radius:inherit}
+:is(.internal,.market) summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 24px;font:var(--md-sys-typescale-title-small);cursor:pointer;list-style:none;border-radius:var(--shape-surface)}
 :is(.internal,.market) summary:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 4%,transparent)}
 :is(.internal,.market) summary::-webkit-details-marker{display:none}
 :is(.internal,.market) summary::after{content:'';width:24px;height:24px;background:var(--md-sys-color-on-surface-variant);-webkit-mask:var(--select-arrow) center/24px no-repeat;mask:var(--select-arrow) center/24px no-repeat;transition:transform var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized)}
 :is(.internal,.market)[open] summary::after{transform:rotate(180deg)}
+:is(.internal,.market)[open] summary{border-end-start-radius:0;border-end-end-radius:0} /* aberto: só os cantos de cima; `inherit` não serve, o summary herda de um contêiner interno do details */
 :is(.internal,.market)>p{margin:0;padding:0 24px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
 .cost-rows{display:grid;margin:8px 24px 0}
 .cost-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--md-sys-color-outline-variant);font:var(--md-sys-typescale-body-medium)}
@@ -195,6 +199,7 @@
   .result-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .result-actions .btn{width:100%;justify-content:center}
   .result-actions #saveQuoteBtn,.result-actions #savePrintBtn,.result-actions #newBtn{grid-column:1/-1}
+  .result-actions::after{display:none}
   .result-actions #newBtn{margin:0}
   .price-editor-row{grid-template-columns:1fr}
   .price-editor-footer{flex-direction:column;align-items:stretch}

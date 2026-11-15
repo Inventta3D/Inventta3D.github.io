@@ -80,3 +80,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Cliente salvo (seletor) alinhado com o campo Telefone: rótulo com a mesma altura dos campos com balão. Teste de alinhamento. CACHE v80.
 
 - Botões do resultado padronizados (principal + 3 secundários com contorno + Limpar pedido à direita); rótulos das etapas cabem em 360–399 px. Testes novos. CACHE v81.
+
+- Desktop: botões do resultado em duas linhas (salvar / editar + Limpar à direita); Composição e Marketplace como cartões iguais, arredondados também no hover (summary não herda raio do details). Testes novos. CACHE v82.

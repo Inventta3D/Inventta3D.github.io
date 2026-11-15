@@ -683,7 +683,7 @@ test.describe('vitrine pública', () => {
 });
 
 test.describe('telas (módulos)', () => {
-  test('botões do resultado: mesma altura, os secundários com o mesmo estilo e o destrutivo ao fim', async ({ page }) => {
+  test('botões do resultado: mesma altura, os secundários com o mesmo estilo e o destrutivo ao fim', async ({ page }, info) => {
     await entrar(page);
     await gerarOrcamento(page);
     const r = await page.evaluate(() => {
@@ -694,6 +694,23 @@ test.describe('telas (módulos)', () => {
     expect(r.alturas).toHaveLength(1);
     expect(new Set(r.sec).size).toBe(1);
     expect(r.nomes).toEqual(['saveQuoteBtn', 'savePrintBtn', 'adjustPricesBtn', 'addQuoteBtn', 'newBtn']);
+    if (!info.project.name.startsWith('celular')) { // computador: salvar na 1ª linha; editar + limpar na 2ª, com "Limpar pedido" encostado à direita
+      const linhas = await page.evaluate(() => { const t = (id) => document.getElementById(id).getBoundingClientRect(); const c = document.querySelector('.result-actions').getBoundingClientRect(); return { salvar: t('saveQuoteBtn').top === t('savePrintBtn').top, editar: t('adjustPricesBtn').top === t('addQuoteBtn').top && t('addQuoteBtn').top === t('newBtn').top, duas: t('adjustPricesBtn').top > t('saveQuoteBtn').bottom, direita: Math.abs(t('newBtn').right - c.right) < 2 }; });
+      expect(linhas).toEqual({ salvar: true, editar: true, duas: true, direita: true });
+    }
+  });
+
+  test('"Composição do preço" e "Preço para marketplace" são cartões iguais e seguem arredondados ao passar o mouse', async ({ page }, info) => {
+    test.skip(info.project.name.startsWith('celular'), 'hover é do mouse');
+    await entrar(page);
+    await gerarOrcamento(page);
+    for (const sel of ['details.internal', 'details.market']) {
+      await page.locator(`${sel} summary`).hover();
+      const cartao = await page.locator(sel).evaluate((d) => { const c = getComputedStyle(d), s = getComputedStyle(d.querySelector('summary')); return { raio: c.borderTopLeftRadius, raioTitulo: s.borderTopLeftRadius, fundo: c.backgroundColor }; });
+      expect(parseFloat(cartao.raio), `${sel} sem canto arredondado`).toBeGreaterThan(8);
+      expect(cartao.raioTitulo).toBe(cartao.raio);
+      expect(cartao.fundo).not.toBe('rgba(0, 0, 0, 0)');
+    }
   });
 
   test('rótulos do menu e das etapas cabem na tela, sem cortar nem sobrepor', async ({ page }) => {
