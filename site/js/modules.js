@@ -13,5 +13,6 @@ window.INVENTTA_MODULES = [
   { id: 'novo-orcamento', label: 'Novo orçamento', short: 'Novo', route: '#top', icon: 'i-calc', iconActive: 'i-calc-fill', default: true },
   { id: 'orcamentos-salvos', label: 'Orçamentos salvos', short: 'Salvos', route: '#/orcamentos-salvos', icon: 'i-list', iconActive: 'i-list-fill' },
   { id: 'clientes', label: 'Clientes', short: 'Clientes', route: '#/clientes', icon: 'i-group', iconActive: 'i-group-fill' },
+  { id: 'painel', label: 'Painel do mês', short: 'Painel', route: '#/painel', icon: 'i-chart' },
   { id: 'impressoes', label: 'Impressões', short: 'Impressões', route: '#/impressoes', icon: 'i-cube', iconActive: 'i-cube-fill' }
 ];

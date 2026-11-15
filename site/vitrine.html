@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFF8EF">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/modules/aprovar.css">
+  <link rel="stylesheet" href="./css/modules/vitrine.css">
+  <title>Vitrine | Inventta 3D</title>
+</head>
+<body>
+  <main class="vit" id="vitMain" aria-labelledby="vitTitle">
+    <header class="apv-brand"><img class="logo-light" src="./img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" height="32"><img class="logo-dark" src="./img/logo-inventta-3d-escuro.svg" alt="" height="32"></header>
+    <h1 id="vitTitle">Carregando a vitrine…</h1>
+    <p class="apv-intro" id="vitIntro"></p>
+    <section class="vit-grid" id="vitGrid" aria-label="Peças da vitrine" aria-live="polite"></section>
+  </main>
+  <script src="./config.js"></script>
+  <script src="./vendor/supabase.js"></script>
+  <script src="./js/vitrine.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFF8EF">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/modules/aprovar.css">
+  <title>Aprovar orçamento | Inventta 3D</title>
+</head>
+<body>
+  <main class="apv" id="apvMain" aria-labelledby="apvTitle">
+    <header class="apv-brand"><img class="logo-light" src="./img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" height="32"><img class="logo-dark" src="./img/logo-inventta-3d-escuro.svg" alt="" height="32"></header>
+    <h1 id="apvTitle">Carregando o orçamento…</h1>
+    <p class="apv-intro" id="apvIntro"></p>
+    <section class="apv-card" id="apvCard" hidden aria-label="Itens do orçamento">
+      <ul class="apv-items" id="apvItems"></ul>
+      <div class="apv-totals" id="apvTotals"></div>
+    </section>
+    <section class="apv-actions" id="apvActions" hidden aria-label="Responder ao orçamento">
+      <button type="button" class="btn btn-primary" id="apvApprove">Aprovar orçamento</button>
+      <button type="button" class="btn btn-outline" id="apvAdjust">Pedir ajuste</button>
+      <div class="field apv-note" id="apvNoteBox" hidden>
+        <label for="apvNote">O que você quer ajustar?</label>
+        <textarea class="control" id="apvNote" maxlength="500" rows="4" placeholder="Ex.: outra cor, quantidade maior, prazo"></textarea>
+        <button type="button" class="btn btn-primary" id="apvSend">Enviar pedido de ajuste</button>
+      </div>
+    </section>
+    <p class="apv-msg" id="apvMsg" role="status" aria-live="polite"></p>
+  </main>
+  <script src="./config.js"></script>
+  <script src="./vendor/supabase.js"></script>
+  <script src="./js/aprovar.js"></script>
+</body>
+</html>

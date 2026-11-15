@@ -18,7 +18,7 @@ function sessao() {
 
 // Banco falso: imita o suficiente do PostgREST e do Storage para o app funcionar sem rede.
 function bancoFalso() {
-  const db = { inventta3d_quotes: [], inventta3d_customers: [], inventta3d_prints: [], inventta3d_print_requests: [] };
+  const db = { inventta3d_quotes: [], inventta3d_customers: [], inventta3d_prints: [], inventta3d_print_requests: [], inventta3d_spools: [], inventta3d_printers: [], inventta3d_shop: [] };
   const arquivos = {};
   let seq = 0;
   const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'access-control-expose-headers': '*' };
@@ -29,6 +29,24 @@ function bancoFalso() {
     if (metodo === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
     const unico = (req.headers().accept || '').includes('vnd.pgrst.object');
     const quer = (req.headers().prefer || '').includes('return=representation');
+    if (url.pathname.startsWith('/rest/v1/rpc/')) {
+      const corpo = JSON.parse(req.postData() || '{}'), q = db.inventta3d_quotes.find((r) => r.share_token && r.share_token === corpo.p_token);
+      if (url.pathname.endsWith('/inventta3d_showcase')) {
+        const s = db.inventta3d_shop.find((x) => x.enabled && x.slug === String(corpo.p_slug || '').toLowerCase());
+        if (!s) return json(route, 200, null);
+        return json(route, 200, { name: s.name, intro: s.intro, whatsapp: s.whatsapp, items: db.inventta3d_prints.filter((p) => p.showcase).map((p) => ({ id: p.id, name: p.name, material: p.material, color: p.color, price: p.showcase_price ?? null, text: p.showcase_text || '', photo_path: p.photo_path || null })) });
+      }
+      if (url.pathname.endsWith('/inventta3d_quote_public')) {
+        if (!q) return json(route, 200, null);
+        return json(route, 200, { title: q.title, client_name: String(q.client_name || '').trim().split(' ')[0], created_at: q.created_at, status: q.status || 'orcado', client_response: q.client_response || null, client_response_at: q.client_response_at || null, subtotal: q.subtotal, discount_amount: q.discount_amount, total: q.total,
+          items: (q.items || []).map((it) => ({ product: it.data?.product || 'Peça impressa em 3D', quantity: it.result?.q || it.data?.quantity || 1, material: it.data?.filamentType || '', color: it.data?.filamentColor || '', unit_price: Number(it.result?.unitPrice || 0) })) });
+      }
+      if (url.pathname.endsWith('/inventta3d_quote_respond')) {
+        if (!q || (q.status || 'orcado') !== 'orcado' || !['aprovado', 'ajuste'].includes(corpo.p_decision)) return json(route, 400, { message: 'orçamento não encontrado ou já respondido' });
+        Object.assign(q, { client_response: corpo.p_decision, client_response_at: new Date().toISOString(), client_note: corpo.p_note || '' }, corpo.p_decision === 'aprovado' ? { status: 'aprovado', status_at: new Date().toISOString() } : {});
+        return json(route, 200, q.status);
+      }
+    }
     if (url.pathname.startsWith('/rest/v1/')) {
       const tabela = url.pathname.split('/')[3];
       const linhas = db[tabela];
@@ -57,9 +75,27 @@ function bancoFalso() {
         return route.fulfill({ status: 204, headers: cors });
       }
     }
-    if (url.pathname.startsWith('/storage/v1/object/sign/')) return json(route, 200, { signedURL: `/object/sign/x?token=t` });
+    if (url.pathname.startsWith('/storage/v1/object/public/')) {
+      const corpo = arquivos[url.pathname.replace('/public/', '/')];
+      return corpo ? route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'image/png' }, body: corpo }) : route.fulfill({ status: 404, headers: cors });
+    }
+    if (url.pathname.startsWith('/storage/v1/object/sign/')) {
+      const obj = url.pathname.replace('/storage/v1/object/sign/', '');
+      if (metodo === 'GET') { const corpo = arquivos[`/storage/v1/object/${obj}`]; return corpo ? route.fulfill({ status: 200, headers: cors, body: corpo }) : route.fulfill({ status: 404, headers: cors }); }
+      return json(route, 200, { signedURL: `/object/sign/${obj}?token=t` });
+    }
     if (url.pathname.startsWith('/storage/v1/object/')) {
-      if (metodo === 'POST') { arquivos[url.pathname] = true; return json(route, 200, { Key: url.pathname }); }
+      if (metodo === 'POST') {
+        // o Supabase real guarda só o arquivo; o supabase-js envia como formulário (multipart): extrai a parte do arquivo
+        let corpo = route.request().postDataBuffer() || Buffer.alloc(0);
+        const limite = (route.request().headers()['content-type'] || '').match(/boundary=(.+)$/);
+        if (limite) {
+          const sep = Buffer.from('--' + limite[1]), ini = corpo.indexOf('\r\n\r\n', corpo.indexOf('filename=')) + 4;
+          corpo = corpo.subarray(ini, corpo.indexOf(Buffer.concat([Buffer.from('\r\n'), sep]), ini));
+        }
+        arquivos[url.pathname] = corpo;
+        return json(route, 200, { Key: url.pathname });
+      }
       if (metodo === 'DELETE') { Object.keys(arquivos).forEach((k) => delete arquivos[k]); return json(route, 200, []); }
     }
     if (url.pathname.startsWith('/auth/v1/')) return route.fulfill({ status: 204, headers: cors });
@@ -129,4 +165,14 @@ function auditar(page, seletor) {
   }, seletor);
 }
 
-module.exports = { entrar, gerarOrcamento, auditar, urlSupabase };
+
+// Cubo de lado L em STL binário (12 triângulos), como arquivo para setInputFiles.
+function cuboSTL(L = 20, name = 'cubo_teste.stl') {
+  const v = [[0,0,0],[L,0,0],[L,L,0],[0,L,0],[0,0,L],[L,0,L],[L,L,L],[0,L,L]];
+  const f = [[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],[1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]];
+  const b = Buffer.alloc(84 + f.length * 50); b.writeUInt32LE(f.length, 80);
+  f.forEach((t, i) => t.forEach((k, j) => v[k].forEach((c, e) => b.writeFloatLE(c, 84 + i * 50 + 12 + j * 12 + e * 4))));
+  return { name, mimeType: 'model/stl', buffer: b };
+}
+
+module.exports = { bancoFalso, cuboSTL, entrar, gerarOrcamento, auditar, urlSupabase };

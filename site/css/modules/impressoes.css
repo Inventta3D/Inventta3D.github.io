@@ -25,3 +25,48 @@
 .print-requests li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;padding:12px 0;border-bottom:1px solid var(--md-sys-color-outline-variant);font:var(--md-sys-typescale-body-medium)}
 .print-requests li span:last-child{grid-column:2;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
 .print-detail-msg{margin:0 24px}
+/* abas (Peças / Filamentos) */
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:0 0 16px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
+.tabs [role=tab]{min-width:0;min-height:48px;padding:0 4px;overflow:hidden;text-overflow:ellipsis;border:0;border-bottom:3px solid transparent;background:none;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-title-small);cursor:pointer;white-space:nowrap}
+.tabs [role=tab][aria-selected=true]{color:var(--md-sys-color-primary);border-bottom-color:var(--md-sys-color-primary)}
+.tabs [role=tab]:focus-visible{outline:2px solid var(--md-sys-color-primary);outline-offset:-2px}
+/* estoque de filamento */
+.spool-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.spool-tools p{margin:0;flex:1 1 260px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.spool-meter{height:8px;margin:8px 0 6px;border-radius:var(--md-sys-shape-corner-full);background:var(--md-sys-color-surface-container-highest);overflow:hidden;max-width:360px}
+.spool-meter span{display:block;height:100%;border-radius:inherit;background:var(--md-sys-color-primary)}
+.spool-row.baixo .spool-meter span{background:var(--md-sys-color-error)}
+.stock-hint{margin:-8px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.stock-hint[hidden]{display:none}
+.stock-hint.falta{color:var(--md-sys-color-error)}
+/* impressoras e manutenção */
+.printer-list{display:grid;gap:16px}
+.printer-card{padding:16px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container-low)}
+.printer-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.printer-head>div:first-child{display:grid;gap:2px}
+.printer-head strong{font:var(--md-sys-typescale-title-medium)}
+.printer-head small{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.printer-tasks{display:grid;gap:12px;margin:16px 0 0;padding:0;list-style:none}
+.printer-tasks li{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.printer-tasks li>div{display:grid;gap:2px;flex:1;min-width:0}
+.printer-tasks span{font:var(--md-sys-typescale-body-medium)}
+.printer-tasks small{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.printer-tasks .spool-meter{margin:4px 0 0}
+.printer-tasks li.vencida small{color:var(--md-sys-color-error)}
+.printer-tasks li.vencida .spool-meter span{background:var(--md-sys-color-error)}
+.printer-tasks li.perto .spool-meter span{background:var(--md-sys-color-tertiary)}
+.printer-log{margin:16px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+/* vitrine (dono) */
+.shop-form{display:grid;gap:16px;max-width:560px}
+.shop-help,.showcase-tip{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.shop-form .field{margin:0}
+.shop-form textarea.control,.showcase-box textarea.control{min-height:88px;padding:14px 20px;border-radius:var(--shape-nested);resize:vertical;font:inherit}
+.shop-link{margin:6px 0 0;overflow-wrap:anywhere;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.shop-actions{display:flex;flex-wrap:wrap;gap:8px}
+.shop-actions [hidden]{display:none}
+.showcase-check{display:flex;align-items:center;gap:8px;font:var(--md-sys-typescale-body-large)}
+.showcase-check input{width:20px;height:20px;accent-color:var(--md-sys-color-primary)}
+.showcase-box{display:grid;gap:12px;margin-top:8px}
+.showcase-box h3{margin:8px 0 0}
+.showcase-box .btn{justify-self:start}
+.showcase-thumb{width:120px;height:90px;object-fit:cover;border-radius:var(--shape-field)}

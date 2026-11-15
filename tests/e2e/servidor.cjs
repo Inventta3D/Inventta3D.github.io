@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const raiz = path.join(__dirname, '..', '..', 'site');
-const tipos = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.b64': 'text/plain' };
+const tipos = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.wasm': 'application/wasm', '.b64': 'text/plain' };
 
 http.createServer((req, res) => {
   let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);

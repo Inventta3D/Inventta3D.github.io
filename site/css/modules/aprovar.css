@@ -1,0 +1,23 @@
+/* Inventta 3D · página pública de aprovação do orçamento (usa só tokens) */
+body{margin:0;min-height:100vh;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface);font:var(--md-sys-typescale-body-large)}
+.apv{box-sizing:border-box;width:min(560px,100%);margin:0 auto;padding:24px 16px 48px;display:grid;gap:16px}
+.apv-brand img{display:block;height:32px;width:auto}
+.logo-dark{display:none}
+@media (prefers-color-scheme:dark){.logo-light{display:none}.logo-dark{display:block}}
+.apv h1{margin:8px 0 0;font:var(--md-sys-typescale-headline-medium)}
+.apv-intro{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.apv-card{padding:16px;border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-low)}
+.apv-card[hidden],.apv-actions[hidden],.apv-note[hidden]{display:none}
+.apv-items{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.apv-items li{display:flex;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--md-sys-color-outline-variant)}
+.apv-items li>div{display:grid;gap:2px;min-width:0}
+.apv-items small{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.apv-items span{white-space:nowrap;font-variant-numeric:tabular-nums}
+.apv-totals{display:grid;gap:8px;margin-top:12px}
+.apv-totals div{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.apv-total strong{font:var(--md-sys-typescale-headline-small)}
+.apv-actions{display:grid;gap:12px}
+.apv-actions .btn{width:100%;justify-content:center}
+.apv-note{display:grid;gap:8px}
+.apv-note textarea{min-height:96px;padding:14px 20px;border-radius:var(--shape-nested);resize:vertical;font:inherit}
+.apv-msg{margin:0;font:var(--md-sys-typescale-title-medium)}

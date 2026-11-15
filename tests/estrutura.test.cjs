@@ -15,7 +15,9 @@ const html = read('site/index.html');
 const listFiles = (dir, ext) => fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith(ext)).map((f) => `${dir}/${f}`);
 const ownJs = listFiles('site/js', '.js').filter((f) => !/qrcode-generator/.test(f));
 const ownCss = [...listFiles('site/css', '.css'), ...listFiles('site/css/modules', '.css')];
-const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+// ids de todas as páginas (index e páginas públicas como aprovar.html)
+const paginas = listFiles('site', '.html').map(read);
+const ids = paginas.flatMap((h) => [...h.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 const idSet = new Set(ids);
 const sprite = new Set([...html.matchAll(/<symbol id="([^"]+)"/g)].map((m) => m[1]));
 const git = (cmd) => execSync(`git ${cmd}`, { cwd: root, stdio: ['ignore', 'pipe', 'ignore'] }).toString();
@@ -33,7 +35,7 @@ test('HTML: ids são únicos', () => {
 
 test('JS: todo id usado nos scripts existe no HTML', () => {
   // ids criados em tempo de execução (ex.: campos de arquivo por item) ficam aqui, com motivo.
-  const dinamicos = new Set([]);
+  const dinamicos = new Set(['printView']); // printView: caixa do 3D criada ao abrir o modelo no histórico
   const faltando = [];
   for (const f of ownJs) {
     const src = read(f);
@@ -175,7 +177,14 @@ test('banco: toda tabela criada tem RLS e nenhuma é aberta ao anon', () => {
   const tabelas = [...sql.matchAll(/create table(?: if not exists)?\s+public\.(\w+)/gi)].map((m) => m[1]);
   assert.ok(tabelas.length >= 1);
   for (const t of tabelas) assert.match(sql, new RegExp(`alter table public\\.${t}\\s+enable row level security`, 'i'), `${t}: sem RLS`);
-  assert.doesNotMatch(sql, /grant[^;]*\bto\s+anon\b/i, 'nenhum grant para anon');
+  assert.doesNotMatch(sql, /grant[^;]*\bon\s+(?:table\s+)?public\.\w+[^;]*\bto\s+[^;]*\banon\b/i, 'nenhuma tabela aberta ao anon');
+  // funções liberadas ao anon (link de aprovação, vitrine): security definer, search_path fixo e nada de custo ou lucro
+  for (const [, nome] of sql.matchAll(/grant execute on function public\.(\w+)\([^)]*\)[^;]*\banon\b/gi)) {
+    const corpo = (sql.match(new RegExp(`create or replace function public\\.${nome}\\b[\\s\\S]*?\\$\\$[\\s\\S]*?\\$\\$`, 'i')) || [''])[0];
+    assert.match(corpo, /security definer/i, `${nome}: precisa ser security definer`);
+    assert.match(corpo, /set search_path = ''/i, `${nome}: search_path fixo`);
+    assert.doesNotMatch(corpo, /cost|profit|fees|packPrice|margin|laborRate|material_cost|print_cost/i, `${nome}: não pode expor custos ou lucro`);
+  }
 });
 
 test('banco: migrações têm nomes ordenáveis e sem repetição', () => {

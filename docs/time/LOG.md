@@ -29,3 +29,21 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 | Layouts de orçamento (imagem e PDF), QR codes | Publicados | Render com dados de exemplo; QR não escaneado |
 | Publicação no GitHub Pages e APK | Site no ar, APK assinado v1.0.0 | Assinatura conferida com `openssl`; instalação não testada |
 | Calculadora nos campos de valor | Pronta, não publicada (`v55`) | 7 testes do núcleo, 5 de navegador e auditoria de layout em 320, 360, 390, 412 e 1440 px; não testada em aparelho |
+| Importar do fatiador (G-code e 3MF) | Pronto, não publicado (`v56`) | 8 testes do leitor (inclui 3MF montado no teste), 2 de navegador; não testado com arquivos reais de cada fatiador |
+| Fatiamento automático (Kiri + modo rápido) | Pronto, não publicado (`v58`) | 14 testes de unidade do leitor/estimador, 3 de navegador (um fatia de verdade com o Kiri); comparação com o Bambu Studio no projeto real; não testado em celular real |
+| Visualizador 3D (etapa 1 e histórico) | Pronto, não publicado | 2 testes de navegador (canvas na etapa 1; "Ver em 3D" no histórico, com o simulador de armazenamento devolvendo o arquivo real) |
+| Painel do mês | Pronto, não publicado | 3 testes de unidade (resumo, pedidos, série com virada de ano) e 1 de navegador; auditoria de layout em 360 e 1280 |
+| Preço para marketplace | Pronto, não publicado | 3 testes de unidade (conta inversa, faixas da Shopee, taxas impossíveis) e 1 de navegador |
+| Biblioteca: "Orçar de novo" no histórico | Pronto, não publicado | 1 teste de navegador |
+| Estoque de filamento | Pronto, não publicado; migração escrita, não aplicada | 3 testes de unidade, 2 de navegador (cadastro, validação, desconto ao salvar, aviso na etapa 2) |
+| Pedidos com status, entrega, lembrete e etiqueta | Pronto, não publicado; migração escrita, não aplicada | 4 testes de unidade, 3 de navegador; Painel com valor fechado |
+| Impressoras e manutenção | Pronto, não publicado; migração escrita, não aplicada | 3 testes de unidade, 1 de navegador |
+| Link de aprovação (aprovar.html) | Pronto, não publicado; migração com funções públicas escrita, não aplicada; SQL das funções não executado em banco real | 1 teste de unidade, 2 de navegador (dono gera link, cliente aprova; cliente pede ajuste; link inválido) com simulador das funções; corrigida sobreposição de botões nos pedidos em 360 px e uma condição de corrida na lista |
+| Vitrine pública (vitrine.html) | Pronto, não publicado; migração com bucket público e função escrita, não aplicada | 3 testes de unidade, 2 de navegador (configurar loja, publicar peça com foto, visitante vê e pede pelo WhatsApp; vitrine fechada) |
+| Status ao vivo da impressora | Não feito (D30) | — |
+## 2026-11-15 — migrações das features aplicadas no Supabase (com "sim" do usuário)
+- Aplicadas 20261118000000…0400 (spools, status em quotes, printers, aprovação, vitrine).
+- Acrescentada antes de aplicar: política `inventta3d_vitrine_select_own` (Storage exige select para remover a foto antiga).
+- Verificado no banco real (bloco com rollback, papel anon): link de aprovação devolve só campos públicos, token errado = nulo, anon não lê tabelas, ajuste/aprovação/repetição/decisão inválida corretos; vitrine ativa lista itens sem custo, desativada = nulo. Nada ficou gravado.
+- Advisors: 3 avisos esperados (funções públicas por desenho, D17), índices novos ainda sem uso, proteção de senha vazada desligada (pré-existente).
+- Site ainda NÃO publicado.

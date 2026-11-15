@@ -4,7 +4,7 @@
 (()=>{
   const $=id=>document.getElementById(id),app=()=>window.InventtaApp;
   const BUCKET='inventta3d-models',MAX_FILE=50*1024*1024,EXT=/\.(stl|3mf)$/i;
-  const COLS='id,name,material,color,weight_g,print_minutes,material_cost,energy_cost,machine_cost,print_cost,file_path,file_name,file_size,created_at,updated_at,inventta3d_print_requests(id,customer_id,customer_name,quantity,unit_print_cost,requested_at,quote_id)';
+  const COLS='id,name,material,color,weight_g,print_minutes,material_cost,energy_cost,machine_cost,print_cost,file_path,file_name,file_size,showcase,showcase_price,showcase_text,photo_path,created_at,updated_at,inventta3d_print_requests(id,customer_id,customer_name,quantity,unit_print_cost,requested_at,quote_id)';
   const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
   const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
   const digits=s=>String(s||'').replace(/\D/g,'');
@@ -47,9 +47,10 @@
       info.append(el('strong','',p.name),el('small','',[p.material+(p.color?` · ${p.color}`:''),fmtG(p.weight_g),fmtTime(p.print_minutes),`${money.format(Number(p.print_cost))} de impressão por peça`].join(' · ')));
       info.append(el('small','',`${reqs.length} pedido${reqs.length===1?'':'s'} · último em ${fmtDate(lastDate(p))}${names.length?' · '+names.join(', '):''}`));
       if(p.file_name)info.append(el('small','',`Arquivo: ${p.file_name}`));
-      const open=el('button','btn btn-sm btn-solid','Detalhes'),del=el('button','btn btn-sm btn-danger delete','Excluir');open.type=del.type='button';
-      open.addEventListener('click',()=>openDetail(p.id));del.addEventListener('click',()=>removePrint(p));
-      acts.append(open,del);row.append(info,acts);list.append(row);
+      const again=el('button','btn btn-sm btn-solid','Orçar de novo'),open=el('button','btn btn-sm btn-outline','Detalhes'),del=el('button','btn btn-sm btn-danger delete','Excluir');again.type=open.type=del.type='button';
+      again.setAttribute('aria-label',`Orçar de novo: ${p.name}`);
+      again.addEventListener('click',()=>orcarDeNovo(p));open.addEventListener('click',()=>openDetail(p.id));del.addEventListener('click',()=>removePrint(p));
+      acts.append(again,open,del);row.append(info,acts);list.append(row);
     });
     const total=prints.length;
     $('printStatus').textContent=!total?'Nenhuma impressão salva ainda.':!rows.length?`Nenhuma impressão encontrada para “${raw}”.`:q?`${rows.length} de ${total} impressões.`:`${total} impressão${total===1?'':'ões'} salva${total===1?'':'s'}.`;
@@ -96,7 +97,7 @@
       if(!EXT.test(f.name)){msg.textContent=`“${f.name}” não é um arquivo STL ou 3MF.`;return}
       if(f.size>MAX_FILE){msg.textContent=`“${f.name}” passa de 50 MB.`;return}}
     const btn=$('printSaveBtn');btn.disabled=true;msg.textContent='Salvando…';
-    const c=app().client(),uid=app().user().id,quoteId=app().quoteId()||null;let saved=0,dup=0,fileFail=0;
+    const c=app().client(),uid=app().user().id,quoteId=app().quoteId()||null;let saved=0,dup=0,fileFail=0,estoqueMsg='';
     try{
       await load();const cust=await ensureCustomerId();
       for(const cb of boxes){
@@ -111,6 +112,8 @@
           const rq=await c.from('inventta3d_print_requests').insert({print_id:print.id,customer_id:cust.id,customer_name:cust.name,quote_id:quoteId,quantity:it.quantity,unit_print_cost:it.print_cost}).select('id,customer_id,customer_name,quantity,unit_print_cost,requested_at,quote_id').single();
           if(rq.error)throw rq.error;
           print.inventta3d_print_requests=[...print.inventta3d_print_requests,rq.data];saved++;
+          // ponytail: desconta peso × quantidade, sem a margem de perdas (o histórico guarda o peso por peça)
+          if(window.InventtaEstoque)estoqueMsg+=await window.InventtaEstoque.descontar(it.material,it.color,Number(it.weight_g)*it.quantity);
         }
         if(file){
           const up=await uploadFile(print,file,uid);
@@ -119,7 +122,7 @@
         prints=prints.filter(p=>p.id!==print.id);prints.push(print);
       }
       render();$('printSaveDialog').close();
-      app().status(fileFail?'Salvo no histórico, mas o arquivo não foi enviado. Tente anexar de novo em Detalhes.':dup&&!saved?'Esta peça já estava no histórico para este orçamento.':'Salvo no histórico de impressões.',!!fileFail);
+      app().status(fileFail?'Salvo no histórico, mas o arquivo não foi enviado. Tente anexar de novo em Detalhes.':dup&&!saved?'Esta peça já estava no histórico para este orçamento.':'Salvo no histórico de impressões.'+estoqueMsg,!!fileFail);
     }catch(e){msg.textContent='Não foi possível salvar. Confira sua conexão e tente novamente.'}
     finally{btn.disabled=false}
   }
@@ -147,18 +150,41 @@
     await c.storage.from(BUCKET).remove([p.file_path]);
     replace({...r.data,inventta3d_print_requests:r.data.inventta3d_print_requests||p.inventta3d_print_requests});
   }
+  /* ---------- biblioteca: orçar de novo uma peça já feita (nome, material, cor, peso e tempo) ---------- */
+  function orcarDeNovo(p){
+    const pre=(id,v,ev='input')=>{const e=$(id);if(!e)return;e.value=v;e.dispatchEvent(new Event(ev,{bubbles:true}));e.dispatchEvent(new Event('blur'))};
+    const outro='Outro tipo (especificar)',ops=[...$('filamentType').options].map(o=>o.value),mat=ops.includes(p.material)?p.material:outro;
+    pre('product',p.name);pre('filamentType',mat,'change');if(mat===outro)pre('customFilament',p.material);
+    pre('filamentColor',p.color||'');pre('amount',String(Number(p.weight_g)).replace('.',','));
+    const m=Math.min(5999,Number(p.print_minutes)||0),dois=n=>String(n).padStart(2,'0');pre('printHours',`${dois(Math.floor(m/60))}:${dois(m%60)}`);
+    location.hash='#top';app().status(`${p.name} pronto para orçar: confira a quantidade e o cliente.`);
+  }
+
+  /* ---------- ver o arquivo anexado em 3D ---------- */
+  let vis=null;const fecharVis=()=>{vis?.fechar();vis=null};
+  async function ver3d(p,depois){
+    const F=window.InventtaFatiador,V=window.InventtaVisualizador;if(!F||!V)return;
+    $('printDetailMsg').textContent='Carregando o modelo…';
+    try{const{data,error}=await app().client().storage.from(BUCKET).createSignedUrl(p.file_path,60);if(error||!data?.signedUrl)throw error;
+      const bytes=new Uint8Array(await (await fetch(data.signedUrl)).arrayBuffer());
+      let tri;if(/\.3mf$/i.test(p.file_name||'')){const pl=await F.lerMalha3mf(bytes);tri=new Float32Array(pl.reduce((t,x)=>t+x.tri.length,0));let o=0;for(const x of pl){tri.set(x.tri,o);o+=x.tri.length}}else tri=F.lerSTL(bytes);
+      if(!tri.length)throw new Error('vazio');
+      fecharVis();let box=$('printView');if(!box){box=el('div','model-view print-view');box.id='printView';depois.after(box)}
+      vis=await V.mostrar(box,tri,{cor:p.color,nome:p.name});$('printDetailMsg').textContent=''}
+    catch(e){console.warn('3D:',e);$('printDetailMsg').textContent='Não foi possível mostrar o modelo em 3D.'}
+  }
   function replace(p){prints=prints.map(x=>x.id===p.id?p:x);render();if(current===p.id)openDetail(p.id,true)}
 
   /* ---------- detalhes e exclusão ---------- */
   function openDetail(id,keepOpen){
-    const p=prints.find(x=>x.id===id);if(!p)return;current=id;
+    const p=prints.find(x=>x.id===id);if(!p)return;current=id;fecharVis();
     $('printDetailTitle').textContent=p.name;$('printDetailMsg').textContent='';
     const body=$('printDetailBody');body.replaceChildren();
     const dl=el('dl','print-facts');
     [['Filamento',p.material+(p.color?` · ${p.color}`:'')],['Peso por peça',fmtG(p.weight_g)],['Tempo por peça',fmtTime(p.print_minutes)],['Material',money.format(Number(p.material_cost))],['Energia',money.format(Number(p.energy_cost))],['Máquina',money.format(Number(p.machine_cost))],['Custo de impressão por peça',money.format(Number(p.print_cost))]].forEach(([k,v],i)=>{const d=el('div');d.append(el('dt','',i>=3&&i<6?k+' (por peça)':k),el('dd','',v));dl.append(d)});
     body.append(dl);
     const fh=el('h3','','Arquivo da impressão'),fbox=el('div','print-file-box');
-    if(p.file_name){fbox.append(el('span','',`${p.file_name} · ${fmtSize(p.file_size||0)}`));const g=el('button','btn btn-sm btn-solid','Baixar'),rm=el('button','btn btn-sm btn-danger delete','Remover');g.type=rm.type='button';g.addEventListener('click',()=>download(p));rm.addEventListener('click',()=>removeFile(p));fbox.append(g,rm)}
+    if(p.file_name){fbox.append(el('span','',`${p.file_name} · ${fmtSize(p.file_size||0)}`));const g=el('button','btn btn-sm btn-solid','Baixar'),rm=el('button','btn btn-sm btn-danger delete','Remover');g.type=rm.type='button';g.addEventListener('click',()=>download(p));rm.addEventListener('click',()=>removeFile(p));const v3=el('button','btn btn-sm btn-outline','Ver em 3D');v3.type='button';v3.addEventListener('click',()=>ver3d(p,fbox));fbox.append(g,v3,rm)}
     else fbox.append(el('span','','Nenhum arquivo anexado.'));
     const lab=el('label','btn btn-sm btn-outline print-attach',p.file_name?'Substituir arquivo':'Anexar STL ou 3MF'),inp=el('input');inp.type='file';inp.accept='.stl,.3mf';inp.hidden=true;lab.append(inp);fbox.append(lab);
     inp.addEventListener('change',async()=>{const f=inp.files[0];if(!f)return;
@@ -167,6 +193,7 @@
       $('printDetailMsg').textContent='Enviando arquivo…';const up=await uploadFile(p,f,app().user().id);
       if(!up){$('printDetailMsg').textContent='Não foi possível enviar o arquivo. Tente novamente.';return}replace(up)});
     body.append(fh,fbox);
+    if(window.InventtaVitrine)body.append(window.InventtaVitrine.secao(p,replace));
     const reqs=[...p.inventta3d_print_requests].sort((a,b)=>b.requested_at.localeCompare(a.requested_at));
     body.append(el('h3','',`Pedidos (${reqs.length})`));
     const ul=el('ul','print-requests');
@@ -188,7 +215,7 @@
   $('savePrintBtn').addEventListener('click',openSave);
   $('printSaveBtn').addEventListener('click',savePrints);
   $('printSaveCancel').addEventListener('click',()=>$('printSaveDialog').close());$('printSaveClose').addEventListener('click',()=>$('printSaveDialog').close());
-  $('printDetailClose').addEventListener('click',()=>$('printDetailDialog').close());$('printDetailDone').addEventListener('click',()=>$('printDetailDialog').close());
+  $('printDetailClose').addEventListener('click',()=>$('printDetailDialog').close());$('printDetailDialog').addEventListener('close',fecharVis);$('printDetailDone').addEventListener('click',()=>$('printDetailDialog').close());
   $('printDetailDelete').addEventListener('click',()=>{const p=prints.find(x=>x.id===current);if(p)removePrint(p)});
   document.addEventListener('inventta:auth',()=>{loaded=false;load()});
   window.addEventListener('hashchange',()=>{if(location.hash==='#/impressoes')load(true)});

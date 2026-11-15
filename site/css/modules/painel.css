@@ -1,0 +1,32 @@
+/* Inventta 3D · módulo Painel (usa só tokens) */
+.dash-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;margin:16px 0 24px}
+.dash-head h1{margin:0}
+.dash-head p{margin:6px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.dash-month{display:flex;align-items:center;gap:4px}
+.dash-month strong{min-width:11ch;text-align:center;font:var(--md-sys-typescale-title-medium)}
+.dash-month .btn-icon{--bd:transparent;--btn-h:48px}
+.dash-body{display:grid;gap:16px}
+.dash-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:12px}
+.dash-kpi{display:grid;gap:4px;align-content:start;padding:16px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container-low)}
+.dash-kpi-label{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-label-large)}
+.dash-kpi-value{font:var(--md-sys-typescale-headline-small);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.dash-kpi-detail{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
+.dash-card{padding:16px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container-low)}
+.dash-card h2{margin:0 0 12px;font:var(--md-sys-typescale-title-medium)}
+.dash-bars{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;height:180px;align-items:end;padding-top:28px}
+.dash-col{position:relative;display:grid;grid-template-rows:1fr auto;align-items:end;justify-items:center;height:100%;gap:6px;outline:none}
+.dash-bar{width:min(36px,70%);border-radius:var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0;background:var(--md-sys-color-outline-variant);transition:background var(--md-sys-motion-duration-short)}
+.dash-col.atual .dash-bar{background:var(--md-sys-color-primary)}
+.dash-col-label{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-label-medium)}
+.dash-tip{position:absolute;top:-26px;padding:2px 8px;border-radius:var(--shape-field);background:var(--md-sys-color-inverse-surface);color:var(--md-sys-color-inverse-on-surface);font:var(--md-sys-typescale-label-medium);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--md-sys-motion-duration-short)}
+.dash-col:hover .dash-tip,.dash-col:focus-visible .dash-tip,.dash-col.atual .dash-tip{opacity:1}
+.dash-col:hover .dash-bar,.dash-col:focus-visible .dash-bar{background:var(--md-sys-color-primary)}
+.dash-col:focus-visible .dash-col-label{outline:2px solid var(--md-sys-color-primary);outline-offset:2px;border-radius:var(--shape-field)}
+.dash-lists{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.dash-rank{display:grid;gap:8px;margin:0;padding:0;list-style:none;counter-reset:pos}
+.dash-rank li{display:flex;justify-content:space-between;gap:12px;font:var(--md-sys-typescale-body-medium);counter-increment:pos}
+.dash-rank li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-rank li span::before{content:counter(pos) '. ';color:var(--md-sys-color-on-surface-variant)}
+.dash-rank strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.dash-empty{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+@media (prefers-reduced-motion:reduce){.dash-bar,.dash-tip{transition:none}}
