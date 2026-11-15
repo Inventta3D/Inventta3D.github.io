@@ -150,11 +150,6 @@
 .validity-field small{color:var(--md-sys-color-on-surface-variant);font-weight:400}
 .validity-field .hint{display:none}
 .share-buttons{display:grid;gap:8px}
-.share-btn.whatsapp{--btn-h:52px;font-size:1rem}
-.share-secondary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.share-secondary .btn{--btn-px:4px;--radius:var(--shape-nested);flex-direction:column;gap:4px;min-height:64px;white-space:normal;text-align:center;font:var(--md-sys-typescale-label-medium)}
-.share-secondary .btn:active:not(:disabled){border-radius:var(--shape-nested)}
-.share-secondary .icon{width:22px;height:22px}
 .share-help{margin:12px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
 .share-status{min-height:20px;margin:8px 0 0;color:var(--md-ext-success);font:var(--md-sys-typescale-body-medium);font-weight:600}
 .share-status:empty{min-height:0;margin:0}
@@ -216,3 +211,16 @@
 
 /* telas baixas (notebooks): compacta o espaçamento vertical para o formulário caber sem rolagem */
 @media (min-width:900px) and (max-height:900px){.panel{padding-top:20px;padding-bottom:16px}.panel-head{margin-bottom:12px}.fields{gap:12px}.actions{margin-top:14px}.stepper-wrap{padding:8px 0 6px}}
+
+/* botão dividido "Enviar": ação principal + seta que abre o menu de formas de envio */
+.split-btn{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 56px;gap:2px}
+.split-btn .btn{--btn-h:52px;font-size:1rem}
+.split-btn .share-main{border-radius:var(--shape-control) var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) var(--shape-control)}
+.split-btn .share-caret{--btn-px:0;border-radius:var(--md-sys-shape-corner-extra-small) var(--shape-control) var(--shape-control) var(--md-sys-shape-corner-extra-small)}
+.split-btn .btn:active:not(:disabled){border-radius:inherit}
+.share-caret .icon{transition:transform var(--md-sys-motion-duration-short)}
+.share-caret[aria-expanded="true"] .icon{transform:rotate(180deg)}
+.share-menu{position:absolute;left:0;right:0;bottom:calc(100% + 8px);z-index:20;display:grid;gap:2px;padding:8px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container-high);box-shadow:var(--md-sys-elevation-3)}
+.share-menu[hidden]{display:none}
+.share-menu .menu-item[data-atual]::after{content:'';margin-left:auto;width:20px;height:20px;background:var(--md-ext-success);-webkit-mask:var(--check-mask) center/20px no-repeat;mask:var(--check-mask) center/20px no-repeat}
+@media (prefers-reduced-motion:reduce){.share-caret .icon{transition:none}}

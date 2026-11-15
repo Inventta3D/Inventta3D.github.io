@@ -130,6 +130,22 @@ test('acessibilidade: botões só com ícone têm aria-label e diálogos têm t�
   }
 });
 
+test('acessibilidade: botões que abrem menu apontam para o menu e iniciam fechados', () => {
+  for (const m of html.matchAll(/<button\b([^>]*aria-haspopup="[^"]+"[^>]*)>/g)) {
+    const alvo = (m[1].match(/aria-controls="([^"]+)"/) || [])[1];
+    assert.ok(alvo && idSet.has(alvo), `menu sem aria-controls válido: ${m[1].slice(0, 60)}`);
+    assert.match(m[1], /aria-expanded="false"/, 'menu deve iniciar fechado');
+  }
+});
+
+test('cliente: o que é compartilhado (texto, imagem e PDF) não mostra lucro', () => {
+  const src = read('site/js/app.js');
+  const inicio = src.indexOf('function sharedCosts');
+  assert.ok(inicio > 0);
+  const corpo = src.slice(inicio, src.indexOf('function crc16Pix', inicio));
+  assert.doesNotMatch(corpo, /lucro/i, 'sharedCosts alimenta texto, imagem e PDF: lucro é só da visão interna');
+});
+
 test('CSS: sem cores soltas fora dos tokens (módulos, componentes e shell)', () => {
   const permitido = new Set(['site/css/tokens.css', 'site/css/print.css']);
   const achados = [];

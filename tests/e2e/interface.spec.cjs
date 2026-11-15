@@ -5,6 +5,10 @@ const { entrar, gerarOrcamento, auditar } = require('./apoio.cjs');
 
 const ehCelular = (info) => info.project.name.startsWith('celular');
 const ehComputador = (info) => info.project.name.startsWith('computador');
+const escolherEnvio = async (page, nome) => {
+  await page.locator('#shareMenuBtn').click();
+  await page.getByRole('menuitem', { name: nome }).click();
+};
 
 test.describe('login', () => {
   test('abre sem erros, mostra o formulário e alterna o tema', async ({ page }) => {
@@ -93,10 +97,89 @@ test.describe('orçamento', () => {
     await page.locator('#savePrintBtn').click();
     achados.push(...(await auditar(page, '#printSaveDialog')));
     await page.locator('#printSaveCancel').click();
-    await page.getByRole('button', { name: /Pré-visualizar/ }).click();
+    await escolherEnvio(page, 'Pré-visualizar');
     await expect(page.locator('#previewDialog')).toBeVisible();
     achados.push(...(await auditar(page, '#previewDialog')));
     expect(achados).toEqual([]);
+  });
+});
+
+test.describe('enviar por e-mail', () => {
+  test('gera o PDF e prepara o e-mail com o cliente preenchido', async ({ page }, info) => {
+    await page.addInitScript(() => {
+      window.__abertos = [];
+      window.open = (u) => { window.__abertos.push(u); return null; };
+      window.__compartilhado = null;
+      navigator.canShare = () => true;
+      navigator.share = async (d) => { window.__compartilhado = { title: d.title, texto: d.text, arquivos: (d.files || []).map((f) => `${f.name}:${f.type}`) }; };
+    });
+    await entrar(page);
+    await gerarOrcamento(page, { cliente: 'Rafael Cardoso', email: 'rafael@exemplo.com' });
+    const celular = ehCelular(info);
+    const download = celular ? null : page.waitForEvent('download');
+    await escolherEnvio(page, 'E-mail com PDF');
+    await expect(page.locator('#shareMain')).toContainText('Enviar por e-mail');
+    if (celular) {
+      await expect(page.locator('#shareStatus')).toContainText('Compartilhamento aberto');
+      const c = await page.evaluate(() => window.__compartilhado);
+      expect(c.arquivos).toEqual(['orcamento-inventta-3d.pdf:application/pdf']);
+      expect(c.title).toContain('Rafael Cardoso');
+      expect(c.texto).toContain('Olá, Rafael!');
+    } else {
+      expect((await download).suggestedFilename()).toBe('orcamento-inventta-3d.pdf');
+      await expect(page.locator('#shareStatus')).toContainText('PDF baixado e e-mail aberto');
+      const [link] = await page.evaluate(() => window.__abertos);
+      expect(link).toMatch(/^mailto:rafael%40exemplo\.com\?subject=/);
+      expect(decodeURIComponent(link)).toContain('Segue o orçamento em PDF');
+    }
+    await expect(page.locator('#shareMain')).toBeEnabled();
+  });
+
+  test('botão dividido: lembra a última forma, abre pelo teclado e pré-visualizar não muda o principal', async ({ page }) => {
+    await entrar(page);
+    await gerarOrcamento(page);
+    const principal = page.locator('#shareMain');
+    await expect(principal).toContainText('Enviar pelo WhatsApp');
+    await page.locator('#shareMenuBtn').click();
+    await expect(page.getByRole('menuitem')).toHaveCount(5);
+    await expect(page.locator('#shareMenuBtn')).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#shareMenu')).toBeHidden();
+    await expect(page.locator('#shareMenuBtn')).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#shareMenu')).toBeVisible();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.getByRole('menuitem', { name: 'E-mail com PDF' })).toBeFocused();
+    await page.keyboard.press('Escape');
+    const download = page.waitForEvent('download');
+    await escolherEnvio(page, 'Baixar PDF');
+    expect((await download).suggestedFilename()).toBe('orcamento-inventta-3d.pdf');
+    await expect(principal).toContainText('Baixar PDF');
+    await escolherEnvio(page, 'Pré-visualizar');
+    await expect(page.locator('#previewDialog')).toBeVisible();
+    await page.locator('#previewClose').click();
+    await expect(principal).toContainText('Baixar PDF');
+    await page.reload();
+    await expect(page.locator('#shareMainLbl')).toHaveText('Baixar PDF');
+  });
+});
+
+test.describe('detalhamento para o cliente', () => {
+  test('orçamento detalhado mostra custos e taxas, mas nunca o lucro', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__copiado = '';
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__copiado = t; } }, configurable: true });
+    });
+    await entrar(page);
+    await gerarOrcamento(page);
+    await page.locator('input[name="shareMode"][value="detailed"]').check({ force: true });
+    await escolherEnvio(page, 'Copiar texto');
+    await expect.poll(() => page.evaluate(() => window.__copiado)).toContain('DETALHAMENTO DO ORÇAMENTO');
+    const texto = await page.evaluate(() => window.__copiado);
+    expect(texto).toContain('Custo estimado');
+    expect(texto).toContain('Taxas e tributos');
+    expect(texto.toLowerCase()).not.toContain('lucro');
+    await expect(page.locator('.share-panel')).toContainText('O lucro nunca vai para o cliente.');
   });
 });
 
