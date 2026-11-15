@@ -131,7 +131,8 @@ select.control option,select.control optgroup{background:var(--md-sys-color-surf
 .preview-body{flex:1;min-height:200px;overflow:auto;padding:4px 24px 16px}
 .preview-img{display:block;width:100%;height:auto;margin:0 0 12px;border-radius:var(--shape-nested);box-shadow:var(--md-sys-elevation-1)}
 .preview-msg{margin:40px 0;text-align:center;color:var(--md-sys-color-on-surface-variant)}
-.preview-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px 24px}
+.preview-foot{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding:16px 24px 24px}
+@media(max-width:480px){.preview-foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));padding:16px 16px calc(16px + env(safe-area-inset-bottom))}.preview-foot .btn{width:100%;justify-content:center}}
 .preview-foot .btn-outline{--bd:transparent;--fg:var(--md-sys-color-primary)}
 
 /* ---------- snackbar ---------- */

@@ -60,6 +60,7 @@
   .main-nav .nav-indicator{width:64px}
   .app-status,.toast{bottom:calc(92px + env(safe-area-inset-bottom))}
   .site-footer{flex-direction:column;align-items:flex-start;gap:0}
+  .site-footer-link{margin-left:-12px}
 }
 
 /* ---------- tablet e computador: navigation rail ---------- */
