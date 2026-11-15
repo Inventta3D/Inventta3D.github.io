@@ -288,6 +288,9 @@
         const mat = material(r.material);
         if (mat) { preencher('filamentType', mat, 'change'); feito.push(mat); }
         status.textContent = `Do fatiador: ${feito.join(' · ')}.` + (placaTxt(r.placas || 0, r.objetos || 0) || ' Confira nas próximas etapas.');
+        if (/\.3mf$/i.test(arq.name)) { // 3MF fatiado também traz a malha da peça
+          try { const placas = await F.lerMalha3mf(new Uint8Array(await arq.arrayBuffer())); if (placas.some((p) => p.tri.length)) mostrarPeca(placas); } catch { /* sem 3D, só os números */ }
+        }
         return;
       }
       if (!malha && !/\.3mf$/i.test(arq.name)) throw aviso('Não encontrei peso nem tempo neste arquivo. Use o G‑code gerado pelo fatiador, um STL ou um 3MF.');

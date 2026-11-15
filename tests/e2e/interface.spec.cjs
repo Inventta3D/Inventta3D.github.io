@@ -1,7 +1,7 @@
 // Testes de interface no navegador. Cada teste descreve o que o usuário faz e vê.
 // Os módulos (telas) são lidos de js/modules.js: uma tela nova entra sozinha nos testes de navegação e de layout.
 const { test, expect } = require('@playwright/test');
-const { entrar, gerarOrcamento, auditar, cuboSTL, bancoFalso, urlSupabase } = require('./apoio.cjs');
+const { entrar, gerarOrcamento, auditar, cuboSTL, cubo3mfFatiado, bancoFalso, urlSupabase } = require('./apoio.cjs');
 
 const ehCelular = (info) => info.project.name.startsWith('celular');
 const ehComputador = (info) => info.project.name.startsWith('computador');
@@ -315,6 +315,16 @@ test.describe('importar do fatiador', () => {
 });
 
 test.describe('importar STL para ver em 3D', () => {
+  test('3MF fatiado: preenche peso, tempo e material e também mostra a peça em 3D', async ({ page }) => {
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cubo3mfFatiado());
+    await expect(page.locator('#slicerStatus')).toContainText('12,5 g');
+    await expect(page.locator('#amount')).toHaveValue('12,5');
+    await expect(page.locator('#printHours')).toHaveValue('01:30');
+    await expect(page.locator('#filamentType')).toHaveValue('PETG');
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+  });
+
   test('STL: mostra a peça em 3D, sem estimar peso nem tempo; trocar a cor preenche a cor do filamento', async ({ page }) => {
     await entrar(page);
     await page.locator('#slicerFile').setInputFiles(cuboSTL());

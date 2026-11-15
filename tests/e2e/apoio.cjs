@@ -175,4 +175,27 @@ function cuboSTL(L = 20, name = 'cubo_teste.stl') {
   return { name, mimeType: 'model/stl', buffer: b };
 }
 
-module.exports = { bancoFalso, cuboSTL, entrar, gerarOrcamento, auditar, urlSupabase };
+// 3MF fatiado (Bambu/Orca) com um cubo: peso 12,5 g, 1h30, PETG.
+function cubo3mfFatiado(name = 'cubo_fatiado.3mf') {
+  const zlib = require('node:zlib');
+  const v = [[0,0,0],[10,0,0],[10,10,0],[0,10,0],[0,0,10],[10,0,10],[10,10,10],[0,10,10]];
+  const f = [[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],[1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]];
+  const modelo = '<model><resources><object id="1"><mesh><vertices>' + v.map(([x, y, z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('') +
+    '</vertices><triangles>' + f.map(([a, b, c]) => `<triangle v1="${a}" v2="${b}" v3="${c}"/>`).join('') + '</triangles></mesh></object></resources><build><item objectid="1"/></build></model>';
+  const arquivos = {
+    '3D/3dmodel.model': modelo,
+    'Metadata/slice_info.config': '<config><plate><metadata key="prediction" value="5400"/><metadata key="weight" value="12.5"/><object identify_id="1" name="a"/><filament id="1" type="PETG" used_g="12.5"/></plate></config>',
+  };
+  const locais = [], central = []; let off = 0;
+  for (const [nome, txt] of Object.entries(arquivos)) {
+    const n = Buffer.from(nome), dado = zlib.deflateRawSync(Buffer.from(txt));
+    const l = Buffer.alloc(30); l.writeUInt32LE(0x04034b50, 0); l.writeUInt16LE(8, 8); l.writeUInt32LE(dado.length, 18); l.writeUInt16LE(n.length, 26);
+    const c = Buffer.alloc(46); c.writeUInt32LE(0x02014b50, 0); c.writeUInt16LE(8, 10); c.writeUInt32LE(dado.length, 20); c.writeUInt16LE(n.length, 28); c.writeUInt32LE(off, 42);
+    locais.push(l, n, dado); central.push(c, n); off += 30 + n.length + dado.length;
+  }
+  const cd = Buffer.concat(central), e = Buffer.alloc(22);
+  e.writeUInt32LE(0x06054b50, 0); e.writeUInt16LE(2, 10); e.writeUInt32LE(cd.length, 12); e.writeUInt32LE(off, 16);
+  return { name, mimeType: 'model/3mf', buffer: Buffer.concat([...locais, cd, e]) };
+}
+
+module.exports = { bancoFalso, cuboSTL, cubo3mfFatiado, entrar, gerarOrcamento, auditar, urlSupabase };
