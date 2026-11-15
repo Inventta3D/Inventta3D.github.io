@@ -80,8 +80,34 @@
     canvas.setAttribute('role', 'img');
     canvas.setAttribute('aria-label', `Visualização 3D de ${nome}. Arraste para girar e use a roda ou dois dedos para aproximar.`);
     caixa.append(canvas);
-    const cores = document.createElement('div');
-    cores.className = 'model-cores'; cores.setAttribute('role', 'group'); cores.setAttribute('aria-label', 'Cor da peça');
+    // três ícones sobre o 3D: tela cheia (topo direito), cores (base esquerda) e compartilhar (base direita)
+    const ICONES = {
+      tela: '<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>',
+      cor: '<path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-.9 2-1.8 0-1.3-1-1.5-1-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z"/><circle cx="7.5" cy="11.5" r="1" fill="currentColor"/><circle cx="10.5" cy="7.5" r="1" fill="currentColor"/><circle cx="15.5" cy="8" r="1" fill="currentColor"/>',
+      enviar: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/>',
+    };
+    const icone = (tipo, rotulo, pos) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = `model-icone model-icone-${pos}`; b.title = rotulo; b.setAttribute('aria-label', rotulo);
+      b.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[tipo]}</svg>`;
+      return b;
+    };
+    const painel = (classe, rotulo) => { const d = document.createElement('div'); d.className = `model-painel ${classe}`; d.hidden = true; d.setAttribute('role', 'group'); d.setAttribute('aria-label', rotulo); return d; };
+    const alternar = (gatilho, alvo) => { gatilho.setAttribute('aria-expanded', 'false'); gatilho.addEventListener('click', () => { const abrir = alvo.hidden; fecharPaineis(); alvo.hidden = !abrir; gatilho.setAttribute('aria-expanded', String(abrir)); }); };
+    const fecharPaineis = () => { for (const [g, a] of pares) { a.hidden = true; g.setAttribute('aria-expanded', 'false'); } };
+    const pares = [];
+    const cores = painel('model-cores', 'Cor da peça');
+    const acoes = painel('model-acoes', 'Compartilhar peça');
+    const gCor = icone('cor', 'Escolher cor', 'esq'), gEnviar = icone('enviar', 'Compartilhar peça', 'dir');
+    pares.push([gCor, cores], [gEnviar, acoes]); alternar(gCor, cores); alternar(gEnviar, acoes);
+    const gTela = icone('tela', 'Tela cheia', 'topo');
+    if (caixa.requestFullscreen) {
+      gTela.addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else caixa.requestFullscreen().catch(() => {}); });
+      caixa.append(gTela);
+    }
+    const fora = (e) => { if (!caixa.contains(e.target) || !e.target.closest('.model-painel, .model-icone')) fecharPaineis(); };
+    document.addEventListener('pointerdown', fora);
+    caixa.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharPaineis(); });
     const botoes = Object.entries(CORES).map(([k, hex]) => {
       const b = document.createElement('button'), rotulo = k[0].toUpperCase() + k.slice(1);
       b.type = 'button'; b.className = 'model-cor'; b.style.background = hex; b.title = rotulo; b.setAttribute('aria-label', rotulo); b.dataset.cor = rotulo;
@@ -89,11 +115,9 @@
       cores.append(b); return [k, b];
     });
     const marcar = (texto) => { const t = String(texto || '').toLowerCase(), k = Object.keys(CORES).find((c) => t.includes(c)); for (const [c, b] of botoes) b.setAttribute('aria-pressed', String(c === k)); };
-    caixa.append(cores);
-    const acoes = document.createElement('div'); acoes.className = 'model-acoes';
-    const botao = (texto) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-tonal btn-sm'; b.textContent = texto; acoes.append(b); return b; };
+    const botao = (texto) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'model-item'; b.textContent = texto; acoes.append(b); return b; };
     const enviar = botao('Compartilhar imagem'), enviarGif = botao('Compartilhar GIF');
-    caixa.append(acoes);
+    caixa.append(cores, acoes, gCor, gEnviar);
 
     const cena = new T.Scene();
     const geo = new T.BufferGeometry();
@@ -176,7 +200,7 @@
 
     return {
       cor: (c) => { marcar(c); material.color.set(corDe(c)); },
-      fechar: () => { vivo = false; ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
+      fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
     };
   }
 

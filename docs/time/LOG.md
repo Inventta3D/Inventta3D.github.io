@@ -70,3 +70,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - GIF mais lento (local, CACHE v74, não publicado): de 48 quadros a 6 cs (~3 s por volta) para 72 quadros a 10 cs (~7 s por volta).
 
 - 3MF fatiado também mostra a peça em 3D (além de peso, tempo e material). Teste e2e novo. CACHE v75.
+
+- Visualizador 3D com ícones sobre a peça: tela cheia (topo), cores (base esquerda, abre painel) e compartilhar (base direita, abre imagem/GIF). Altura 300 px. CACHE v76.

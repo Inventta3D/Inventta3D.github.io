@@ -323,6 +323,7 @@ test.describe('importar STL para ver em 3D', () => {
     await expect(page.locator('#printHours')).toHaveValue('01:30');
     await expect(page.locator('#filamentType')).toHaveValue('PETG');
     await expect(page.locator('#slicerView canvas')).toBeVisible();
+    for (const n of ['Escolher cor', 'Compartilhar peça']) await expect(page.locator('#slicerView').getByRole('button', { name: n })).toBeVisible();
   });
 
   test('STL: mostra a peça em 3D, sem estimar peso nem tempo; trocar a cor preenche a cor do filamento', async ({ page }) => {
@@ -334,12 +335,15 @@ test.describe('importar STL para ver em 3D', () => {
     await expect(page.locator('#slicerView canvas')).toHaveAttribute('aria-label', /cubo teste/);
     await expect(page.locator('#amount')).toHaveValue('');
     await expect(page.locator('#printHours')).toHaveValue('');
+    await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toBeHidden(); // cores ficam atrás do ícone
+    await page.locator('#slicerView').getByRole('button', { name: 'Escolher cor' }).click();
     await page.locator('#slicerView').getByRole('button', { name: 'Azul' }).click();
     await expect(page.locator('#filamentColor')).toHaveValue('Azul');
     await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'true');
     await page.locator('.panel[data-panel="0"] .btn-next').click();
     await page.locator('#filamentColor').fill('Vermelho fosco');
     await page.locator('.panel[data-panel="1"] .btn-back').click();
+    await page.locator('#slicerView').getByRole('button', { name: 'Escolher cor' }).click(); // clicar fora fechou o painel
     await expect(page.locator('#slicerView').getByRole('button', { name: 'Vermelho' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'false');
   });
@@ -350,6 +354,7 @@ test.describe('importar STL para ver em 3D', () => {
     await entrar(page);
     await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
     await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await page.getByRole('button', { name: 'Compartilhar peça' }).click();
     if (celular) {
       await page.getByRole('button', { name: 'Compartilhar imagem' }).click();
       await expect.poll(() => page.evaluate(() => window.__enviado?.[0])).toMatch(/^cubo-teste\.png:image\/png:\d{4,}/);
@@ -366,6 +371,7 @@ test.describe('importar STL para ver em 3D', () => {
     await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
     await expect(page.locator('#slicerView canvas')).toBeVisible();
     let bytes;
+    await page.getByRole('button', { name: 'Compartilhar peça' }).click();
     if (celular) {
       await page.getByRole('button', { name: 'Compartilhar GIF' }).click();
       await expect.poll(() => page.evaluate(() => !!window.__gif), { timeout: 30000 }).toBe(true);
