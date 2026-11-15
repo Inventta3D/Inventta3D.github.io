@@ -28,3 +28,4 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 | APK não abre | Cores do TWA corrigidas, v1.0.1 publicada | Não verificado em aparelho (P1) |
 | Layouts de orçamento (imagem e PDF), QR codes | Publicados | Render com dados de exemplo; QR não escaneado |
 | Publicação no GitHub Pages e APK | Site no ar, APK assinado v1.0.0 | Assinatura conferida com `openssl`; instalação não testada |
+| Calculadora nos campos de valor | Pronta, não publicada (`v55`) | 7 testes do núcleo, 5 de navegador e auditoria de layout em 320, 360, 390, 412 e 1440 px; não testada em aparelho |

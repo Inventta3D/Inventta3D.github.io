@@ -84,6 +84,9 @@ test.describe('orçamento', () => {
     await page.locator('#amount').fill('38');
     await page.locator('#packPrice').fill('120');
     achados.push(...(await auditar(page, '.panel[data-panel="1"]')));
+    await page.getByRole('button', { name: /Abrir calculadora para Filamento por peça/ }).click();
+    achados.push(...(await auditar(page, '#calcDialog')));
+    await page.keyboard.press('Escape');
     await proximo(1);
     await page.locator('#printHours').fill('0342');
     achados.push(...(await auditar(page, '.panel[data-panel="2"]')));
@@ -204,6 +207,84 @@ test.describe('o que vai para o cliente', () => {
     await page.locator('details.internal > summary').click();
     await expect(page.locator('details.internal')).toContainText('Lucro estimado após taxas');
     await expect(page.locator('details.internal')).toContainText('privados e não aparecem no orçamento compartilhado');
+  });
+});
+
+test.describe('calculadora', () => {
+  const abrir = (page, campo) => page.getByRole('button', { name: new RegExp(`Abrir calculadora para ${campo}`) }).click();
+
+  test('só aparece nos campos de valor do orçamento, nunca no login nem nas outras telas', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.calc-open:visible')).toHaveCount(0);
+    await entrar(page);
+    await expect(page.locator('.calc-open')).toHaveCount(3);
+    for (const rota of ['#/clientes', '#/impressoes', '#/orcamentos-salvos']) {
+      await page.evaluate((r) => { location.hash = r; }, rota);
+      await expect(page.locator('.calc-open:visible')).toHaveCount(0);
+    }
+  });
+
+  test('filamento por peça: soma pelo teclado e grava o resultado no campo', async ({ page }) => {
+    await entrar(page);
+    await page.getByRole('textbox', { name: 'Nome da peça' }).fill('Peça');
+    await page.locator('.panel[data-panel="0"] .btn-next').click();
+    await abrir(page, 'Filamento por peça');
+    await expect(page.locator('#calcDialog')).toBeVisible();
+    await expect(page.locator('#calcAlvo')).toContainText('Filamento por peça');
+    await page.keyboard.type('30+8');
+    await expect(page.locator('#calcResult')).toHaveText('38');
+    await page.locator('#calcUse').click();
+    await expect(page.locator('#calcDialog')).toBeHidden();
+    await expect(page.locator('#amount')).toHaveValue('38');
+  });
+
+  test('preço do rolo: divisão grava em reais com duas casas; teclado na tela funciona', async ({ page }) => {
+    await entrar(page);
+    await page.getByRole('textbox', { name: 'Nome da peça' }).fill('Peça');
+    await page.locator('.panel[data-panel="0"] .btn-next').click();
+    await abrir(page, 'Preço do');
+    await page.locator('#calcDialog [data-tecla="1"]').click();
+    await page.locator('#calcDialog [data-tecla="2"]').click();
+    await page.locator('#calcDialog [data-tecla="0"]').click();
+    await page.locator('#calcDialog [data-tecla="0"]').click();
+    await page.locator('#calcDialog [data-tecla="/"]').click();
+    await page.locator('#calcDialog [data-tecla="1"]').click();
+    await page.locator('#calcDialog [data-tecla="0"]').click();
+    await expect(page.locator('#calcExpr')).toHaveText('1200÷10');
+    await expect(page.locator('#calcResult')).toHaveText('120');
+    await page.locator('#calcUse').click();
+    await expect(page.locator('#packPrice')).toHaveValue('120,00');
+  });
+
+  test('valor final do desconto: calcula, grava e o total acompanha; % e Esc funcionam', async ({ page }) => {
+    await entrar(page);
+    await gerarOrcamento(page);
+    await page.locator('label.discount-choice', { hasText: 'Valor final' }).click();
+    await abrir(page, 'Valor final');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type('200+10%');
+    await expect(page.locator('#calcResult')).toHaveText('220');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type('20-8,5');
+    await expect(page.locator('#calcResult')).toHaveText('11,5');
+    await page.locator('#calcUse').click();
+    await expect(page.locator('#discountValue')).toHaveValue('11,50');
+    await expect(page.locator('#batchTotal')).toContainText('11,50');
+    await abrir(page, 'Valor final');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#calcDialog')).toBeHidden();
+  });
+
+  test('conta incompleta mostra aviso e não altera o campo', async ({ page }) => {
+    await entrar(page);
+    await page.getByRole('textbox', { name: 'Nome da peça' }).fill('Peça');
+    await page.locator('.panel[data-panel="0"] .btn-next').click();
+    await abrir(page, 'Filamento por peça');
+    await page.keyboard.type('5+');
+    await page.locator('#calcUse').click();
+    await expect(page.locator('#calcResult')).toHaveText('Complete a conta');
+    await expect(page.locator('#calcDialog')).toBeVisible();
+    await expect(page.locator('#amount')).not.toHaveValue('5');
   });
 });
 
