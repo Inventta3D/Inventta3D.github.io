@@ -5,7 +5,7 @@ const { entrar, gerarOrcamento } = require('./apoio.cjs');
 test.describe('etapas do orçamento', () => {
   const noPainel = (page, i) => page.evaluate((n) => {
     const p = document.querySelector(`.panel[data-panel="${n}"]`), v = document.getElementById('viewport').getBoundingClientRect(), r = p.getBoundingClientRect();
-    return { inert: p.inert, aTela: Math.abs(r.left - v.left) < 2 };
+    return { inert: p.inert, aTela: Math.abs(r.left - v.left) < 2, semRolagem: document.getElementById('viewport').scrollLeft === 0 };
   }, i);
 
   test('voltar pelos números durante o preenchimento mostra a etapa e o Continuar segue de lá', async ({ page }) => {
@@ -18,14 +18,14 @@ test.describe('etapas do orçamento', () => {
     await ir(1);
     await page.locator('#printHours').fill('0342');
     await ir(2);
-    await expect.poll(() => noPainel(page, 3)).toMatchObject({ aTela: true, inert: false });
+    await expect.poll(() => noPainel(page, 3)).toMatchObject({ aTela: true, inert: false, semRolagem: true });
 
     await page.getByRole('button', { name: /^Etapa 1:/ }).click();
-    await expect.poll(() => noPainel(page, 0)).toMatchObject({ aTela: true, inert: false });
+    await expect.poll(() => noPainel(page, 0)).toMatchObject({ aTela: true, inert: false, semRolagem: true });
     await expect(page.locator('#stageCount')).toHaveText('Etapa 1 de 5');
 
     await page.locator('.panel[data-panel="0"] .btn-next').click();
-    await expect.poll(() => noPainel(page, 1)).toMatchObject({ aTela: true, inert: false });
+    await expect.poll(() => noPainel(page, 1)).toMatchObject({ aTela: true, inert: false, semRolagem: true });
     await expect(page.locator('#stageCount')).toHaveText('Etapa 2 de 5');
   });
 
@@ -38,7 +38,7 @@ test.describe('etapas do orçamento', () => {
     await expect(page.locator('#result')).not.toHaveClass(/show/);
     await expect(page.locator('#formCard')).toBeVisible();
     await expect(page.locator('#stageCount')).toHaveText('Etapa 2 de 5');
-    await expect.poll(() => noPainel(page, 1)).toMatchObject({ aTela: true, inert: false });
+    await expect.poll(() => noPainel(page, 1)).toMatchObject({ aTela: true, inert: false, semRolagem: true });
     await expect(page.locator('#amount')).toHaveValue('38');
 
     // avançar pelo número e pelo Continuar chega de novo ao preço, com um item só

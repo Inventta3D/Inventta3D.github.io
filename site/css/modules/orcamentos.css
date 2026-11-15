@@ -26,7 +26,7 @@
 /* ---------- formulário em etapas ---------- */
 .form-card{display:grid;grid-template-columns:minmax(0,1fr);scroll-margin-top:calc(var(--appbar-h) + 96px);overflow:hidden;border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-lowest)}
 .card-top{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
-.viewport{overflow:hidden;touch-action:pan-y;transition:height var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized)}
+.viewport{overflow:hidden;overflow:clip;touch-action:pan-y;transition:height var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized)}
 .track{display:flex;align-items:flex-start;transition:transform var(--md-sys-motion-duration-long) var(--md-sys-motion-easing-emphasized)}
 .panel{flex:0 0 100%;width:100%;padding:clamp(24px,4vw,40px) clamp(20px,4vw,40px) 24px}
 .panel-head{margin-bottom:28px;max-width:600px}
@@ -177,7 +177,8 @@
   .stepper-wrap{margin-inline:calc(var(--gutter)*-1);padding-inline:var(--gutter)}
   .stepper{gap:0}
   .step-btn{flex-direction:column;justify-content:center;gap:4px;padding:4px 0;border-radius:var(--shape-nested);text-align:center;font:var(--md-sys-typescale-label-medium)}
-  .step-name{max-width:68px}
+  .step-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .step-btn{min-width:0}
   .form-card{margin-inline:calc(var(--gutter)*-1);border-radius:var(--shape-surface) var(--shape-surface) 0 0}
   .fields{grid-template-columns:1fr}
   .field.full{grid-column:auto}
@@ -272,3 +273,5 @@
 @media (max-width:519px){.order-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.filter-chip{padding:0 8px}}
 .order-note{display:block;margin-top:6px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small);font-style:italic}
 @media (max-width:719px){.order-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-left:0}.order-actions>:last-child:nth-child(odd){grid-column:1/-1}.order-actions .btn{justify-content:center}}
+
+@media (max-width:359px){.step-btn{font-size:.625rem}}

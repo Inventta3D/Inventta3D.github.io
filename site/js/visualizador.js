@@ -147,7 +147,10 @@
     cena.add(sol);
 
     const camera = new T.PerspectiveCamera(35, larg / alt, raio / 100, raio * 50);
-    camera.position.set(raio * 1.6, raio * 1.2, raio * 1.9);
+    // enquadra a peça inteira (esfera que a contém) para a proporção da caixa, em qualquer tela
+    const dir = new T.Vector3(1.6, 1.2, 1.9).normalize(), R = tam.length() / 2;
+    const fov = Math.min(35, (2 * Math.atan(Math.tan((35 * Math.PI) / 360) * camera.aspect) * 180) / Math.PI) * (Math.PI / 180);
+    camera.position.copy(dir.multiplyScalar((R * 1.15) / Math.sin(fov / 2))).add(new T.Vector3(0, tam.y / 2, 0));
     const ctrl = new OrbitControls(camera, canvas);
     ctrl.target.set(0, tam.y / 2, 0);
     ctrl.enableDamping = !matchMedia('(prefers-reduced-motion: reduce)').matches;

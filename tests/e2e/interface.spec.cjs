@@ -683,6 +683,25 @@ test.describe('vitrine pública', () => {
 });
 
 test.describe('telas (módulos)', () => {
+  test('rótulos do menu e das etapas cabem na tela, sem cortar nem sobrepor', async ({ page }) => {
+    await entrar(page);
+    const falhas = await page.evaluate(() => {
+      const out = [], visivel = (e) => e.getClientRects().length > 0;
+      for (const e of [...document.querySelectorAll('.main-nav a, .stepper .step-btn')].filter(visivel)) {
+        const b = e.getBoundingClientRect(), nome = e.textContent.trim();
+        if (b.left < -1 || b.right > innerWidth + 1) out.push(`fora da tela: ${nome}`);
+        if (e.scrollWidth > e.clientWidth + 1) out.push(`item mais largo que a coluna: ${nome}`);
+        for (const t of e.querySelectorAll('span, strong')) if (visivel(t) && t.scrollWidth > t.clientWidth + 1) out.push(`texto cortado: ${t.textContent.trim()}`);
+      }
+      for (const g of ['.main-nav', '.stepper']) {
+        const l = [...document.querySelectorAll(`${g} > *`)].filter(visivel).map((e) => e.getBoundingClientRect());
+        for (let i = 1; i < l.length; i++) if (l[i].left < l[i - 1].right - 1 && Math.abs(l[i].top - l[i - 1].top) < 4) out.push(`itens sobrepostos em ${g}`);
+      }
+      return out;
+    });
+    expect(falhas).toEqual([]);
+  });
+
   test('cada módulo abre, tem título e passa na auditoria de layout', async ({ page }) => {
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));

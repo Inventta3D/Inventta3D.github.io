@@ -74,3 +74,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Visualizador 3D com ícones sobre a peça: tela cheia (topo), cores (base esquerda, abre painel) e compartilhar (base direita, abre imagem/GIF). Altura 300 px. CACHE v76.
 
 - WhatsApp do orçamento envia também o PNG da peça em 3D (peca-3d.png) quando há 3D na tela; sem 3D, só o orçamento. CACHE v78.
+
+- Auditoria de UI: rótulos do passo a passo e do menu inferior cabiam mal em 320 px (corrigido); 3D enquadra a peça inteira (câmera por esfera); viewport das etapas com overflow:clip e rolagem zerada (falha só no CI); testes em 10 telas incl. 1366, 1920 e A56 (411). CACHE v79.

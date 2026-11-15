@@ -19,9 +19,13 @@ module.exports = defineConfig({
   projects: [
     { name: 'celular-320', use: celular(320, 640) },
     { name: 'celular-360', use: celular(360, 740) },
+    { name: 'celular-384', use: celular(384, 854) },
     { name: 'celular-390', use: celular(390, 844) },
+    { name: 'celular-411', use: celular(411, 891) }, // Samsung A56 (app instalado)
     { name: 'celular-412', use: celular(412, 915) },
     { name: 'computador-1280', use: { viewport: { width: 1280, height: 720 } } },
+    { name: 'computador-1366', use: { viewport: { width: 1366, height: 657 } } }, // notebook 1366×768 com a barra do navegador
     { name: 'computador-1440', use: { viewport: { width: 1440, height: 900 } } },
+    { name: 'computador-1920', use: { viewport: { width: 1920, height: 950 } } }, // monitor 1920×1080 com a barra do navegador
   ],
 });
