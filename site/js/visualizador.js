@@ -146,9 +146,9 @@
       const a = document.createElement('a'); a.href = URL.createObjectURL(arq); a.download = arq.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
     enviar.addEventListener('click', async () => compartilhar(await imagem(), 'png'));
-    // peça girando uma volta (48 quadros de 400×300, ~3 s); a câmera fica parada e a peça gira, como num prato giratório
+    // peça girando uma volta (72 quadros de 400×300 a 10 por segundo, ~7 s); a câmera fica parada e a peça gira, como num prato giratório
     enviarGif.addEventListener('click', async () => {
-      const L = 400, A = 300, N = 48, w = renderer.domElement.width, h = renderer.domElement.height, pr = renderer.getPixelRatio(), giro = malha.rotation.y, texto = enviarGif.textContent;
+      const L = 400, A = 300, N = 72, w = renderer.domElement.width, h = renderer.domElement.height, pr = renderer.getPixelRatio(), giro = malha.rotation.y, texto = enviarGif.textContent;
       acoes.querySelectorAll('button').forEach((b) => { b.disabled = true; });
       try {
         renderer.setPixelRatio(1); renderer.setSize(L, A, false); camera.aspect = L / A; camera.updateProjectionMatrix();
@@ -161,7 +161,7 @@
           await new Promise((ok) => setTimeout(ok));
         }
         enviarGif.textContent = 'Montando…'; await new Promise((ok) => setTimeout(ok));
-        await compartilhar(gif(quadros, L, A, 6), 'gif');
+        await compartilhar(gif(quadros, L, A, 10), 'gif');
       } finally {
         malha.rotation.y = giro; renderer.setPixelRatio(pr); renderer.setSize(w / pr, h / pr, false); camera.aspect = w / h; camera.updateProjectionMatrix();
         enviarGif.textContent = texto; acoes.querySelectorAll('button').forEach((b) => { b.disabled = false; });

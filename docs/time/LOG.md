@@ -67,3 +67,4 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Motivo: e-mail de confirmação do Supabase (SMTP padrão) só entrega à equipe do projeto e tem limite baixo; clientes novos não receberiam.
 - PENDENTE no painel do Supabase (Authentication → Sign In / Providers → Email): desligar "Enable email signups", senão a API ainda aceita cadastro por e-mail.
 - Quem já tinha conta por senha deve entrar com o Google do mesmo e-mail (o Supabase costuma vincular pela mesma conta; não verificado).
+- GIF mais lento (local, CACHE v74, não publicado): de 48 quadros a 6 cs (~3 s por volta) para 72 quadros a 10 cs (~7 s por volta).

@@ -349,7 +349,7 @@ test.describe('importar STL para ver em 3D', () => {
     }
   });
 
-  test('STL: compartilhar GIF girando; o arquivo tem 48 quadros de 400×300', async ({ page }, info) => {
+  test('STL: compartilhar GIF girando; o arquivo tem 72 quadros de 400×300', async ({ page }, info) => {
     const celular = info.project.name.startsWith('celular');
     await page.addInitScript(() => { window.__gif = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__gif = new Uint8Array(await d.files[0].arrayBuffer()); }; });
     await entrar(page);
@@ -368,7 +368,7 @@ test.describe('importar STL para ver em 3D', () => {
     expect(bytes.subarray(0, 6).toString()).toBe('GIF89a');
     expect(bytes.readUInt16LE(6)).toBe(400);
     expect(bytes.readUInt16LE(8)).toBe(300);
-    expect(bytes.toString('latin1').split('!ù').length - 1).toBe(48); // um bloco de controle por quadro
+    expect(bytes.toString('latin1').split('!ù').length - 1).toBe(72); // um bloco de controle por quadro
     expect(bytes.at(-1)).toBe(0x3b);
     await expect(page.getByRole('button', { name: 'Compartilhar GIF' })).toBeEnabled();
   });
