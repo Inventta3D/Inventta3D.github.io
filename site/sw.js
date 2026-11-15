@@ -1,4 +1,4 @@
-const CACHE_NAME='inventta3d-v71';
+const CACHE_NAME='inventta3d-v73';
 const KIRI_CACHE='inventta3d-kiri-4.7.3'; // motor de fatiamento (~9 MB): baixado só no primeiro uso e mantido entre versões do site
 const APP_SHELL=[
   './',
@@ -54,7 +54,6 @@ const APP_SHELL=[
   './js/vitrine-dono.js',
   './js/recap.js',
   './js/theme.js',
-  './js/password-toggle.js',
   './js/context-help.js',
   './js/qrcode-generator.js',
   './vendor/supabase.js'

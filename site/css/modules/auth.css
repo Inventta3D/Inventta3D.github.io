@@ -28,7 +28,6 @@
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--md-sys-color-outline-variant)}
 .login-status{min-height:22px;margin:16px 0 0;color:var(--md-ext-success);font:var(--md-sys-typescale-body-medium);font-weight:600;text-align:center}
 .login-status.error{color:var(--md-sys-color-error)}
-.login-links{display:flex;justify-content:space-between;gap:8px;margin:0 -12px}
 .login-link{min-height:48px;padding:0 12px;border:0;border-radius:var(--shape-control);background:none;color:var(--md-sys-color-primary);font:var(--md-sys-typescale-label-large)}
 .login-link:hover{background:color-mix(in srgb,var(--md-sys-color-primary) 8%,transparent)}
 .login-footnote{margin:16px 0 0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small);text-align:center}
@@ -45,7 +44,6 @@
   .login-card{flex:1;display:flex;flex-direction:column;margin-block:0}
   .login-card #loginTitle{display:flex;align-items:center;justify-content:center;height:72px;margin:0;font:var(--md-sys-typescale-headline-large)}
   .login-intro{margin:0 0 24px;font:var(--md-sys-typescale-body-large)}
-  .login-links{margin-top:auto}
   .login-tools{top:24px;right:24px}
   .login-aside .aside-logo{display:flex;align-items:center;justify-content:center;width:100%;height:72px}
   .aside-logo img{display:block;width:min(260px,100%);height:auto}

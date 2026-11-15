@@ -1,8 +1,5 @@
 (()=>{
   const descriptions={
-    loginEmail:'Use o e-mail da conta para entrar ou criar seu acesso. Se pedir redefinição de senha, o link será enviado para este endereço.',
-    loginPassword:'Digite a senha da sua conta. O controle ao lado permite conferir o que foi digitado.',
-    loginConfirmPassword:'Ao criar a conta, repita a senha para evitar erro de digitação.',
     product:'Escolha um nome que ajude você e o cliente a identificar a peça, como “Suporte de headset”. Esse nome aparece no orçamento compartilhado.',
     quantity:'Informe quantas unidades iguais serão produzidas. O total do pedido considera essa quantidade; use “Adicionar item” para incluir uma peça diferente.',
     clientName:'Opcional. Identifica o cliente no orçamento enviado. Deixe em branco se preferir não incluir o nome.',

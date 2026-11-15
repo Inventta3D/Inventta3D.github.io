@@ -16,8 +16,8 @@ test.describe('login', () => {
     page.on('pageerror', (e) => erros.push(e.message));
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Acesse sua conta' })).toBeVisible();
-    await expect(page.locator('#loginEmail')).toBeVisible();
-    await expect(page.locator('#loginPassword')).toBeVisible();
+    await expect(page.locator('#loginScreen input')).toHaveCount(0); // só Google: sem e-mail nem senha
+    await expect(page.getByText(/Criar conta|Esqueci minha senha|Entrar com senha/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Continuar com Google/ })).toBeVisible();
     const antes = await page.locator('html').getAttribute('data-theme');
     await page.locator('.login-tools [data-theme-toggle]').click();
@@ -30,13 +30,12 @@ test.describe('login', () => {
     expect(await auditar(page, '#loginScreen')).toEqual([]);
   });
 
-  test('computador: logo alinhada com o título e último tópico alinhado com os links', async ({ page }, info) => {
+  test('computador: logo alinhada com o título', async ({ page }, info) => {
     test.skip(!ehComputador(info) || info.project.use.viewport.width < 960, 'só na tela dividida');
     await page.goto('/');
     const centro = async (sel) => page.locator(sel).first().evaluate((e) => { const r = e.getBoundingClientRect(); return (r.top + r.bottom) / 2; });
     const logo = await page.locator('.aside-logo img:visible').evaluate((e) => { const r = e.getBoundingClientRect(); return (r.top + r.bottom) / 2; });
     expect(Math.abs(logo - (await centro('#loginTitle')))).toBeLessThan(3);
-    expect(Math.abs((await centro('.login-aside li:last-child')) - (await centro('.login-links')))).toBeLessThan(3);
     const q = await page.locator('.login-aside').boundingBox();
     expect(q.x).toBe(0);
     expect(q.y).toBe(0);

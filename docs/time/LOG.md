@@ -61,3 +61,9 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Funções puras do fatiador (estimarRapido, processoKiri, tempoGcode) e site/lib/kiri ficaram no repositório, sem uso, para voltar depois.
 - Novo (CACHE v70, não publicado): botão "Compartilhar imagem" no 3D (etapa 1 e histórico). PNG 1200×900 com fundo claro na cor escolhida; no celular abre o compartilhamento do sistema (WhatsApp), no computador baixa o arquivo. Vídeo giratório e link interativo ficam para depois.
 - Novo (CACHE v71, não publicado): botão "Compartilhar GIF" — peça girando uma volta (48 quadros 400×300, ~3 s, ~240 KB), gerada no navegador sem biblioteca (paleta única + LZW). Conferido decodificando os 48 quadros com ImageDecoder (erro médio 0,16/pixel). Mesmo caminho do PNG: celular compartilha, computador baixa.
+
+## 2026-11-15 — login só com Google (local, CACHE v73, não publicado)
+- Removidos da tela e do código: e-mail, senha, "Criar conta", "Esqueci minha senha", confirmação de senha, fluxo de recuperação (PASSWORD_RECOVERY) e o olho de senha (password-toggle.js apagado). Sobra "Continuar com Google".
+- Motivo: e-mail de confirmação do Supabase (SMTP padrão) só entrega à equipe do projeto e tem limite baixo; clientes novos não receberiam.
+- PENDENTE no painel do Supabase (Authentication → Sign In / Providers → Email): desligar "Enable email signups", senão a API ainda aceita cadastro por e-mail.
+- Quem já tinha conta por senha deve entrar com o Google do mesmo e-mail (o Supabase costuma vincular pela mesma conta; não verificado).
