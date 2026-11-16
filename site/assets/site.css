@@ -10,7 +10,7 @@
 .win img { display: block; width: 100%; height: auto; }
 
 /* telas inteiras do celular, em moldura, com o contexto ao lado */
-#app, #negocio { --h: 1; --hm: 2; }
+#app, #negocio { --h: 1; --hm: 1; }
 @media (max-width: 1279px) { #app, #negocio { --h: 2; } }
 .telas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: var(--s-7); min-height: 0; }
 .tela { grid-column: span 4; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-4); align-items: start; min-height: 0; transition: transform var(--dur, .2s) var(--ease, ease); }
@@ -105,3 +105,20 @@
 #recursos .panel.panel--tela { --p-h: 0px; min-height: 0; flex: none; }
 #recursos .panel--tela .frame__img { height: auto; display: block; }
 #recursos .panel--tela .frame__img { position: static; inset: auto; }
+
+/* celular: etapas sem a imagem cortada (números no lugar da barra) e cores do 3D numa linha abaixo da peça */
+@media (max-width: 639px) {
+  .barra { display: none; }
+  .etapas { counter-reset: e; }
+  .etapa { counter-increment: e; display: grid; grid-template-columns: 36px 1fr; column-gap: var(--s-4); }
+  .etapa::before { content: counter(e); grid-row: 1 / span 2; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 500 14px/1 var(--font-text); background: #0b6b35; color: #fff; align-self: center; }
+  .etapa:last-child::before { background: var(--accent); }
+  .etapa h3, .etapa p { grid-column: 2; }
+  #recursos .panel.panel--peca { --p-h: 300px; }
+  #recursos .panel--peca .peca-tile { inset: 0 0 64px 0; }
+  .cores { flex-wrap: nowrap; justify-content: space-between; gap: 6px; left: var(--s-3); right: var(--s-3); bottom: var(--s-3); }
+  .cor { min-height: 44px; padding: 4px 10px 4px 4px; font-size: 12px; gap: 6px; flex: 1 1 0; min-width: 0; justify-content: flex-start; }
+  .cor i { width: 30px; height: 30px; flex: none; }
+}
+@media (max-width: 1279px) { .telas.fill { flex: none; min-height: auto; } .tela { min-height: auto; } }
+@media (max-width: 639px) { .telas { grid-auto-rows: auto; } .tela img { height: auto !important; } }

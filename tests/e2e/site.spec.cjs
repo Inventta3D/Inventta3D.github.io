@@ -54,7 +54,7 @@ test.describe('site de apresentação', () => {
     expect(secoes.map((s) => s.id)).toEqual(['hero', 'app', 'recursos', 'negocio', 'como', 'faq']);
     for (const s of secoes) {
       const telas = s.h / vh;
-      if (ehCelular(info)) { expect(s.h, `#${s.id} menor que a tela`).toBeGreaterThanOrEqual(vh - 3); expect(telas, `#${s.id} muito longa`).toBeLessThanOrEqual(3); continue; } // no celular a seção cresce com o conteúdo (telas de alturas diferentes; 320 px é a mais apertada)
+      if (ehCelular(info)) { expect(s.h, `#${s.id} menor que a tela`).toBeGreaterThanOrEqual(vh - 3); expect(telas, `#${s.id} muito longa`).toBeLessThanOrEqual(4); continue; } // no celular a seção cresce com o conteúdo (telas de alturas diferentes; 320 px é a mais apertada)
       expect([1, 2], `#${s.id} tem ${telas.toFixed(2)} telas`).toContain(Math.round(telas));
       expect(Math.abs(telas - Math.round(telas)) * vh, `#${s.id} fora da grade de telas`).toBeLessThanOrEqual(3);
       expect(Math.abs(s.top / vh - Math.round(s.top / vh)) * vh, `#${s.id} não começa numa tela inteira`).toBeLessThanOrEqual(3);
