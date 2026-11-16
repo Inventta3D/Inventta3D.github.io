@@ -69,6 +69,7 @@
   }
 
   async function mostrar(caixa, tri, { cor = '', nome = 'peça', aoTrocarCor = null, coresOriginais = null } = {}) {
+    let vivo = true, pendente = false, visivel = true; // desenho sob demanda: só redesenha quando algo muda (gira, zoom, cor, tamanho)
     const temProjeto = !!coresOriginais && coresOriginais.length === tri.length; // cor por vértice (sRGB 0–1), lida do 3MF do projeto
     const [T, { OrbitControls }] = await carregar();
     caixa.replaceChildren();
@@ -112,7 +113,7 @@
     const botoes = Object.entries(CORES).map(([k, hex]) => {
       const b = document.createElement('button'), rotulo = k[0].toUpperCase() + k.slice(1);
       b.type = 'button'; b.className = 'model-cor'; b.style.background = hex; b.title = rotulo; b.setAttribute('aria-label', rotulo); b.dataset.cor = rotulo;
-      b.addEventListener('click', () => { marcar(k); usarProjeto(false); material.color.set(hex); aoTrocarCor?.(rotulo); });
+      b.addEventListener('click', () => { marcar(k); usarProjeto(false); material.color.set(hex); pedir(); aoTrocarCor?.(rotulo); });
       cores.append(b); return [k, b];
     });
     const marcar = (texto) => { const t = String(texto || '').toLowerCase(), k = Object.keys(CORES).find((c) => t.includes(c)); for (const [c, b] of botoes) b.setAttribute('aria-pressed', String(c === k)); bProjeto?.setAttribute('aria-pressed', 'false'); };
@@ -149,7 +150,7 @@
       geo.setAttribute('color', new T.BufferAttribute(lin, 3));
     }
     const material = new T.MeshStandardMaterial({ color: corDe(cor), roughness: 0.55, metalness: 0.05 });
-    function usarProjeto(sim) { material.vertexColors = sim; if (sim) material.color.set(0xffffff); material.needsUpdate = true; bProjeto?.setAttribute('aria-pressed', String(sim)); }
+    function usarProjeto(sim) { material.vertexColors = sim; if (sim) material.color.set(0xffffff); material.needsUpdate = true; bProjeto?.setAttribute('aria-pressed', String(sim)); pedir(); }
     if (temProjeto) usarProjeto(true); else marcar(cor);
     const malha = new T.Mesh(geo, material);
     malha.castShadow = true;
@@ -182,7 +183,7 @@
       renderer.render(cena, camera);
       const c = document.createElement('canvas'); c.width = L; c.height = A;
       const x = c.getContext('2d'); x.fillStyle = '#f4f2ee'; x.fillRect(0, 0, L, A); x.drawImage(renderer.domElement, 0, 0);
-      renderer.setPixelRatio(pr); renderer.setSize(w / pr, h / pr, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+      renderer.setPixelRatio(pr); renderer.setSize(w / pr, h / pr, false); camera.aspect = w / h; camera.updateProjectionMatrix(); pedir();
       return new Promise((ok) => c.toBlob(ok, 'image/png'));
     }
     const base = String(nome).trim().replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase() || 'peca';
@@ -216,7 +217,7 @@
         }
         return gif(quadros, L, A, 10);
       } finally {
-        malha.rotation.y = giro; renderer.setRenderTarget(null); alvo.dispose();
+        malha.rotation.y = giro; renderer.setRenderTarget(null); alvo.dispose(); pedir();
       }
     }
     enviarGif.addEventListener('click', async () => {
@@ -230,17 +231,20 @@
       finally { enviarGif.textContent = texto; acoes.querySelectorAll('button').forEach((b) => { b.disabled = false; }); }
     });
 
-    let vivo = true;
-    const desenhar = () => { if (!vivo) return; ctrl.update(); renderer.render(cena, camera); requestAnimationFrame(desenhar); };
-    desenhar();
-    const ajuste = new ResizeObserver(() => { const w = caixa.clientWidth, h = caixa.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); });
+    function desenhar() { pendente = false; if (!vivo || !visivel) return; const mudou = ctrl.update(); renderer.render(cena, camera); if (mudou) pedir(); } // mudou = ainda girando (inércia)
+    function pedir() { if (pendente || !vivo) return; pendente = true; requestAnimationFrame(desenhar); }
+    ctrl.addEventListener('change', pedir);
+    const aparece = new IntersectionObserver(([e]) => { visivel = e.isIntersecting; if (visivel) pedir(); }); // fora da tela (etapa oculta, rolou): não desenha
+    aparece.observe(canvas);
+    pedir();
+    const ajuste = new ResizeObserver(() => { const w = caixa.clientWidth, h = caixa.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); pedir(); });
     ajuste.observe(caixa);
 
     return {
       imagem,
       gif: gerarGif,
-      cor: (c) => { marcar(c); usarProjeto(false); material.color.set(corDe(c)); },
-      fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
+      cor: (c) => { marcar(c); usarProjeto(false); material.color.set(corDe(c)); pedir(); },
+      fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); aparece.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
     };
   }
 

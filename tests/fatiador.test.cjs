@@ -175,3 +175,14 @@ test('3MF pintado (paint_color): cada triângulo usa o filamento pintado; sem pi
   assert.strictEqual(cor(3), '0,0,1'); // face dividida em duas metades de filamento 2: azul
   assert.strictEqual(cor(4), '1,0,0'); // "4" = filamento 1 (vermelho)
 });
+
+test('leitura de 3MF grande informa progresso crescente entre 0 e 1 e cede a vez ao navegador', async () => {
+  const tris = Array.from({ length: 120000 }, () => '<triangle v1="0" v2="1" v3="2"/>').join('');
+  const malha = '<mesh><vertices><vertex x="0" y="0" z="0"/><vertex x="1" y="0" z="0"/><vertex x="0" y="1" z="0"/></vertices><triangles>' + tris + '</triangles></mesh>';
+  const marcas = [];
+  const [placa] = await F.lerMalha3mf(zip({ '3D/3dmodel.model': `<model><resources><object id="1">${malha}</object></resources><build><item objectid="1"/></build></model>` }), (f) => marcas.push(f));
+  assert.strictEqual(placa.tri.length, 120000 * 9);
+  assert.ok(marcas.length >= 2, `poucas marcas: ${marcas.length}`);
+  assert.ok(marcas.every((f) => f >= 0 && f <= 1));
+  assert.deepStrictEqual(marcas, [...marcas].sort((a, b) => a - b)); // nunca anda para trás
+});

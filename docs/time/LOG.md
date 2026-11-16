@@ -92,3 +92,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - GIF: pixels lidos direto do WebGL (render target + readPixels) em vez de drawImage em canvas 2D (saiu em branco num celular); recusa quadro vazio; teste confere pixels da peça nos quadros. WhatsApp pergunta se envia o GIF junto (peca-3d.gif). Tela de preço mostra o mesmo quadro 3D acima dos itens (o elemento muda de lugar, sem 2º WebGL). CACHE v86.
 
 - 3MF pintado por triângulo (paint_color de Bambu/Orca, slic3rpe:mmu_segmentation do Prusa): árvore de subdivisão decodificada, filamento dominante por face. Testado com Santa++keychain.3mf (1 mi de triângulos, 99 MB): ~10 s para abrir no notebook, ~145 MB retidos, pico ~660 MB durante a leitura; GIF 808 KB em 9 s. CACHE v87.
+
+- Orçamento salvo: "Adicionar item" não esquece mais o orçamento já salvo (antes o 2º Salvar criava um orçamento novo duplicado) e "Limpar pedido"/novo pedido esquece (antes sobrescrevia o anterior). Testes de regressão. 3D redesenha só sob demanda (parado: 0 quadros; fora da tela não desenha). Barra de progresso ao ler 3MF grande, com leitura em blocos que cedem a vez ao navegador. CACHE v88.

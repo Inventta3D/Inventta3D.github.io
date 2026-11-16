@@ -372,6 +372,27 @@ test.describe('importar STL para ver em 3D', () => {
     await expect(page.locator('#slicerView').getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'false');
   });
 
+  test('3D redesenha só quando algo muda: parado não gasta quadros; girar e trocar a cor atualizam a imagem', async ({ page }) => {
+    await entrar(page);
+    await page.evaluate(() => { window.__q = 0; const ra = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = (f) => ra((t) => { window.__q++; f(t); }); });
+    await page.locator('#slicerFile').setInputFiles(cuboSTL());
+    const canvas = page.locator('#slicerView canvas');
+    await expect(canvas).toBeVisible();
+    await page.waitForTimeout(1200);
+    const q0 = await page.evaluate(() => window.__q); await page.waitForTimeout(1500);
+    expect((await page.evaluate(() => window.__q)) - q0).toBeLessThanOrEqual(3); // parado (antes: ~90 quadros por 1,5 s)
+    const antes = await canvas.screenshot();
+    const c = await canvas.boundingBox();
+    await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2); await page.mouse.down(); await page.mouse.move(c.x + c.width / 2 + 90, c.y + c.height / 2 + 40, { steps: 8 }); await page.mouse.up();
+    await page.waitForTimeout(800);
+    const girado = await canvas.screenshot();
+    expect(girado.equals(antes)).toBe(false);
+    await page.locator('#slicerView').getByRole('button', { name: 'Escolher cor' }).click();
+    await page.locator('#slicerView').getByRole('button', { name: 'Azul' }).click();
+    await page.waitForTimeout(400);
+    expect((await canvas.screenshot()).equals(girado)).toBe(false);
+  });
+
   test('STL: compartilhar imagem da peça (celular abre o compartilhamento, computador baixa o PNG)', async ({ page }, info) => {
     const celular = info.project.name.startsWith('celular');
     await page.addInitScript(() => { window.__enviado = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__enviado = d.files.map((f) => `${f.name}:${f.type}:${f.size}`); }; });
@@ -984,6 +1005,33 @@ test.describe('confirmação antes de salvar e excluir', () => {
     page.responder = true;
     await page.locator('#saveQuoteBtn').click();
     await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(1);
+  });
+
+  test('adicionar item a um orçamento já salvo atualiza o MESMO orçamento (2 itens), sem criar outro', async ({ page }) => {
+    const banco = await entrar(page);
+    await gerarOrcamento(page, { peca: 'Primeira' });
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(1);
+    await page.locator('#addQuoteBtn').click();
+    await gerarOrcamento(page, { peca: 'Segunda' });
+    await expect(page.locator('#quoteItems .quote-item')).toHaveCount(2);
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => banco.db.inventta3d_quotes[0].items.length).toBe(2);
+    expect(banco.db.inventta3d_quotes).toHaveLength(1);
+    expect(banco.db.inventta3d_quotes[0].title).toContain('Primeira');
+    expect(banco.db.inventta3d_quotes[0].title).toContain('Segunda');
+  });
+
+  test('pedido novo (Limpar pedido) depois de salvar cria outro orçamento e não sobrescreve o anterior', async ({ page }) => {
+    const banco = await entrar(page);
+    await gerarOrcamento(page, { peca: 'Pedido um' });
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(1);
+    await page.getByRole('button', { name: 'Limpar pedido' }).click();
+    await gerarOrcamento(page, { peca: 'Pedido dois' });
+    await page.locator('#saveQuoteBtn').click();
+    await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(2);
+    expect(banco.db.inventta3d_quotes.map((q) => q.title).sort()).toEqual(['Pedido dois', 'Pedido um']);
   });
 
   test('salvar cliente a partir do orçamento: cancelar não grava', async ({ page }) => {

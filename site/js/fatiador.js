@@ -65,11 +65,12 @@
     for (let i = v.getUint16(fim + 10, true); i > 0; i--) {
       const metodo = v.getUint16(p + 10, true), tam = v.getUint32(p + 20, true), nl = v.getUint16(p + 28, true);
       const local = v.getUint32(p + 42, true), nome = new TextDecoder().decode(bytes.subarray(p + 46, p + 46 + nl));
-      arquivos[nome] = async () => {
+      const tamReal = v.getUint32(p + 24, true);
+      (arquivos[nome] = async () => {
         const ini = local + 30 + v.getUint16(local + 26, true) + v.getUint16(local + 28, true), dado = bytes.subarray(ini, ini + tam);
         if (metodo === 0) return new TextDecoder().decode(dado);
         return new Response(new Blob([dado]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
-      };
+      }).bytes = tamReal;
       p += 46 + nl + v.getUint16(p + 30, true) + v.getUint16(p + 32, true);
     }
     return arquivos;
@@ -119,18 +120,32 @@
     return melhor;
   }
 
-  function objetos3mf(xml) {
+  const ceder = () => new Promise((ok) => setTimeout(ok)); // devolve o controle ao navegador para a tela atualizar
+  function lerTriangulos(it, ts, est, max) { // consome até `max` triângulos do iterador; devolve se acabou, se houve pintura e a posição no texto
+    let pintado = false, pos = 0;
+    for (let n = 0; n < max; n++) {
+      const { done, value: m } = it.next();
+      if (done) return { fim: true, pintado, pos };
+      ts.push(+m[1], +m[2], +m[3]); pos = m.index;
+      const e = m[4] ? estadoPintura((m[4].match(/(?:paint_color|slic3rpe:mmu_segmentation)="([0-9A-Fa-f]+)"/) || [])[1]) : 0;
+      est.push(e); if (e) pintado = true;
+    }
+    return { fim: false, pintado, pos };
+  }
+  async function objetos3mf(xml, posicao = () => {}) {
     const objs = {};
-    for (const [, tag, corpo] of xml.matchAll(/(<object\b[^>]*>)([\s\S]*?)<\/object>/g)) {
+    for (const mo of xml.matchAll(/(<object\b[^>]*>)([\s\S]*?)<\/object>/g)) {
+      const [, tag, corpo] = mo, base = mo.index + tag.length;
       const o = { comps: [] };
       if (corpo.includes('<mesh')) {
         o.vs = []; o.ts = [];
         for (const m of corpo.matchAll(/<vertex\s+x="([^"]+)"\s+y="([^"]+)"\s+z="([^"]+)"/g)) o.vs.push(+m[1], +m[2], +m[3]);
-        const est = []; let pintado = false;
-        for (const m of corpo.matchAll(/<triangle\s+v1="(\d+)"\s+v2="(\d+)"\s+v3="(\d+)"([^>]*)>/g)) {
-          o.ts.push(+m[1], +m[2], +m[3]);
-          const e = m[4] ? estadoPintura((m[4].match(/(?:paint_color|slic3rpe:mmu_segmentation)="([0-9A-Fa-f]+)"/) || [])[1]) : 0;
-          est.push(e); if (e) pintado = true;
+        const est = [], it = corpo.matchAll(/<triangle\s+v1="(\d+)"\s+v2="(\d+)"\s+v3="(\d+)"([^>]*)>/g);
+        let pintado = false, fim = false;
+        while (!fim) { // blocos de 60 mil triângulos: o laço fica síncrono (rápido) e a tela respira entre um bloco e outro
+          const r = lerTriangulos(it, o.ts, est, 60000);
+          fim = r.fim; pintado ||= r.pintado;
+          if (!fim) { posicao(base + r.pos); await ceder(); }
         }
         if (pintado) o.est = Uint8Array.from(est); // filamento (1…n) pintado em cada triângulo; 0 = usa o do objeto
       }
@@ -144,11 +159,14 @@
 
   // Lê a geometria de um 3MF (projeto ou não). Bambu/Orca: uma entrada por placa, sem peças modificadoras.
   // ponytail: modificadores do PrusaSlicer (Slic3r_PE_model.config) não são filtrados; entram como volume
-  async function lerMalha3mf(bytes) {
+  async function lerMalha3mf(bytes, aoProgresso = () => {}) {
     const zip = await lerZip(bytes), cache = {};
-    const texto = async (nome) => (cache[nome] ??= objetos3mf(await zip[nome.replace(/^\//, '')]()));
+    const modelos = Object.keys(zip).filter((n) => /^3D\/.*\.model$/i.test(n)), totalBytes = modelos.reduce((t, n) => t + (zip[n].bytes || 0), 0) || 1;
+    let lidos = 0, vertices = 0, emitidos = 0; // progresso: leitura dos modelos = 0–70%, montagem da malha = 70–100%
+    const texto = async (nome) => (cache[nome] ??= objetos3mf(await zip[nome.replace(/^\//, '')](), (pos) => aoProgresso(0.7 * Math.min(1, (lidos + pos) / totalBytes))).then((o) => { lidos += zip[nome.replace(/^\//, '')].bytes || 0; for (const k in o) vertices += o[k].ts?.length || 0; return o; }));
     const raizNome = Object.keys(zip).find((n) => /^3D\/[^/]+\.model$/i.test(n));
     if (!raizNome) throw new Error('3mf');
+    for (const nome of modelos) await texto(nome);
     const raiz = await zip[raizNome]();
     const cfg = zip['Metadata/model_settings.config'] ? await zip['Metadata/model_settings.config']() : '';
     const modificador = new Set();
@@ -170,9 +188,14 @@
     async function emitir(arquivo, id, mats, saida, raizId, cor, cores) {
       const o = (await texto(arquivo))[id];
       if (!o) return;
-      if (o.vs) for (let k = 0; k < o.ts.length; k++) {
-        const i = o.ts[k]; let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z);
-        const e = o.est ? o.est[(k / 3) | 0] : 0; cores.push(...((e && cores255[e - 1]) || cor || corPadrao));
+      if (o.vs) for (let ini = 0; ini < o.ts.length; ini += 300000) {
+        const fim = Math.min(o.ts.length, ini + 300000);
+        for (let k = ini; k < fim; k++) { // laço síncrono por bloco; entre blocos a tela atualiza
+          const i = o.ts[k]; let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z);
+          const e = o.est ? o.est[(k / 3) | 0] : 0; cores.push(...((e && cores255[e - 1]) || cor || corPadrao));
+        }
+        emitidos += fim - ini;
+        if (fim < o.ts.length) { aoProgresso(0.7 + 0.3 * Math.min(1, emitidos / (vertices || 1))); await ceder(); }
       }
       for (const c of o.comps) {
         if (raizId && modificador.has(`${raizId}:${c.id}`)) continue;
@@ -283,6 +306,12 @@
   const BORDA = 512 * 1024, aviso = (m) => Object.assign(new Error(m), { aviso: true });
   const g1 = (g) => String(Math.round(g * 10) / 10).replace('.', ',');
   let vis = null;
+  // barra de progresso para arquivos grandes (a leitura cede a vez ao navegador, então a tela continua respondendo)
+  const barra = document.createElement('progress');
+  barra.className = 'slicer-progress'; barra.max = 1; barra.hidden = true; barra.setAttribute('aria-label', 'Lendo o arquivo');
+  status.after(barra);
+  let ultimo = 0;
+  const progresso = (f) => { const agora = performance.now(); if (f < 1 && agora - ultimo < 80) return; ultimo = agora; barra.hidden = false; barra.value = f; status.textContent = `Lendo a peça… ${Math.round(f * 100)}%`; };
   window.InventtaPecaImagem = () => (vis ? vis.imagem() : null); // PNG da peça em 3D, para o envio do orçamento (app.js)
   window.InventtaPecaGif = (progresso) => (vis ? vis.gif(progresso) : null); // GIF girando, se o usuário quiser mandar junto
 
@@ -343,20 +372,21 @@
         if (mat) { preencher('filamentType', mat, 'change'); feito.push(mat); }
         status.textContent = `Do fatiador: ${feito.join(' · ')}.` + (placaTxt(r.placas || 0, r.objetos || 0) || ' Confira nas próximas etapas.');
         if (/\.3mf$/i.test(arq.name)) { // 3MF fatiado também traz a malha da peça
-          try { const placas = await F.lerMalha3mf(new Uint8Array(await arq.arrayBuffer())); if (placas.some((p) => p.tri.length)) mostrarPeca(placas); } catch { /* sem 3D, só os números */ }
+          const resumo = status.textContent;
+          try { const placas = await F.lerMalha3mf(new Uint8Array(await arq.arrayBuffer()), progresso); if (placas.some((p) => p.tri.length)) await mostrarPeca(placas); } catch { /* sem 3D, só os números */ } finally { status.textContent = resumo; }
         }
         return;
       }
       if (!malha && !/\.3mf$/i.test(arq.name)) throw aviso('Não encontrei peso nem tempo neste arquivo. Use o G‑code gerado pelo fatiador, um STL ou um 3MF.');
       const bytes = new Uint8Array(await arq.arrayBuffer());
-      const placas = malha ? [{ objetos: 1, tri: F.lerSTL(bytes) }] : await F.lerMalha3mf(bytes);
+      const placas = malha ? [{ objetos: 1, tri: F.lerSTL(bytes) }] : await F.lerMalha3mf(bytes, progresso);
       if (!placas.length || !placas.some((p) => p.tri.length)) throw aviso('Não encontrei a peça neste arquivo.');
       status.textContent = 'Peça em 3D. Gire, aproxime e escolha a cor. Informe peso e tempo nas próximas etapas.';
-      mostrarPeca(placas);
+      await mostrarPeca(placas);
     } catch (e) {
       status.classList.add('erro');
       status.textContent = e.aviso ? e.message : 'Não consegui ler este arquivo. Use STL, 3MF ou G‑code.';
-    } finally { entrada.value = ''; }
+    } finally { entrada.value = ''; barra.hidden = true; }
   }
 
   $('filamentColor').addEventListener('input', () => vis?.cor($('filamentColor').value));
