@@ -31,20 +31,20 @@
 
   /* tipografia: escala M3 com as fontes da marca */
   --md-ref-typeface-brand:Outfit,'Segoe UI',Arial,sans-serif;
-  --md-ref-typeface-plain:'DM Sans','Segoe UI',Arial,sans-serif;
-  --md-sys-typescale-display-medium:600 2.8125rem/3.25rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-display-small:600 2.25rem/2.75rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-headline-large:600 2rem/2.5rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-headline-medium:600 1.75rem/2.25rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-headline-small:600 1.5rem/2rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-title-large:600 1.375rem/1.75rem var(--md-ref-typeface-brand);
-  --md-sys-typescale-title-medium:600 1rem/1.5rem var(--md-ref-typeface-plain);
-  --md-sys-typescale-title-small:600 .875rem/1.25rem var(--md-ref-typeface-plain);
+  --md-ref-typeface-plain:Outfit,'Segoe UI',Arial,sans-serif;
+  --md-sys-typescale-display-medium:500 2.8125rem/3.25rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-small:500 2.25rem/2.75rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-large:500 2rem/2.5rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-medium:500 1.75rem/2.25rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-small:500 1.5rem/2rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-title-large:500 1.375rem/1.75rem var(--md-ref-typeface-brand);
+  --md-sys-typescale-title-medium:500 1rem/1.5rem var(--md-ref-typeface-plain);
+  --md-sys-typescale-title-small:500 .875rem/1.25rem var(--md-ref-typeface-plain);
   --md-sys-typescale-body-large:400 1rem/1.5rem var(--md-ref-typeface-plain);
   --md-sys-typescale-body-medium:400 .875rem/1.25rem var(--md-ref-typeface-plain);
   --md-sys-typescale-body-small:400 .75rem/1rem var(--md-ref-typeface-plain);
-  --md-sys-typescale-label-large:600 .875rem/1.25rem var(--md-ref-typeface-plain);
-  --md-sys-typescale-label-medium:600 .75rem/1rem var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-large:500 .875rem/1.25rem var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-medium:500 .75rem/1rem var(--md-ref-typeface-plain);
 
   /* forma */
   --md-sys-shape-corner-extra-small:4px;--md-sys-shape-corner-small:8px;--md-sys-shape-corner-medium:12px;
@@ -53,8 +53,8 @@
   /* padrão de bordas por papel (use estes, não os valores soltos):
      superfície = cartões, painéis, diálogos · aninhado = menus, faixas, linhas, opções, imagens
      campo = avisos e feedback · controle = botões, campos de texto, chips, abas, navegação, passos, interruptores */
-  --shape-surface:var(--md-sys-shape-corner-extra-large);--shape-nested:var(--md-sys-shape-corner-large);
-  --shape-field:var(--md-sys-shape-corner-small);--shape-control:var(--md-sys-shape-corner-full);
+  --shape-surface:var(--md-sys-shape-corner-large-increased);--shape-nested:var(--md-sys-shape-corner-medium);
+  --shape-field:var(--md-sys-shape-corner-small);--shape-control:var(--md-sys-shape-corner-small);
 
   /* elevação */
   --md-sys-elevation-1:0 1px 2px rgb(0 0 0/.18),0 1px 3px 1px rgb(0 0 0/.08);
