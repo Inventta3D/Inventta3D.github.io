@@ -1,7 +1,7 @@
 // Testes de interface no navegador. Cada teste descreve o que o usuário faz e vê.
 // Os módulos (telas) são lidos de js/modules.js: uma tela nova entra sozinha nos testes de navegação e de layout.
 const { test, expect } = require('@playwright/test');
-const { entrar, gerarOrcamento, auditar, cuboSTL, cubo3mfFatiado, bancoFalso, urlSupabase } = require('./apoio.cjs');
+const { sessaoDeTeste, entrar, gerarOrcamento, auditar, cuboSTL, cubo3mfFatiado, bancoFalso, urlSupabase } = require('./apoio.cjs');
 
 const ehCelular = (info) => info.project.name.startsWith('celular');
 const ehComputador = (info) => info.project.name.startsWith('computador');
@@ -1074,4 +1074,32 @@ test('desconto do pedido: rótulos alinhados no computador e seletor com a largu
   const m = await page.evaluate(() => { const r = (s) => document.querySelector(s).getBoundingClientRect(); return { dl: r('.discount-mode legend').top - r('label[for=discountValue]').top, modo: r('.discount-mode'), campo: r('#discountValue') }; });
   if (ehComputador(info) && info.project.use.viewport.width >= 1280) expect(Math.abs(m.dl)).toBeLessThanOrEqual(2);
   if (ehCelular(info)) expect(Math.abs(m.modo.right - (m.campo.right + 80))).toBeGreaterThanOrEqual(0) && expect(m.modo.width).toBeGreaterThan(m.campo.width);
+});
+
+test.describe('aprovação de acesso', () => {
+  test('conta pendente vê "Aguardando aprovação" e não usa o app; depois de aprovada, entra', async ({ page }) => {
+    const banco = bancoFalso();
+    banco.acesso.status = 'pending';
+    await page.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
+    await page.addInitScript(([chave, valor]) => localStorage.setItem(chave, valor), sessaoDeTeste());
+    await page.goto('/app/');
+    await expect(page.getByRole('heading', { name: 'Aguardando aprovação' })).toBeVisible();
+    await expect(page.locator('#acessoPendente')).toContainText('teste@exemplo.com');
+    await expect(page.locator('#appShell')).toHaveAttribute('inert', '');
+    banco.acesso.status = 'approved';
+    await page.getByRole('button', { name: 'Verificar de novo' }).click();
+    await page.locator('#appShell').waitFor({ state: 'visible' });
+    await expect(page.locator('#acessoPendente')).toBeHidden();
+    await expect(page.locator('#appShell')).not.toHaveAttribute('inert', '');
+  });
+
+  test('conta bloqueada vê a mensagem de acesso não liberado e pode sair', async ({ page }) => {
+    const banco = bancoFalso();
+    banco.acesso.status = 'blocked';
+    await page.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
+    await page.addInitScript(([chave, valor]) => localStorage.setItem(chave, valor), sessaoDeTeste());
+    await page.goto('/app/');
+    await expect(page.getByRole('heading', { name: 'Acesso não liberado' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible();
+  });
 });

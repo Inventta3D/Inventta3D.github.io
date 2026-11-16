@@ -20,6 +20,7 @@ function sessao() {
 function bancoFalso() {
   const db = { inventta3d_quotes: [], inventta3d_customers: [], inventta3d_prints: [], inventta3d_print_requests: [], inventta3d_spools: [], inventta3d_printers: [], inventta3d_shop: [] };
   const arquivos = {};
+  const acesso = { status: 'approved' }; // aprovação de acesso: 'approved' | 'pending' | 'blocked'
   let seq = 0;
   const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*', 'access-control-expose-headers': '*' };
   const json = (route, status, corpo) => route.fulfill({ status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(corpo) });
@@ -31,6 +32,7 @@ function bancoFalso() {
     const quer = (req.headers().prefer || '').includes('return=representation');
     if (url.pathname.startsWith('/rest/v1/rpc/')) {
       const corpo = JSON.parse(req.postData() || '{}'), q = db.inventta3d_quotes.find((r) => r.share_token && r.share_token === corpo.p_token);
+      if (url.pathname.endsWith('/inventta3d_request_access')) return json(route, 200, acesso.status);
       if (url.pathname.endsWith('/inventta3d_showcase')) {
         const s = db.inventta3d_shop.find((x) => x.enabled && x.slug === String(corpo.p_slug || '').toLowerCase());
         if (!s) return json(route, 200, null);
@@ -101,7 +103,7 @@ function bancoFalso() {
     if (url.pathname.startsWith('/auth/v1/')) return route.fulfill({ status: 204, headers: cors });
     return json(route, 404, { message: 'não simulado' });
   }
-  return { db, arquivos, tratar };
+  return { db, arquivos, tratar, acesso };
 }
 
 // Abre o app já "logado", com o banco falso. Devolve o banco para os testes conferirem o que foi gravado.
@@ -205,4 +207,5 @@ function cubo3mfFatiado(name = 'cubo_fatiado.3mf', { colorido = false } = {}) {
   return { name, mimeType: 'model/3mf', buffer: Buffer.concat([...locais, cd, e]) };
 }
 
-module.exports = { bancoFalso, cuboSTL, cubo3mfFatiado, entrar, gerarOrcamento, auditar, urlSupabase };
+const sessaoDeTeste = () => [`sb-${ref}-auth-token`, JSON.stringify(sessao())];
+module.exports = { sessaoDeTeste, bancoFalso, cuboSTL, cubo3mfFatiado, entrar, gerarOrcamento, auditar, urlSupabase };

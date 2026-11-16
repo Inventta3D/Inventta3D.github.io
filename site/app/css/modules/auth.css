@@ -55,3 +55,11 @@
   .login-brand{display:none}
 }
 @media(min-width:960px) and (max-height:800px){.login-screen{--login-pad:24px}}
+
+.acesso{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:var(--md-sys-color-surface)}
+.acesso[hidden]{display:none}
+.acesso-card{width:min(440px,100%);display:grid;gap:16px;padding:32px;border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-lowest);box-shadow:var(--md-sys-elevation-1)}
+.acesso-card img{height:36px;width:auto;justify-self:start}
+.acesso-card h1{margin:0;font:var(--md-sys-typescale-headline-small)}
+.acesso-texto{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-large)}
+.acesso-botoes{display:flex;flex-wrap:wrap;gap:8px}
