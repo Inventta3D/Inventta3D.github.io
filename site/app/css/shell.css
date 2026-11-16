@@ -47,7 +47,7 @@
 /* rodapé discreto */
 .site-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(100% - var(--gutter)*2,var(--content-max));margin:0 auto;padding:8px 0 12px;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-small)}
 .foot-brand{display:inline-flex;align-items:center;gap:8px;font:var(--md-sys-typescale-label-medium)}
-.foot-brand img{height:16px;width:auto}
+.foot-brand img{height:21px;width:auto}
 .site-footer-link{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:var(--shape-control);color:inherit;font:var(--md-sys-typescale-label-medium);text-decoration:none}
 .site-footer-link:hover{background:color-mix(in srgb,var(--md-sys-color-on-surface) 8%,transparent);color:var(--md-sys-color-on-surface)}
 .site-footer-link svg{width:16px;height:16px}
@@ -70,7 +70,7 @@
   :root{--appbar-h:0px}
   .app-bar{position:fixed;inset:0 auto 0 0;z-index:30;flex-direction:column;align-items:center;gap:0;width:var(--rail-w);height:auto;padding:20px 0 16px;background:var(--md-sys-color-surface-container-low)}
   .app-bar .brand img.brand-full{display:none!important}
-  .brand .brand-mark{height:36px}
+  .brand .brand-mark{height:47px}
   .main-nav{flex-direction:column;gap:12px;margin-top:40px}
   .main-nav a{width:80px}
   .account-menu{margin:auto 0 0}

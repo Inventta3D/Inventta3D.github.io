@@ -54,6 +54,7 @@ p{margin:0}
 .topo{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:20px;min-height:var(--topo);padding:10px max(var(--gutter),calc((100vw - var(--max)) / 2 + var(--gutter)));background:color-mix(in srgb,var(--md-sys-color-surface) 84%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.15);backdrop-filter:blur(14px) saturate(1.15);border-bottom:1px solid transparent;transition:border-color .3s}
 .topo.rolou{border-bottom-color:var(--md-sys-color-outline-variant)}
 .marca img{height:34px;width:auto}
+.rodape .marca img{height:44px} /* logo 3D (mais alta que antes): 44px mantém o tamanho visual das letras */
 .menu{display:none;margin-left:auto;gap:28px}
 .menu a{font:var(--md-sys-typescale-label-large);font-size:.9375rem;text-decoration:none;color:var(--md-sys-color-on-surface-variant);padding:8px 2px;transition:color .2s}
 .menu a:hover{color:var(--md-sys-color-primary)}
