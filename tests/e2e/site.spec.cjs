@@ -51,7 +51,7 @@ test.describe('site de apresentação', () => {
     await page.waitForTimeout(500);
     const vh = page.viewportSize().height;
     const secoes = await page.evaluate(() => [...document.querySelectorAll('main > section')].map((s) => ({ id: s.id || 'hero', top: s.getBoundingClientRect().top + scrollY, h: s.getBoundingClientRect().height })));
-    expect(secoes.map((s) => s.id)).toEqual(['hero', 'app', 'recursos', 'como', 'faq']);
+    expect(secoes.map((s) => s.id)).toEqual(['hero', 'app', 'recursos', 'negocio', 'como', 'faq']);
     for (const s of secoes) {
       const telas = s.h / vh;
       if (ehCelular(info)) { expect(s.h, `#${s.id} menor que a tela`).toBeGreaterThanOrEqual(vh - 3); expect(telas, `#${s.id} muito longa`).toBeLessThanOrEqual(3); continue; } // no celular a seção cresce com o conteúdo (telas de alturas diferentes; 320 px é a mais apertada)

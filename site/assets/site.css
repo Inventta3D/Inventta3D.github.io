@@ -10,8 +10,8 @@
 .win img { display: block; width: 100%; height: auto; }
 
 /* telas inteiras do celular, em moldura, com o contexto ao lado */
-#app { --h: 1; --hm: 2; }
-@media (max-width: 1279px) { #app { --h: 2; } }
+#app, #negocio { --h: 1; --hm: 2; }
+@media (max-width: 1279px) { #app, #negocio { --h: 2; } }
 .telas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: var(--s-7); min-height: 0; }
 .tela { grid-column: span 4; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-4); align-items: start; min-height: 0; transition: transform var(--dur, .2s) var(--ease, ease); }
 .tela:hover { transform: translateY(-4px); }
@@ -96,3 +96,12 @@
 .cor i { width: 32px; height: 32px; border-radius: 50%; background: conic-gradient(var(--a) 0 120deg, var(--b) 120deg 240deg, var(--c) 240deg 360deg); box-shadow: 0 0 0 2px var(--line); }
 .cor[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 @media (max-width: 639px) { .cor { padding-right: 12px; font-size: 13px; } }
+
+/* telas inteiras dentro dos painéis e na seção de gestão */
+#recursos .panel.panel--tela { background: var(--surface) !important; padding: 0; }
+#recursos .panel--tela .frame__img { width: 100%; height: 100%; object-fit: contain; object-position: center top; }
+#recursos .panel--tela::before, #recursos .panel--tela::after { display: none; }
+@media (min-width: 1280px) { #recursos .panel { --p-h: 374px; } }
+#recursos .panel.panel--tela { --p-h: 0px; min-height: 0; flex: none; }
+#recursos .panel--tela .frame__img { height: auto; display: block; }
+#recursos .panel--tela .frame__img { position: static; inset: auto; }

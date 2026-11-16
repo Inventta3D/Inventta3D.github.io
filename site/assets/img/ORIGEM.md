@@ -15,3 +15,5 @@ Todas as imagens desta pasta são **capturas reais do aplicativo** (e dos arquiv
 - `app-etapas.jpg`: recorte da barra de etapas de `app-computador.jpg`.
 - `peca-3d-800.png`: `peca-3d.png` em 800 px de largura (celular).
 - `compartilhar.jpg`: captura da primeira tela do site (imagem de compartilhamento).
+
+- `app-salvos.jpg`, `app-clientes.jpg`, `app-painel.jpg`, `app-impressoes.jpg` (computador) e `app-cel-clientes.jpg`, `app-cel-painel.jpg`, `app-cel-impressoes.jpg` (celular): telas de gestão do aplicativo com dados fictícios (clientes, orçamentos e impressões inventados), geradas por `node scripts/capturar-negocio.cjs`.
