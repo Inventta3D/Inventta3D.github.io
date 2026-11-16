@@ -193,25 +193,41 @@
     }
     enviar.addEventListener('click', async () => compartilhar(await imagem(), 'png'));
     // peça girando uma volta (72 quadros de 400×300 a 10 por segundo, ~7 s); a câmera fica parada e a peça gira, como num prato giratório
-    enviarGif.addEventListener('click', async () => {
-      const L = 400, A = 300, N = 72, w = renderer.domElement.width, h = renderer.domElement.height, pr = renderer.getPixelRatio(), giro = malha.rotation.y, texto = enviarGif.textContent;
-      acoes.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    // GIF da peça girando uma volta (72 quadros de 400×300 a 10 por segundo, ~7 s). A câmera fica parada e a peça gira.
+    // Os pixels vêm direto do WebGL (render target + readPixels), sem passar por canvas 2D: em alguns celulares o drawImage do WebGL saía em branco.
+    const LUT = Uint8Array.from({ length: 256 }, (_, i) => { const v = i / 255; return Math.round((v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055) * 255); }); // linear -> sRGB
+    async function gerarGif(progresso = () => {}) {
+      const L = 400, A = 300, N = 72, FUNDO = [0xf4, 0xf2, 0xee], giro = malha.rotation.y, cam = camera.clone(); // câmera própria: a tela não deforma durante a geração
+      const alvo = new T.WebGLRenderTarget(L, A, { samples: 4 }), buf = new Uint8Array(L * A * 4), quadros = [];
       try {
-        renderer.setPixelRatio(1); renderer.setSize(L, A, false); camera.aspect = L / A; camera.updateProjectionMatrix();
-        const c = document.createElement('canvas'); c.width = L; c.height = A; const x = c.getContext('2d', { willReadFrequently: true }), quadros = [];
+        cam.aspect = L / A; cam.updateProjectionMatrix();
         for (let i = 0; i < N; i++) {
-          malha.rotation.y = giro + (i / N) * 2 * Math.PI; renderer.render(cena, camera);
-          x.fillStyle = '#f4f2ee'; x.fillRect(0, 0, L, A); x.drawImage(renderer.domElement, 0, 0);
-          quadros.push(x.getImageData(0, 0, L, A).data);
-          enviarGif.textContent = `Gerando… ${Math.round(((i + 1) / N) * 100)}%`;
+          malha.rotation.y = giro + (i / N) * 2 * Math.PI;
+          renderer.setRenderTarget(alvo); renderer.render(cena, cam); renderer.readRenderTargetPixels(alvo, 0, 0, L, A, buf); renderer.setRenderTarget(null);
+          const q = new Uint8ClampedArray(L * A * 4);
+          for (let y = 0; y < A; y++) for (let x = 0, o = y * L * 4, e = (A - 1 - y) * L * 4; x < L; x++, o += 4, e += 4) { // WebGL lê de baixo para cima; cor sobre o fundo claro
+            const a = buf[e + 3] / 255;
+            q[o] = LUT[buf[e]] + FUNDO[0] * (1 - a); q[o + 1] = LUT[buf[e + 1]] + FUNDO[1] * (1 - a); q[o + 2] = LUT[buf[e + 2]] + FUNDO[2] * (1 - a); q[o + 3] = 255;
+          }
+          if (i === 0) { let peca = 0; for (let k = 0; k < q.length; k += 4) if (Math.abs(q[k] - FUNDO[0]) + Math.abs(q[k + 1] - FUNDO[1]) + Math.abs(q[k + 2] - FUNDO[2]) > 30) peca++; if (peca < 50) throw new Error('quadro vazio'); }
+          quadros.push(q);
+          progresso(Math.round(((i + 1) / N) * 100));
           await new Promise((ok) => setTimeout(ok));
         }
-        enviarGif.textContent = 'Montando…'; await new Promise((ok) => setTimeout(ok));
-        await compartilhar(gif(quadros, L, A, 10), 'gif');
+        return gif(quadros, L, A, 10);
       } finally {
-        malha.rotation.y = giro; renderer.setPixelRatio(pr); renderer.setSize(w / pr, h / pr, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-        enviarGif.textContent = texto; acoes.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+        malha.rotation.y = giro; renderer.setRenderTarget(null); alvo.dispose();
       }
+    }
+    enviarGif.addEventListener('click', async () => {
+      const texto = enviarGif.textContent;
+      acoes.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      try {
+        const arquivo = await gerarGif((p) => { enviarGif.textContent = `Gerando… ${p}%`; });
+        enviarGif.textContent = 'Montando…'; await new Promise((ok) => setTimeout(ok));
+        await compartilhar(arquivo, 'gif');
+      } catch { enviarGif.textContent = 'Não foi possível gerar o GIF'; await new Promise((ok) => setTimeout(ok, 3000)); }
+      finally { enviarGif.textContent = texto; acoes.querySelectorAll('button').forEach((b) => { b.disabled = false; }); }
     });
 
     let vivo = true;
@@ -222,6 +238,7 @@
 
     return {
       imagem,
+      gif: gerarGif,
       cor: (c) => { marcar(c); usarProjeto(false); material.color.set(corDe(c)); },
       fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
     };

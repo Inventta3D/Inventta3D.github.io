@@ -256,6 +256,18 @@
   const g1 = (g) => String(Math.round(g * 10) / 10).replace('.', ',');
   let vis = null;
   window.InventtaPecaImagem = () => (vis ? vis.imagem() : null); // PNG da peça em 3D, para o envio do orçamento (app.js)
+  window.InventtaPecaGif = (progresso) => (vis ? vis.gif(progresso) : null); // GIF girando, se o usuário quiser mandar junto
+
+  // Na tela de preço o mesmo quadro do 3D aparece acima dos itens do pedido (mesma largura); ao voltar às etapas, volta ao lugar de origem.
+  const resultado = $('result');
+  let casa = null;
+  function posicionar3D() {
+    const caixa = $('slicerView'), main = resultado?.querySelector('.result-main');
+    if (!caixa || !main) return;
+    if (resultado.classList.contains('show') && !caixa.hidden) { if (caixa.parentNode !== main) { casa ??= { pai: caixa.parentNode, antes: caixa.nextSibling }; main.prepend(caixa); } }
+    else if (casa && caixa.parentNode === main) casa.pai.insertBefore(caixa, casa.antes?.parentNode === casa.pai ? casa.antes : null);
+  }
+  if (resultado) new MutationObserver(posicionar3D).observe(resultado, { attributes: true, attributeFilter: ['class'] });
   async function mostrarPeca(placas) { // junta as placas e mostra em 3D, se o visualizador estiver no app
     const caixa = $('slicerView');
     vis?.fechar(); vis = null; caixa.hidden = true;

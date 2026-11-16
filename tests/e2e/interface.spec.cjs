@@ -410,17 +410,64 @@ test.describe('importar STL para ver em 3D', () => {
     expect(bytes.readUInt16LE(8)).toBe(300);
     expect(bytes.toString('latin1').split('!ù').length - 1).toBe(72); // um bloco de controle por quadro
     expect(bytes.at(-1)).toBe(0x3b);
+    // a peça aparece de fato nos quadros (o GIF já saiu em branco num celular)
+    const visiveis = await page.evaluate(async (dados) => {
+      const dec = new ImageDecoder({ data: new Uint8Array(dados), type: 'image/gif' }), saida = [];
+      await dec.tracks.ready;
+      for (const i of [0, 36]) {
+        const { image } = await dec.decode({ frameIndex: i }), c = new OffscreenCanvas(400, 300), x = c.getContext('2d');
+        x.drawImage(image, 0, 0); const px = x.getImageData(0, 0, 400, 300).data; let n = 0;
+        for (let k = 0; k < px.length; k += 4) if (Math.abs(px[k] - 0xf4) + Math.abs(px[k + 1] - 0xf2) + Math.abs(px[k + 2] - 0xee) > 30) n++;
+        saida.push(n);
+      }
+      return saida;
+    }, [...bytes]);
+    expect(visiveis[0]).toBeGreaterThan(5000); expect(visiveis[1]).toBeGreaterThan(5000);
     await expect(page.getByRole('button', { name: 'Compartilhar GIF' })).toBeEnabled();
   });
 
-  test('WhatsApp do orçamento leva junto o PNG da peça em 3D', async ({ page }) => {
+  test('WhatsApp do orçamento leva junto o PNG da peça em 3D; pergunta se quer o GIF (não = sem GIF)', async ({ page }) => {
     await page.addInitScript(() => { window.__envio = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__envio = d.files.map((f) => f.name); }; });
     await entrar(page);
     await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
     await expect(page.locator('#slicerView canvas')).toBeVisible();
     await gerarOrcamento(page);
+    page.responder = false; // "Enviar também o GIF?" → não
     await page.locator('#shareMain').click();
     await expect.poll(() => page.evaluate(() => window.__envio), { timeout: 30000 }).toEqual(['orcamento-inventta-3d.png', 'peca-3d.png']);
+    expect(page.confirmacoes.some((m) => m.includes('GIF'))).toBe(true);
+  });
+
+  test('WhatsApp do orçamento: respondendo sim, o GIF da peça vai junto', async ({ page }) => {
+    test.setTimeout(120000);
+    await page.addInitScript(() => { window.__envio = null; navigator.canShare = () => true; navigator.share = async (d) => { window.__envio = d.files.map((f) => `${f.name}:${f.type}:${f.size > 5000}`); }; });
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await gerarOrcamento(page);
+    await page.locator('#shareMain').click();
+    await expect.poll(() => page.evaluate(() => window.__envio), { timeout: 90000 }).toEqual(['orcamento-inventta-3d.png:image/png:true', 'peca-3d.png:image/png:true', 'peca-3d.gif:image/gif:true']);
+  });
+
+  test('tela de preço mostra o mesmo quadro do 3D acima dos itens, com a mesma largura; voltar às etapas o devolve', async ({ page }) => {
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cuboSTL(20, 'cubo_teste.stl'));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await gerarOrcamento(page);
+    const m = await page.evaluate(() => { const v = document.getElementById('slicerView'), i = document.querySelector('.batch-summary'), a = v.getBoundingClientRect(), b = i.getBoundingClientRect(); return { dentro: !!document.querySelector('#result .result-main > #slicerView'), acima: a.bottom <= b.top + 1, larg: Math.abs(a.width - b.width) < 2, esq: Math.abs(a.left - b.left) < 2, visivel: a.width > 100 && a.height > 100 }; });
+    expect(m).toEqual({ dentro: true, acima: true, larg: true, esq: true, visivel: true });
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await page.getByRole('button', { name: /^Etapa 1:/ }).click();
+    await expect(page.locator('#result')).not.toHaveClass(/show/);
+    await expect(page.locator('.slicer-import #slicerView')).toHaveCount(1);
+    await expect(page.locator('#result #slicerView')).toHaveCount(0);
+  });
+
+  test('tela de preço sem peça em 3D não mostra o quadro', async ({ page }) => {
+    await entrar(page);
+    await gerarOrcamento(page);
+    await expect(page.locator('#result #slicerView')).toHaveCount(0);
+    await expect(page.locator('#slicerView')).toBeHidden();
   });
 
   test('WhatsApp do orçamento sem peça em 3D leva só o orçamento', async ({ page }) => {

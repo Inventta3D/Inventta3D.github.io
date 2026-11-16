@@ -88,3 +88,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - Confirmação (window.confirm) antes de: salvar orçamento, salvar cliente (2 lugares), salvar rolo, salvar impressora, salvar no histórico, salvar vitrine e peça da vitrine, excluir orçamento salvo (mantém o desfazer) e sair da conta (o clearDraft solto no clique foi removido). Já existiam nos demais excluir. Testes: apoio.entrar responde OK por padrão; page.responder=false cancela. CACHE v84.
 
 - 3D usa as cores originais do projeto (3MF Bambu/Orca: filament_colour + extruder por objeto/parte), sem fatiar; botão "Cores do projeto" no painel de cores. PrusaSlicer/STL ficam sem. Testes unitários e e2e. CACHE v85.
+
+- GIF: pixels lidos direto do WebGL (render target + readPixels) em vez de drawImage em canvas 2D (saiu em branco num celular); recusa quadro vazio; teste confere pixels da peça nos quadros. WhatsApp pergunta se envia o GIF junto (peca-3d.gif). Tela de preço mostra o mesmo quadro 3D acima dos itens (o elemento muda de lugar, sem 2º WebGL). CACHE v86.
