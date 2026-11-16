@@ -12,3 +12,7 @@ playwright-report/
 # capturas de revisão do design (geradas, não versionar)
 .impeccable/review/
 .impeccable/build/
+
+# verificadores do taste-skill (gerados)
+.taste-skill/
+site/.taste-skill/

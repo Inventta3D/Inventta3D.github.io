@@ -1,260 +1,249 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-type="software" data-radius="soft" data-buttons="arrow" data-motion>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Inventta 3D · Orçamento de impressão 3D com custo real</title>
-  <meta name="description" content="Calcule o custo real de cada peça impressa em 3D, mostre a peça em 3D colorido e mande o orçamento pelo WhatsApp. Feito para o celular, direto da bancada.">
-  <meta name="theme-color" content="#FFF8EF">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Inventta 3D · Seu cliente pergunta. O orçamento responde.">
-  <meta property="og:description" content="Custo real, peça em 3D colorido e orçamento pronto para o WhatsApp.">
-  <meta property="og:image" content="https://inventta3d.github.io/app/icons/icon-512.png">
-  <link rel="icon" href="/app/icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/app/icons/apple-touch-icon.png">
-  <link rel="preload" href="/app/fonts/outfit-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/app/fonts/dm-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <script>try{var t=localStorage.getItem('inventta-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
-  <script>/* se o login Google voltar para a raiz (endereço do app ainda não liberado no Supabase), repassa para /app/ sem perder o código */if(/[?&]code=/.test(location.search)||/access_token=|error_description=/.test(location.hash))location.replace('/app/'+location.search+location.hash)</script>
-  <link rel="stylesheet" href="/app/css/tokens.css">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inventta 3D: orçamento de impressão 3D com custo real</title>
+<meta name="description" content="Calcule o custo real de cada peça, mostre o 3D colorido ao cliente e envie o orçamento pelo WhatsApp. Abre no navegador, com a sua conta Google.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Inventta 3D: orçamento de impressão 3D para quem vende peças">
+<meta property="og:description" content="Custo real de cada peça, 3D colorido para o cliente e orçamento pronto para o WhatsApp.">
+<meta property="og:image" content="https://inventta3d.github.io/assets/img/compartilhar.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script>/* se o login Google voltar para a raiz (endereço do app ainda não liberado no Supabase), repassa para /app/ sem perder o código */if(/[?&]code=/.test(location.search)||/access_token=|error_description=/.test(location.hash))location.replace('/app/'+location.search+location.hash)</script>
+<link rel="icon" href="/app/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/app/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#fff8ef">
+<link rel="canonical" href="https://inventta3d.github.io/">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #fff8ef; --p-surface: #f2ebe2; --p-ink: #1e1b13; --p-muted: #6b665d;
+  --p-accent: #b91e14; --p-accent-ink: #fff8ef; --p-action: #b91e14; --p-action-ink: #fff8ef;
+  --p-inv-bg: #1e1b13; --p-inv-surface: #2b281f; --p-inv-ink: #fff8ef; --p-inv-muted: #a19c93;
+  --p-inv-accent: #fff8ef; --p-inv-accent-ink: #1e1b13; --p-inv-action: #fff8ef; --p-inv-action-ink: #1e1b13;
+  --font-display: "Outfit", system-ui, sans-serif;
+  --font-text: "Outfit", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 400;
+  --display-tracking: -0.03em;
+  --display-tracking-xl: -0.04em;
+}
+/* tema escuro do sistema (o mesmo do aplicativo: creme e grafite) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --p-bg: #16130b; --p-surface: #211d13; --p-ink: #fff8ef; --p-muted: #b3ac9f;
+    --p-accent: #ff8f84; --p-accent-ink: #16130b; --p-action: #c62c1e; --p-action-ink: #fff8ef;
+    --p-inv-bg: #fff8ef; --p-inv-surface: #f2ebe2; --p-inv-ink: #1e1b13; --p-inv-muted: #6b665d;
+    --p-inv-accent: #b91e14; --p-inv-accent-ink: #fff8ef; --p-inv-action: #b91e14; --p-inv-action-ink: #fff8ef;
+  }
+}
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="assets/ui/checklist/fragment.css">
+<link rel="stylesheet" href="assets/diagrams/diagram.css">
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="assets/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js">
+<link rel="modulepreload" href="assets/moments/lib.js">
+<link rel="modulepreload" href="assets/moments/liquid-type/moment.js">
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.4-4.7A8.5 8.5 0 1 1 20.5 11.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path fill="currentColor" d="M9 8.2c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.6 1.5c.1.3.1.5-.1.7l-.5.6c-.2.2-.2.4 0 .7.6 1 1.4 1.7 2.4 2.2.3.1.5.1.7-.1l.7-.8c.2-.2.4-.2.7-.1l1.5.7c.3.1.4.3.4.5 0 .3-.2 1-.7 1.4-.5.4-1.2.6-2 .4-1.3-.3-2.7-1-4-2.3-1.1-1-2-2.6-2.3-3.7-.2-1 .2-1.6.6-2.1Z"/></symbol>
-  <symbol id="i-instagram" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="5"/><circle cx="12" cy="12" r="4"/></g><circle cx="17.7" cy="6.7" r="1.1" fill="currentColor"/></symbol>
-  <symbol id="i-sol" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></symbol>
-  <symbol id="i-lua" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7.5l8.5 6 8.5-6"/></g></symbol>
-  <symbol id="i-pdf" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 13h5M9.5 16.5h5"/></g></symbol>
-  <symbol id="i-imagem" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></g></symbol>
-  <symbol id="i-gif" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M8 5v14M16 5v14M3 10h5M3 14h5M16 10h5M16 14h5"/></g></symbol>
-  <symbol id="i-celular" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="3"/><path d="M10.5 18.5h3"/></g></symbol>
-</svg>
+<!-- type: software · site-kind software
+     deal: hero centred (a janela do aplicativo no computador), nav centre, close word, footer columns, rhythm dark-band (#como), buttons arrow, mark: logo do cliente
+     moments: liquid-type no h1 do hero
+     plano (1440x900): hero 1 · #app 1 (celular: pedido, preço, envio) · #recursos 2 (calculadora, 3D, WhatsApp, o resto do negócio) · #como 1 (cinco etapas, diagrama) · #perguntas 1 · footer.closing 1 -->
 
-<a class="pular" href="#conteudo">Pular para o conteúdo</a>
-
-<header class="topo" id="topo-site">
-  <a class="marca" href="#inicio" aria-label="Inventta 3D, início">
-    <img class="logo-claro" src="/app/img/logo-inventta-3d-colorido.svg" alt="" width="150" height="34">
-    <img class="logo-escuro" src="/app/img/logo-inventta-3d-escuro.svg" alt="" width="150" height="34">
-  </a>
-  <nav class="menu" aria-label="Seções da página">
-    <a href="#veja">O app</a>
-    <a href="#recursos">Recursos</a>
-    <a href="#como">Como funciona</a>
-    <a href="#perguntas">Perguntas</a>
-  </nav>
-  <div class="topo-acoes">
-    <button class="tema" type="button" data-tema aria-pressed="false" aria-label="Usar tema escuro" title="Alternar tema claro e escuro">
-      <svg class="icone icone-lua" aria-hidden="true"><use href="#i-lua"/></svg><svg class="icone icone-sol" aria-hidden="true"><use href="#i-sol"/></svg>
-    </button>
-    <a class="btn btn-contorno btn-contato" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." target="_blank" rel="noopener">
-      <svg class="icone" aria-hidden="true"><use href="#i-whatsapp"/></svg><span>Entrar em contato</span>
-    </a>
-    <a class="btn btn-cheio" href="/app/"><span>Acessar o app</span><svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Pular para o conteúdo</a>
+    <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><picture><source media="(prefers-color-scheme: dark)" srcset="/app/img/logo-inventta-3d-escuro.svg"><img class="logo" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"></picture></a>
+    <nav class="nav__links" aria-label="Principal">
+      <div class="nav__item"><a class="nav__link" href="#app">Aplicativo</a></div>
+      <div class="nav__item"><a class="nav__link" href="#recursos">Recursos</a></div>
+      <div class="nav__item"><a class="nav__link" href="#como">Como funciona</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Perguntas</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Falar no WhatsApp</a>
+      <a class="btn btn--primary" href="/app/">Acessar o app</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
   </div>
 </header>
 
-<main id="conteudo">
-  <!-- 1. Conversa: o primeiro quadro é a própria demonstração -->
-  <section class="hero" id="inicio" aria-labelledby="titulo-hero">
-    <div class="hero-texto">
-      <h1 id="titulo-hero">Seu cliente pergunta. <span class="realce">O orçamento responde.</span></h1>
-      <p class="hero-sub">Calcule o custo real de cada peça, mostre o 3D colorido e mande tudo pelo WhatsApp. Feito para o celular, direto da bancada.</p>
-      <div class="hero-botoes">
-        <a class="btn btn-cheio btn-grande" href="/app/"><span>Acessar o app</span><svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
-        <a class="btn btn-contorno btn-grande" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." target="_blank" rel="noopener">
-          <svg class="icone" aria-hidden="true"><use href="#i-whatsapp"/></svg><span>Entrar em contato</span>
-        </a>
-      </div>
-      <p class="hero-nota">Entre com a sua conta Google. Funciona no navegador, sem instalar nada.</p>
-    </div>
-
-    <div class="palco">
-      <p class="sr-only">Telas reais do aplicativo, com dados fictícios: o cliente pergunta quanto custa um vaso decorativo; o aplicativo mostra a peça em 3D, soma os custos (R$ 429,72 para 12 unidades) e gera o orçamento para enviar pelo WhatsApp.</p>
-      <p class="balao balao-cliente">Oi! Quanto fica esse vaso decorativo? Preciso de 12.</p>
-      <div class="celular" id="celular">
-        <img class="tela on" src="/assets/img/app-preco.jpg" width="780" height="1688" alt="Aplicativo, etapa Preço: preço sugerido de R$ 429,72 para 12 unidades, com a peça em 3D e os itens do pedido.">
-        <img class="tela" src="/assets/img/app-pedido.jpg" width="780" height="1688" alt="Aplicativo, etapa Pedido: peça em 3D de um vaso vermelho, nome da peça e quantidade." loading="lazy">
-        <img class="tela" src="/assets/img/app-envio.jpg" width="780" height="1688" alt="Aplicativo, painel Compartilhar com o cliente: botão Enviar pelo WhatsApp." loading="lazy">
-      </div>
-      <div class="telas-nav" role="group" aria-label="Telas do aplicativo">
-        <button type="button" class="ponto" data-tela="0" aria-pressed="true">Preço</button>
-        <button type="button" class="ponto" data-tela="1" aria-pressed="false">Pedido</button>
-        <button type="button" class="ponto" data-tela="2" aria-pressed="false">Envio</button>
-      </div>
-      <figure class="balao balao-orcamento">
-        <img src="/assets/img/orcamento-whatsapp.png" width="1080" height="929" alt="Orçamento gerado pelo aplicativo: total de R$ 429,72, cliente Marina Souza e o item Vaso decorativo, 12 unidades." loading="lazy">
-        <figcaption>Orçamento pronto para enviar</figcaption>
-      </figure>
-      <p class="palco-nota">Telas reais do aplicativo, com dados fictícios.</p>
-    </div>
-  </section>
-
-  <!-- 1b. O aplicativo por dentro: imagens reais com dados fictícios -->
-  <section class="veja" id="veja" aria-labelledby="titulo-veja">
-    <h2 id="titulo-veja">O aplicativo por dentro</h2>
-    <p class="veja-sub">Capturas reais, com dados fictícios: um vaso decorativo para a cliente Marina Souza.</p>
-    <div class="veja-grade">
-      <figure class="janela">
-        <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>inventta3d.github.io/app</span></div>
-        <img src="/assets/img/app-computador.jpg" width="1920" height="1244" alt="Aplicativo no computador: a peça em 3D, os itens do pedido, o preço sugerido de R$ 429,72 e o botão Enviar pelo WhatsApp." loading="lazy">
-        <figcaption>No computador, o 3D da peça, os itens e o preço ficam lado a lado.</figcaption>
-      </figure>
-      <div class="veja-celulares">
-        <img src="/assets/img/app-pedido.jpg" width="780" height="1688" alt="Aplicativo no celular, etapa Pedido, com a peça em 3D.">
-        <img src="/assets/img/app-envio.jpg" width="780" height="1688" alt="Aplicativo no celular, painel Compartilhar com o cliente.">
-      </div>
-      <figure class="recebe recebe-orcamento">
-        <img src="/assets/img/orcamento-whatsapp.png" width="1080" height="929" alt="Imagem do orçamento: total do pedido, dados do cliente e itens." loading="lazy">
-        <figcaption>O orçamento como o cliente recebe.</figcaption>
-      </figure>
-      <figure class="recebe recebe-peca">
-        <img src="/assets/img/peca-3d.png" width="1200" height="900" alt="Imagem da peça em 3D, um vaso vermelho com camadas visíveis." loading="lazy">
-        <figcaption>E a peça em 3D, na cor escolhida.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- 2. Recursos: grade com demonstrações vivas -->
-  <section class="recursos" id="recursos" aria-labelledby="titulo-recursos">
-    <h2 id="titulo-recursos">Tudo que a bancada precisa para orçar e fechar</h2>
-
-    <div class="bento">
-      <article class="tile tile-calc" aria-labelledby="t-calc">
-        <h3 id="t-calc">Mexa nos números. O preço acompanha.</h3>
-        <p class="tile-texto">É o mesmo cálculo do aplicativo: material, energia, desgaste da máquina, mão de obra, falhas, margem, taxas e impostos.</p>
-        <form class="calc" id="calc" onsubmit="return false">
-          <div class="campo"><label for="c-peso">Peso por peça <output id="o-peso" for="c-peso">38 g</output></label>
-          <input id="c-peso" type="range" min="5" max="400" step="1" value="38"></div>
-          <div class="campo"><label for="c-tempo">Tempo de impressão <output id="o-tempo" for="c-tempo">3h40</output></label>
-          <input id="c-tempo" type="range" min="15" max="1440" step="5" value="220"></div>
-          <div class="campo"><label for="c-margem">Margem <output id="o-margem" for="c-margem">120%</output></label>
-          <input id="c-margem" type="range" min="0" max="300" step="5" value="120"></div>
-          <div class="campo"><label for="c-qtd">Quantidade <output id="o-qtd" for="c-qtd">12</output></label>
-          <input id="c-qtd" type="range" min="1" max="100" step="1" value="12"></div>
-        </form>
-        <div class="calc-saida">
-          <div class="calc-preco"><span>Preço por peça</span><strong id="r-unit">R$ 0,00</strong></div>
-          <div class="calc-preco"><span>Total do pedido</span><strong id="r-total">R$ 0,00</strong></div>
-          <div class="calc-preco"><span>Lucro estimado</span><strong id="r-lucro">R$ 0,00</strong></div>
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c" data-moment="liquid-type">
+        <h1 id="hero-h">Orçamento de impressão 3D</h1>
+        <p class="hero__lead">Calcule o custo real de cada peça, mostre o 3D colorido ao cliente e mande o orçamento pronto pelo WhatsApp.</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="/app/">Acessar o app<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <a class="btn btn--secondary" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Falar no WhatsApp</a>
         </div>
-        <p class="sr-only" id="calc-fala" role="status"></p>
-        <div class="barra" id="barra" role="img" aria-label="Composição do custo e do lucro"></div>
-        <ul class="legenda" id="legenda"></ul>
-        <details class="exemplo"><summary>Valores de exemplo usados</summary>
-          <p>Filamento a R$ 120 o quilo, 8% de material extra, 5% de falhas, energia a R$ 0,95 o kWh com a impressora em 120 W, impressora de R$ 3.200 com 5.000 horas de vida útil e R$ 0,40 por hora de manutenção, mão de obra a R$ 30 a hora (20 min de preparo e 10 min de acabamento por peça) e R$ 6 de embalagem. Troque pelos seus no aplicativo.</p>
-        </details>
-      </article>
-
-      <article class="tile tile-3d" aria-labelledby="t-3d">
-        <h3 id="t-3d">A peça em 3D, nas cores do projeto</h3>
-        <p class="tile-texto">Abra o STL ou o 3MF e mostre a peça girando para o cliente. Os 3MF do Bambu Studio e do Orca entram com as cores dos filamentos.</p>
-        <div class="peca-tile" id="peca-tile" role="group" aria-label="Peça de demonstração em 3D. Arraste para girar ou use as setas esquerda e direita."></div>
-        <div class="paleta" role="group" aria-label="Cores do projeto de demonstração">
-          <button type="button" class="cor" data-p="natal" aria-pressed="true"><i style="--a:#B91E14;--b:#FFF8EF;--c:#2F6B3A"></i><span>Natal</span></button>
-          <button type="button" class="cor" data-p="oceano" aria-pressed="false"><i style="--a:#1F5FD6;--b:#E9F1FF;--c:#0B2A5B"></i><span>Oceano</span></button>
-          <button type="button" class="cor" data-p="grafite" aria-pressed="false"><i style="--a:#3A3A3A;--b:#D9D2C3;--c:#CF2F22"></i><span>Grafite</span></button>
+      </div>
+      <div class="hero__window" role="img" aria-label="Tela do aplicativo no computador: o orçamento de 12 vasos decorativos, com a peça em 3D, os itens e o preço">
+        <div class="ly-piece win" aria-hidden="true">
+          <div class="win__bar"><span class="win__dots"><i></i><i></i><i></i></span><span>inventta3d.github.io/app</span></div>
+          <img src="assets/img/app-computador.jpg" alt="" width="1920" height="1244" fetchpriority="high">
         </div>
-        <p class="rotulo-demo">Peça de demonstração, gerada nesta página. Arraste ou use as setas para girar.</p>
-      </article>
+      </div>
+    </div></div>
+  </section>
 
-      <article class="tile tile-enviar" aria-labelledby="t-enviar">
-        <h3 id="t-enviar">Mande por onde o cliente está</h3>
-        <ul class="canais">
-          <li><svg class="icone" aria-hidden="true"><use href="#i-whatsapp"/></svg>WhatsApp</li>
-          <li><svg class="icone" aria-hidden="true"><use href="#i-imagem"/></svg>Imagem da peça</li>
-          <li><svg class="icone" aria-hidden="true"><use href="#i-gif"/></svg>GIF girando</li>
-          <li><svg class="icone" aria-hidden="true"><use href="#i-pdf"/></svg>PDF</li>
-          <li><svg class="icone" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</li>
-        </ul>
-        <p class="tile-texto">O cliente também pode aprovar ou pedir ajuste por um link, sem criar conta.</p>
-      </article>
+  <section class="section" id="app" style="--h: 1" aria-labelledby="app-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="section-head span-5"><h2 id="app-h">O aplicativo no celular. <span class="muted">Pedido, preço e envio.</span></h2></div>
+        <p class="t-lead muted span-6 start-7">Um orçamento de 12 vasos decorativos para a cliente Marina Souza, do pedido ao envio, direto da bancada.</p>
+      </div>
+      <div class="shots fill">
+        <img src="assets/img/app-pedido.jpg" alt="Tela Pedido do aplicativo no celular: o que vamos orçar, com a peça em 3D" width="780" height="1688" loading="lazy">
+        <img src="assets/img/app-preco.jpg" alt="Tela Preço do aplicativo no celular: preço sugerido do pedido, R$ 429,72" width="780" height="1688" loading="lazy">
+        <img src="assets/img/app-envio.jpg" alt="Tela Envio do aplicativo no celular: compartilhar o orçamento com o cliente pelo WhatsApp" width="780" height="1688" loading="lazy">
+      </div>
+    </div>
+  </section>
 
-      <article class="tile tile-celular" aria-labelledby="t-cel">
-        <h3 id="t-cel">Cabe no bolso</h3>
-        <p class="tile-texto">Abre no navegador do celular e vai para a tela inicial. Usa na bancada, com a mão suja de filamento.</p>
-        <div class="tela-inicial" aria-hidden="true">
-          <i></i><i></i><i></i><i></i>
-          <i></i><span class="app"><img src="/app/icons/icon-192.png" alt="" width="44" height="44"><b>Inventta 3D</b></span><i></i><i></i>
+  <section class="section g2" id="recursos" aria-labelledby="recursos-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="recursos-h">Recursos para orçar e fechar. <span class="muted">Do custo ao envio, no mesmo lugar.</span></h2>
         </div>
-      </article>
-
-      <article class="tile tile-negocio" aria-labelledby="t-neg">
-        <h3 id="t-neg">O resto do negócio no mesmo lugar</h3>
-        <ul class="chips">
-          <li>Clientes</li><li>Orçamentos salvos</li><li>Histórico de impressões</li><li>Estoque de filamento</li>
-          <li>Pedidos com status</li><li>Etiqueta com QR</li><li>Manutenção das impressoras</li><li>Painel do mês</li>
-          <li>Vitrine pública</li><li>Preço para marketplace</li>
-        </ul>
-      </article>
+        <div class="grid">
+          <article class="card card--row card--open span-6">
+            <h3>Calcula o custo real da peça</h3>
+            <p>Material, energia, máquina, mão de obra, falhas e margem. Mexa nos números e veja o preço.</p>
+            <div class="panel panel--calc">
+              <div class="calc" id="calc" role="group" aria-label="Calculadora de preço">
+                <div class="campo"><label for="c-peso">Peso por peça <output id="o-peso" for="c-peso">38 g</output></label><input id="c-peso" type="range" min="5" max="400" step="1" value="38"></div>
+                <div class="campo"><label for="c-tempo">Tempo <output id="o-tempo" for="c-tempo">3h40</output></label><input id="c-tempo" type="range" min="15" max="1440" step="5" value="220"></div>
+                <div class="campo"><label for="c-margem">Margem <output id="o-margem" for="c-margem">120%</output></label><input id="c-margem" type="range" min="0" max="300" step="5" value="120"></div>
+                <div class="campo"><label for="c-qtd">Quantidade <output id="o-qtd" for="c-qtd">12</output></label><input id="c-qtd" type="range" min="1" max="100" step="1" value="12"></div>
+              </div>
+              <dl class="calc__saida">
+                <div><dt>Preço por peça</dt><dd id="r-unit">R$ 0,00</dd></div>
+                <div><dt>Total do pedido</dt><dd id="r-total">R$ 0,00</dd></div>
+                <div><dt>Lucro estimado</dt><dd id="r-lucro">R$ 0,00</dd></div>
+              </dl>
+              <p class="sr-only" id="calc-fala" role="status"></p>
+            </div>
+            <a class="link" href="#como">Ver as cinco etapas do cálculo</a>
+          </article>
+          <article class="card card--row card--open span-6">
+            <h3>Mostra a peça em 3D colorido</h3>
+            <p>Abra o STL ou o 3MF e gire a peça para o cliente. Os 3MF do Bambu Studio e do Orca trazem as cores dos filamentos.</p>
+            <div class="panel panel--foto"><img class="frame__img" src="assets/img/peca-3d.png" srcset="assets/img/peca-3d-800.png 800w, assets/img/peca-3d.png 1200w" sizes="(max-width: 1023px) 100vw, 628px" alt="Vaso decorativo em 3D, com as cores do projeto" width="1200" height="900" loading="lazy"></div>
+          </article>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6">
+          <h3>Envia o orçamento pelo WhatsApp</h3>
+          <p>Imagem da peça, GIF girando, PDF ou e-mail. O cliente aprova por um link, sem criar conta.</p>
+          <div class="panel panel--foto panel--topo"><img class="frame__img" src="assets/img/orcamento-whatsapp.png" alt="Orçamento do aplicativo: cliente, itens e total" width="1080" height="929" loading="lazy"></div>
+        </article>
+        <article class="card card--row card--open span-6">
+          <h3>Guarda o resto do negócio</h3>
+          <p>Clientes, orçamentos, histórico, estoque de filamento, pedidos e manutenção das impressoras.</p>
+          <div class="panel"><div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:400px;--ax:max(24px, 50% - 200px);--ay:36px;--ay-sm:16px">
+            <div class="ui ui-panel ui-checks" data-ui="checklist">
+              <div class="ui-checks__head"><div class="ui-title">No mesmo lugar</div><span class="ui-spacer"></span><div class="ui-meta">5 áreas</div></div>
+              <div class="ui-checks__bar"><i style="--k:1"></i></div>
+              <ul class="ui-checks__list">
+                <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Clientes e orçamentos salvos</span></li>
+                <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Histórico de impressões</span></li>
+                <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Estoque de filamento</span></li>
+                <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Pedidos com status</span></li>
+                <li class="ui-check is-done"><span class="ui-check__box"><svg viewBox="0 0 16 16"><path d="m4.5 8.2 2.3 2.3 4.7-5"/></svg></span><span class="ui-check__label">Manutenção das impressoras</span></li>
+              </ul>
+            </div>
+          </div></div></div>
+        </article>
+      </div>
     </div>
   </section>
 
-  <!-- 3. Como funciona -->
-  <section class="como" id="como" aria-labelledby="titulo-como">
-    <h2 id="titulo-como">Do pedido ao preço, em cinco etapas</h2>
-    <ol class="etapas">
-      <li><h3>Pedido</h3><p>Nome da peça, quantidade e dados do cliente. Importe o arquivo para ver a peça em 3D.</p></li>
-      <li><h3>Material</h3><p>Tipo, cor, consumo por peça e preço do rolo. O material extra entra na conta.</p></li>
-      <li><h3>Impressão</h3><p>Tempo, energia e desgaste da impressora.</p></li>
-      <li><h3>Trabalho</h3><p>Preparo, acabamento, embalagem, falhas e margem de lucro.</p></li>
-      <li><h3>Preço</h3><p>Preço sugerido, desconto e composição do custo, pronto para enviar.</p></li>
-    </ol>
-  </section>
-
-  <!-- 4. Perguntas -->
-  <section class="perguntas" id="perguntas" aria-labelledby="titulo-perguntas">
-    <h2 id="titulo-perguntas">Perguntas que aparecem antes do primeiro orçamento</h2>
-    <div class="faq">
-      <details><summary>Preciso instalar alguma coisa?</summary><p>Não. O Inventta 3D abre no navegador, no celular ou no computador, e pode ser adicionado à tela inicial.</p></details>
-      <details><summary>Como eu entro?</summary><p>Com a sua conta Google.</p></details>
-      <details><summary>O aplicativo fatia a peça?</summary><p>Não. Ele mostra a peça em 3D e lê peso, tempo e material de arquivos já fatiados (3MF ou G-code). Com um STL, você vê o 3D e informa os números.</p></details>
-      <details><summary>Quais arquivos posso abrir?</summary><p>STL e 3MF para ver a peça em 3D. Os 3MF e G-code já fatiados também preenchem peso, tempo e material.</p></details>
-      <details><summary>O cliente precisa de conta para aprovar?</summary><p>Não. Ele abre um link, vê os itens e os preços e aprova ou pede ajuste.</p></details>
-      <details><summary>Quanto custa?</summary><p>Chame no WhatsApp para saber as condições.</p></details>
+  <section class="section ground-inverse" id="como" style="--h: 1" aria-labelledby="como-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="section-head span-5"><h2 id="como-h">Do pedido ao preço em cinco etapas</h2></div>
+        <p class="t-lead span-6 start-7">Cada etapa vira uma tela do aplicativo. Você preenche o que sabe, e o preço sugerido aparece pronto para enviar.</p>
+      </div>
+      <div class="fill passos">
+        <img class="barra" src="assets/img/app-etapas.jpg" alt="Barra de etapas do aplicativo: pedido, material, impressão e trabalho concluídos, e a etapa 5, preço" width="1474" height="120">
+        <ol class="etapas">
+          <li class="etapa"><h3>Pedido</h3><p>Peça, quantidade e dados do cliente.</p></li>
+          <li class="etapa"><h3>Material</h3><p>Tipo, cor, consumo e preço do rolo.</p></li>
+          <li class="etapa"><h3>Impressão</h3><p>Tempo, energia e desgaste da impressora.</p></li>
+          <li class="etapa"><h3>Trabalho</h3><p>Preparo, acabamento, falhas e margem.</p></li>
+          <li class="etapa"><h3>Preço</h3><p>Preço sugerido e desconto, pronto para enviar.</p></li>
+        </ol>
+      </div>
     </div>
   </section>
 
-  <!-- 5. Fecho -->
-  <section class="fecho" aria-labelledby="titulo-fecho">
-    <div class="fecho-texto">
-    <h2 id="titulo-fecho">Pronto para orçar a próxima peça?</h2>
-    <div class="fecho-botoes">
-      <a class="btn btn-claro btn-grande" href="/app/"><span>Acessar o app</span><svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
-      <a class="btn btn-contorno-claro btn-grande" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." target="_blank" rel="noopener">
-        <svg class="icone" aria-hidden="true"><use href="#i-whatsapp"/></svg><span>Entrar em contato</span>
-      </a>
+  <section class="section" id="faq" style="--h: 1" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="section-head span-5"><h2 id="faq-h">Perguntas antes do primeiro orçamento</h2>
+          <p class="duvida"><span class="ic-tile ic-tile--48" aria-hidden="true"><img class="ic" src="assets/ui/icons/whatsapp.svg" alt="" width="28" height="28"></span><a class="link" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Outra dúvida? Chame no WhatsApp</a></p></div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Preciso instalar alguma coisa?</h3><p>Não. Abre no navegador do celular ou do computador e pode ir para a tela inicial.</p></div>
+          <div class="faq__item"><h3>Como eu entro?</h3><p>Com a sua conta Google.</p></div>
+          <div class="faq__item"><h3>O aplicativo fatia a peça?</h3><p>Não. Ele mostra o 3D e lê peso, tempo e material de 3MF ou G-code já fatiados. Com um STL, você informa os números.</p></div>
+          <div class="faq__item"><h3>O cliente precisa de conta?</h3><p>Não. Ele abre um link e aprova ou pede ajuste.</p></div>
+          <div class="faq__item"><h3>Quanto custa?</h3><p>Chame no WhatsApp para saber as condições.</p></div>
+        </div>
+      </div>
     </div>
-    <p class="fecho-ig"><a href="https://www.instagram.com/3d.inventta/" target="_blank" rel="noopener"><svg class="icone" aria-hidden="true"><use href="#i-instagram"/></svg>Prefere ver os bastidores? @3d.inventta</a></p>
-    </div>
-    <div class="fecho-celular" aria-hidden="true"><img src="/assets/img/app-envio.jpg" width="780" height="1688" alt="" loading="lazy"></div>
   </section>
 </main>
 
-<footer class="rodape">
-  <a class="marca" href="#inicio" aria-label="Inventta 3D, voltar ao início">
-    <img class="logo-claro" src="/app/img/logo-3d-colorido.svg" alt="" width="40" height="45">
-    <img class="logo-escuro" src="/app/img/logo-3d-escuro.svg" alt="" width="40" height="45">
-  </a>
-  <p>Inventta 3D · orçamentos de impressão 3D</p>
-  <p class="rodape-links">
-    <a href="/app/">Acessar o app</a>
-    <a href="https://wa.me/5511946641992" target="_blank" rel="noopener">WhatsApp (11) 94664-1992</a>
-    <a href="https://www.instagram.com/3d.inventta/" target="_blank" rel="noopener">Instagram @3d.inventta</a>
-  </p>
+<footer class="footer closing" id="contato" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Orce a próxima peça no app</h2><p class="t-lead">Entre com a conta Google. Dúvidas? Chame no WhatsApp.</p></div>
+        <a class="btn btn--primary" href="/app/">Acessar o app<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">Inventta 3D</p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><picture><source media="(prefers-color-scheme: dark)" srcset="/app/img/logo-inventta-3d-escuro.svg"><img class="logo" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"></picture></a>
+          <p class="footer__lede">Orçamentos de impressão 3D com custo real, 3D colorido e envio pelo WhatsApp.</p>
+        </div>
+        <div class="span-2 start-7 footer__col"><h3>Produto</h3><ul><li><a href="#app">Aplicativo</a></li><li><a href="#recursos">Recursos</a></li><li><a href="#como">Como funciona</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Ajuda</h3><ul><li><a href="#faq">Perguntas</a></li><li><a href="/app/">Acessar o app</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Contato</h3><ul><li><a href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>WhatsApp (11) 94664-1992</a></li><li><a href="https://www.instagram.com/3d.inventta/" rel="noopener" data-instagram>Instagram @3d.inventta</a></li></ul></div>
+      </div>
+      <div class="footer__legal"><span>&copy; 2026 Inventta 3D</span></div>
+    </div>
+  </div>
 </footer>
 
-<!-- barra fixa no celular: os dois caminhos sempre à mão -->
-<div class="barra-fixa" id="barra-fixa" hidden>
-  <a class="btn btn-cheio" href="/app/"><span>Acessar o app</span></a>
-  <a class="btn btn-contorno" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." target="_blank" rel="noopener"><svg class="icone" aria-hidden="true"><use href="#i-whatsapp"/></svg><span>Contato</span></a>
-</div>
-
 <script src="/app/js/calculations.js"></script>
-<script type="module" src="/assets/site.js"></script>
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+<script type="module" src="assets/diagrams/mount.js"></script>
+<script type="module" src="assets/moments/moments.js"></script>
+<script src="assets/site.js" defer></script>
 </body>
 </html>

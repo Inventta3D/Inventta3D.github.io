@@ -11,3 +11,7 @@ Todas as imagens desta pasta são **capturas reais do aplicativo** (e dos arquiv
 - **Privacidade:** a imagem do orçamento é **recortada** (total, cliente e itens) para não publicar a chave Pix nem o e-mail do negócio, que o aplicativo imprime no rodapé do orçamento completo. As demais capturas não mostram dado real do negócio.
 - **Data da geração:** 16/11/2026 (a data impressa no orçamento é a do dia da captura).
 - Para atualizar as imagens depois de mudar o aplicativo, rode o script de novo.
+
+- `app-etapas.jpg`: recorte da barra de etapas de `app-computador.jpg`.
+- `peca-3d-800.png`: `peca-3d.png` em 800 px de largura (celular).
+- `compartilhar.jpg`: captura da primeira tela do site (imagem de compartilhamento).
