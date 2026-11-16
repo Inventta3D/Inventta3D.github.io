@@ -90,3 +90,5 @@ Cada ciclo: o que foi pedido, o que foi feito, como foi verificado, o que ficou 
 - 3D usa as cores originais do projeto (3MF Bambu/Orca: filament_colour + extruder por objeto/parte), sem fatiar; botão "Cores do projeto" no painel de cores. PrusaSlicer/STL ficam sem. Testes unitários e e2e. CACHE v85.
 
 - GIF: pixels lidos direto do WebGL (render target + readPixels) em vez de drawImage em canvas 2D (saiu em branco num celular); recusa quadro vazio; teste confere pixels da peça nos quadros. WhatsApp pergunta se envia o GIF junto (peca-3d.gif). Tela de preço mostra o mesmo quadro 3D acima dos itens (o elemento muda de lugar, sem 2º WebGL). CACHE v86.
+
+- 3MF pintado por triângulo (paint_color de Bambu/Orca, slic3rpe:mmu_segmentation do Prusa): árvore de subdivisão decodificada, filamento dominante por face. Testado com Santa++keychain.3mf (1 mi de triângulos, 99 MB): ~10 s para abrir no notebook, ~145 MB retidos, pico ~660 MB durante a leitura; GIF 808 KB em 9 s. CACHE v87.

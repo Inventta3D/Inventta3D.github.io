@@ -158,3 +158,20 @@ test('3MF sem cores de filamento: não devolve cores', async () => {
   const r = await F.lerMalha3mf(zip({ '3D/3dmodel.model': '<model><resources><object id="1"><mesh><vertices><vertex x="0" y="0" z="0"/><vertex x="1" y="0" z="0"/><vertex x="0" y="1" z="0"/></vertices><triangles><triangle v1="0" v2="1" v3="2"/></triangles></mesh></object></resources><build><item objectid="1"/></build></model>' }));
   assert.strictEqual(r[0].cores, undefined);
 });
+
+test('3MF pintado (paint_color): cada triângulo usa o filamento pintado; sem pintura usa o do objeto; face dividida usa o dominante', async () => {
+  const tri = (a, c) => `<triangle v1="${a[0]}" v2="${a[1]}" v3="${a[2]}"${c ? ` paint_color="${c}"` : ''}/>`;
+  const malha = '<mesh><vertices>' + [[0,0,0],[1,0,0],[0,1,0],[1,1,0]].map(([x,y,z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('') + '</vertices><triangles>' +
+    tri([0,1,2]) + tri([0,1,2], '8') + tri([0,1,2], '0C') + tri([0,1,2], '881') + tri([0,1,2], '4') + '</triangles></mesh>';
+  const [placa] = await F.lerMalha3mf(zip({
+    '3D/3dmodel.model': `<model><resources><object id="1">${malha}</object></resources><build><item objectid="1"/></build></model>`,
+    'Metadata/project_settings.config': JSON.stringify({ filament_colour: ['#FF0000', '#0000FF', '#00FF00', '#FFFF00'] }),
+    'Metadata/model_settings.config': '<config><object id="1"><metadata key="extruder" value="4"/></object></config>',
+  }));
+  const cor = (t) => [...placa.cores.slice(t * 9, t * 9 + 3)].join(',');
+  assert.strictEqual(cor(0), '1,1,0'); // sem pintura: filamento 4 do objeto (amarelo)
+  assert.strictEqual(cor(1), '0,0,1'); // "8" = filamento 2 (azul)
+  assert.strictEqual(cor(2), '0,1,0'); // "0C" = filamento 3 (verde)
+  assert.strictEqual(cor(3), '0,0,1'); // face dividida em duas metades de filamento 2: azul
+  assert.strictEqual(cor(4), '1,0,0'); // "4" = filamento 1 (vermelho)
+});

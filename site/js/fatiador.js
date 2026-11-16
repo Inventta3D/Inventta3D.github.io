@@ -101,6 +101,24 @@
   const matriz = (t) => (t ? t.trim().split(/\s+/).map(Number) : null); // 3MF: m00 m01 m02 m10 m11 m12 m20 m21 m22 m30 m31 m32
   const aplicar = (m, x, y, z) => (m ? [x * m[0] + y * m[3] + z * m[6] + m[9], x * m[1] + y * m[4] + z * m[7] + m[10], x * m[2] + y * m[5] + z * m[8] + m[11]] : [x, y, z]);
 
+  // paint_color (Bambu/Orca; slic3rpe:mmu_segmentation no PrusaSlicer): árvore de subdivisão da face em nibbles hex, escrita de trás para frente.
+  // Nibble: bits 0-1 = lados divididos (>0: tem filhos); folha: bits 2-3 = filamento, e 3 significa "3 + próximo nibble". Devolve o filamento dominante (0 = sem pintura).
+  function estadoPintura(h) {
+    if (!h) return 0;
+    if (h.length === 1) { const c = parseInt(h, 16); if (!(c & 3) && c >> 2 < 3) return c >> 2; }
+    let p = h.length - 1;
+    const nib = () => (p >= 0 ? parseInt(h[p--], 16) || 0 : 0), pesos = {};
+    (function no(peso) {
+      if (p < 0) return;
+      const c = nib(), lados = c & 3;
+      if (lados) { const n = lados + 1; for (let k = 0; k < n; k++) no(peso / n); return; }
+      let e = c >> 2; if (e === 3) e = 3 + nib();
+      pesos[e] = (pesos[e] || 0) + peso;
+    })(1);
+    let melhor = 0, mp = -1; for (const k in pesos) if (pesos[k] > mp) { mp = pesos[k]; melhor = +k; }
+    return melhor;
+  }
+
   function objetos3mf(xml) {
     const objs = {};
     for (const [, tag, corpo] of xml.matchAll(/(<object\b[^>]*>)([\s\S]*?)<\/object>/g)) {
@@ -108,7 +126,13 @@
       if (corpo.includes('<mesh')) {
         o.vs = []; o.ts = [];
         for (const m of corpo.matchAll(/<vertex\s+x="([^"]+)"\s+y="([^"]+)"\s+z="([^"]+)"/g)) o.vs.push(+m[1], +m[2], +m[3]);
-        for (const m of corpo.matchAll(/<triangle\s+v1="(\d+)"\s+v2="(\d+)"\s+v3="(\d+)"/g)) o.ts.push(+m[1], +m[2], +m[3]);
+        const est = []; let pintado = false;
+        for (const m of corpo.matchAll(/<triangle\s+v1="(\d+)"\s+v2="(\d+)"\s+v3="(\d+)"([^>]*)>/g)) {
+          o.ts.push(+m[1], +m[2], +m[3]);
+          const e = m[4] ? estadoPintura((m[4].match(/(?:paint_color|slic3rpe:mmu_segmentation)="([0-9A-Fa-f]+)"/) || [])[1]) : 0;
+          est.push(e); if (e) pintado = true;
+        }
+        if (pintado) o.est = Uint8Array.from(est); // filamento (1…n) pintado em cada triângulo; 0 = usa o do objeto
       }
       for (const [c] of corpo.matchAll(/<component\b[^>]*>/g)) o.comps.push({ id: atributo(c, 'objectid'), caminho: atributo(c, 'p:path'), m: matriz(atributo(c, 'transform')) });
       objs[atributo(tag, 'id')] = o;
@@ -138,14 +162,18 @@
       extObjeto[oid] = (corpo.split('<part')[0].match(/key="extruder" value="(\d+)"/) || [])[1];
       for (const [, pid, pc] of corpo.matchAll(/<part id="(\d+)"([\s\S]*?)<\/part>/g)) extParte[`${oid}:${pid}`] = (pc.match(/key="extruder" value="(\d+)"/) || [])[1];
     }
-    const corDoExtrusor = (n) => (n && filamentos[Number(n) - 1]) || null;
-    const corPadrao = filamentos[0] || [0.7, 0.7, 0.7];
+    const cores255 = filamentos.map((f) => f.map((v) => Math.round(v * 255)));
+    const corDoExtrusor = (n) => (n && cores255[Number(n) - 1]) || null;
+    const corPadrao = cores255[0] || [179, 179, 179];
     const itens = [...raiz.matchAll(/<item\b[^>]*>/g)].map(([t]) => ({ id: atributo(t, 'objectid'), m: matriz(atributo(t, 'transform')), imprime: atributo(t, 'printable') !== '0' })).filter((i) => i.imprime);
 
     async function emitir(arquivo, id, mats, saida, raizId, cor, cores) {
       const o = (await texto(arquivo))[id];
       if (!o) return;
-      if (o.vs) for (const i of o.ts) { let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z); cores.push(...(cor || corPadrao)); }
+      if (o.vs) for (let k = 0; k < o.ts.length; k++) {
+        const i = o.ts[k]; let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z);
+        const e = o.est ? o.est[(k / 3) | 0] : 0; cores.push(...((e && cores255[e - 1]) || cor || corPadrao));
+      }
       for (const c of o.comps) {
         if (raizId && modificador.has(`${raizId}:${c.id}`)) continue;
         await emitir(c.caminho || arquivo, c.id, [c.m, ...mats], saida, null, (raizId && corDoExtrusor(extParte[`${raizId}:${c.id}`] || extObjeto[raizId])) || cor, cores);
@@ -156,7 +184,7 @@
     for (const ids of grupos.length ? grupos : [itens.map((i) => i.id)]) {
       const saida = [], cores = [];
       for (const it of itens.filter((i) => ids.includes(i.id))) await emitir(raizNome, it.id, [it.m], saida, it.id, corDoExtrusor(extObjeto[it.id]), cores);
-      if (saida.length) placas.push({ objetos: ids.length, tri: new Float32Array(saida), ...(filamentos.length ? { cores: new Float32Array(cores) } : {}) });
+      if (saida.length) placas.push({ objetos: ids.length, tri: new Float32Array(saida), ...(filamentos.length ? { cores: Float32Array.from(cores, (v) => v / 255) } : {}) });
     }
     return placas;
   }
