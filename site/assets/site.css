@@ -31,17 +31,27 @@
 @media (min-width: 640px) and (max-width: 1023px) { #recursos .panel { --p-h: 360px; } }
 @media (max-width: 639px) { #recursos .panel { --p-h: 150px; } .close__word { font-size: clamp(48px, 15vw, 88px); } }
 
-/* calculadora (o mesmo cálculo do aplicativo) */
+/* calculadora: mesma tipografia, botões e controles do sistema */
 #recursos .panel.panel--calc { display: flex; flex-direction: column; justify-content: center; gap: var(--s-5); padding: var(--s-6); background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
 .panel--calc::before, .panel--calc::after { display: none; }
-.calc { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--s-6); }
-.campo label { display: flex; justify-content: space-between; gap: var(--s-3); font-size: 14px; color: var(--muted); margin-bottom: var(--s-2); }
-.campo output { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
-.campo input[type=range] { width: 100%; height: 20px; margin: 0; accent-color: var(--accent); }
-.calc__saida { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); margin: 0; padding-top: var(--s-4); border-top: 1px solid var(--line); }
-.calc__saida dt { font-size: 13px; color: var(--muted); }
-.calc__saida dd { margin: 0; white-space: nowrap; font: var(--display-weight) clamp(19px, 1.7vw, 26px)/1.2 var(--font-display); letter-spacing: var(--display-tracking); font-variant-numeric: tabular-nums; }
-@media (max-width: 639px) { .panel--calc { padding: var(--s-4); gap: var(--s-3); } .calc { gap: var(--s-3) var(--s-4); } .calc__saida dd { font-size: 18px; } }
+.calc { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5) var(--s-6); }
+.campo label { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); font: 400 var(--t-small)/1.3 var(--font-text); color: var(--muted); margin-bottom: var(--s-3); }
+.campo output { color: var(--ink); font: 500 var(--t-body)/1.2 var(--font-text); font-variant-numeric: tabular-nums; }
+.campo input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0; background: transparent; cursor: pointer; --p: 0%; }
+.campo input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: linear-gradient(to right, var(--accent) var(--p), var(--line-strong) var(--p)); }
+.campo input[type=range]::-moz-range-track { height: 4px; border-radius: 99px; background: var(--line-strong); }
+.campo input[type=range]::-moz-range-progress { height: 4px; border-radius: 99px; background: var(--accent); }
+.campo input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); box-shadow: 0 1px 4px rgb(30 27 19 / .25); transition: transform var(--dur, .2s) var(--ease, ease); }
+.campo input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.campo input[type=range]:hover::-webkit-slider-thumb, .campo input[type=range]:active::-webkit-slider-thumb { transform: scale(1.12); }
+.campo input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 99px; }
+.calc__saida { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); margin: 0; padding-top: var(--s-5); border-top: 1px solid var(--line); }
+.calc__saida dt { font: 400 var(--t-small)/1.3 var(--font-text); color: var(--muted); }
+.calc__saida dd { margin: var(--s-1) 0 0; white-space: nowrap; font: var(--display-weight) var(--t-stat)/1.1 var(--font-display); letter-spacing: var(--display-tracking); font-variant-numeric: tabular-nums; }
+.calc__saida > div:nth-child(2) dd { color: var(--accent); }
+.calc__ver { align-self: flex-start; }
+@media (max-width: 1279px) { #recursos .panel.panel--calc { padding: var(--s-4) var(--s-5); gap: var(--s-3); } .calc { gap: var(--s-3) var(--s-5); } .calc__saida { padding-top: var(--s-3); } .calc__saida dd { font-size: 22px; } .campo label { margin-bottom: var(--s-2); } }
+@media (max-width: 639px) { #recursos .panel.panel--calc { padding: var(--s-4); } .calc { gap: var(--s-3) var(--s-4); } .calc__saida dd { font-size: 17px; } .calc__ver { display: none; } }
 
 /* as cinco etapas: a barra real do aplicativo e, embaixo, uma coluna por etapa */
 .passos { display: grid; align-content: start; gap: var(--s-6); margin-top: var(--s-7); }
