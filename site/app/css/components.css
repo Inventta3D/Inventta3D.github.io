@@ -81,7 +81,7 @@ select.control option,select.control optgroup{background:var(--md-sys-color-surf
 
 /* ---------- botões segmentados (rádios em grupo) ---------- */
 .segmented{display:inline-flex}
-.discount-choice{position:relative}
+.discount-choice{position:relative;display:flex}
 .discount-choice input,.share-mode-option input{position:absolute;opacity:0;pointer-events:none}
 .discount-choice span,.preview-tabs [role="tab"]{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 16px;border:1px solid var(--md-sys-color-outline-variant);background:transparent;color:var(--md-sys-color-on-surface);font:var(--md-sys-typescale-label-large);cursor:pointer;transition:background-color var(--md-sys-motion-duration-short)}
 .discount-choice span::before,.preview-tabs [role="tab"]::after{content:'';width:0;height:18px;background:currentColor;-webkit-mask:var(--check-mask) center/18px no-repeat;mask:var(--check-mask) center/18px no-repeat;transition:width var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized)}

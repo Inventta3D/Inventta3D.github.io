@@ -1068,3 +1068,10 @@ test('desconto do pedido: o rótulo e o campo cabem no cartão em ~960 px', asyn
   expect(m.dentro).toBe(true);
   expect(m.largura).toBeGreaterThan(150);
 });
+
+test('desconto do pedido: rótulos alinhados no computador e seletor com a largura do campo no celular', async ({ page }, info) => {
+  await entrar(page); await gerarOrcamento(page);
+  const m = await page.evaluate(() => { const r = (s) => document.querySelector(s).getBoundingClientRect(); return { dl: r('.discount-mode legend').top - r('label[for=discountValue]').top, modo: r('.discount-mode'), campo: r('#discountValue') }; });
+  if (ehComputador(info) && info.project.use.viewport.width >= 1280) expect(Math.abs(m.dl)).toBeLessThanOrEqual(2);
+  if (ehCelular(info)) expect(Math.abs(m.modo.right - (m.campo.right + 80))).toBeGreaterThanOrEqual(0) && expect(m.modo.width).toBeGreaterThan(m.campo.width);
+});
