@@ -7,7 +7,7 @@ plugins {
 
 def env = { String name, String fallback -> System.getenv(name) ?: fallback }
 def twaHost = env('TWA_HOST', 'example.github.io')          // ex.: lucas.github.io
-def twaPath = env('TWA_PATH', '/')                           // ex.: /inventta3d/
+def twaPath = env('TWA_PATH', '/app/')                        // ex.: /app/
 def launchUrl = "https://${twaHost}${twaPath}"
 
 android {

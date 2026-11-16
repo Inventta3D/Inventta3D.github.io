@@ -14,7 +14,7 @@ test.describe('login', () => {
   test('abre sem erros, mostra o formulário e alterna o tema', async ({ page }) => {
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));
-    await page.goto('/');
+    await page.goto('/app/');
     await expect(page.getByRole('heading', { name: 'Acesse sua conta' })).toBeVisible();
     await expect(page.locator('#loginScreen input')).toHaveCount(0); // só Google: sem e-mail nem senha
     await expect(page.getByText(/Criar conta|Esqueci minha senha|Entrar com senha/)).toHaveCount(0);
@@ -26,13 +26,13 @@ test.describe('login', () => {
   });
 
   test('layout: nada sai da tela e os botões ficam alinhados', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app/');
     expect(await auditar(page, '#loginScreen')).toEqual([]);
   });
 
   test('computador: logo alinhada com o título', async ({ page }, info) => {
     test.skip(!ehComputador(info) || info.project.use.viewport.width < 960, 'só na tela dividida');
-    await page.goto('/');
+    await page.goto('/app/');
     const centro = async (sel) => page.locator(sel).first().evaluate((e) => { const r = e.getBoundingClientRect(); return (r.top + r.bottom) / 2; });
     const logo = await page.locator('.aside-logo img:visible').evaluate((e) => { const r = e.getBoundingClientRect(); return (r.top + r.bottom) / 2; });
     expect(Math.abs(logo - (await centro('#loginTitle')))).toBeLessThan(3);
@@ -213,7 +213,7 @@ test.describe('calculadora', () => {
   const abrir = (page, campo) => page.getByRole('button', { name: new RegExp(`Abrir calculadora para ${campo}`) }).click();
 
   test('só aparece nos campos de valor do orçamento, nunca no login nem nas outras telas', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app/');
     await expect(page.locator('.calc-open:visible')).toHaveCount(0);
     await entrar(page);
     await expect(page.locator('.calc-open')).toHaveCount(3);
@@ -630,7 +630,7 @@ test.describe('pedidos (status, entrega, retorno e etiqueta)', () => {
   test('o link do QR abre a lista com o pedido destacado', async ({ page }) => {
     const banco = await entrar(page);
     banco.db.inventta3d_quotes.push(antigo(1, { status: 'pronto' }));
-    await page.goto('/?pedido=ped-antigo#/orcamentos-salvos');
+    await page.goto('/app/?pedido=ped-antigo#/orcamentos-salvos');
     await expect(page.locator('#savedQuoteList .saved-quote-row.order-destaque')).toContainText('Vaso geométrico');
   });
 });
@@ -674,7 +674,7 @@ test.describe('link de aprovação', () => {
 
     const cliente = await context.newPage(); // visitante sem login, mesmo banco falso
     await cliente.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
-    await cliente.goto(`/aprovar.html?t=${token}`);
+    await cliente.goto(`/app/aprovar.html?t=${token}`);
     await expect(cliente.locator('#apvTitle')).toHaveText('Rafael, este é o seu orçamento');
     await expect(cliente.locator('#apvItems')).toContainText('1× Luminária lua');
     const total = (await page.evaluate(() => document.getElementById('batchTotal')?.textContent || '')).trim();
@@ -697,7 +697,7 @@ test.describe('link de aprovação', () => {
     const banco = bancoFalso();
     banco.db.inventta3d_quotes.push({ id: 'q1', title: 'Vaso', client_name: 'Ana Lima', total: 50, subtotal: 50, discount_amount: 0, created_at: new Date().toISOString(), share_token: '11111111-2222-3333-4444-555555555555', items: [{ data: { product: 'Vaso', filamentType: 'PLA' }, result: { q: 2, unitPrice: 25, cost: 9, profit: 12 } }] });
     await page.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
-    await page.goto('/aprovar.html?t=11111111-2222-3333-4444-555555555555');
+    await page.goto('/app/aprovar.html?t=11111111-2222-3333-4444-555555555555');
     await expect(page.locator('#apvItems')).toContainText('2× Vaso');
     await expect(page.locator('#apvItems')).toContainText('R$ 25,00 / un.');
     await page.getByRole('button', { name: 'Pedir ajuste' }).click();
@@ -708,7 +708,7 @@ test.describe('link de aprovação', () => {
     await expect(page.locator('#apvMsg')).toContainText('Você pediu um ajuste');
     expect(banco.db.inventta3d_quotes[0]).toMatchObject({ client_response: 'ajuste', client_note: 'Quero em azul' });
     expect(banco.db.inventta3d_quotes[0].status || 'orcado').toBe('orcado');
-    await page.goto('/aprovar.html?t=nao-existe');
+    await page.goto('/app/aprovar.html?t=nao-existe');
     await expect(page.locator('#apvTitle')).toHaveText('Link inválido');
     const achados = await auditar(page, '#apvMain');
     expect(achados).toEqual([]);
@@ -753,7 +753,7 @@ test.describe('vitrine pública', () => {
 
     const visitante = await context.newPage();
     await visitante.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
-    await visitante.goto('/vitrine.html?loja=atelie-da-ana');
+    await visitante.goto('/app/vitrine.html?loja=atelie-da-ana');
     await expect(visitante.locator('#vitTitle')).toHaveText('Ateliê da Ana');
     const card = visitante.locator('.vit-card', { hasText: 'Vaso espiral' });
     await expect(card).toContainText('A partir de R$ 45,00');
@@ -767,9 +767,9 @@ test.describe('vitrine pública', () => {
     const banco = bancoFalso();
     banco.db.inventta3d_shop.push({ owner_id: 'x', slug: 'fechada', name: 'Loja', whatsapp: '21998765432', intro: '', enabled: false });
     await page.route((u) => u.href.startsWith(urlSupabase), banco.tratar);
-    await page.goto('/vitrine.html?loja=fechada');
+    await page.goto('/app/vitrine.html?loja=fechada');
     await expect(page.locator('#vitTitle')).toHaveText('Vitrine não encontrada');
-    await page.goto('/vitrine.html?loja=X');
+    await page.goto('/app/vitrine.html?loja=X');
     await expect(page.locator('#vitTitle')).toHaveText('Vitrine não encontrada');
   });
 });

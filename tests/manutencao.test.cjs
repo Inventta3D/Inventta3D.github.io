@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const M = require('../site/js/manutencao.js');
+const M = require('../site/app/js/manutencao.js');
 
 const imps = [
   { print_minutes: 90, inventta3d_print_requests: [{ quantity: 2, requested_at: '2026-11-10T10:00:00Z' }, { quantity: 4, requested_at: '2026-10-01T10:00:00Z' }] },

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { avaliar, formatar, paraCampo } = require('../site/js/calculadora-nucleo.js');
+const { avaliar, formatar, paraCampo } = require('../site/app/js/calculadora-nucleo.js');
 
 test('operações básicas e precedência', () => {
   assert.equal(avaliar('2+3*4'), 14);

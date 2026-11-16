@@ -27,7 +27,7 @@ jobs:
           PATHNAME="${{ vars.TWA_PATH }}"
           if [ -z "$HOST" ]; then
             HOST="$OWNER.github.io"
-            if [ "${REPO,,}" = "$HOST" ]; then PATHNAME="${PATHNAME:-/}"; else PATHNAME="${PATHNAME:-/$REPO/}"; fi
+            if [ "${REPO,,}" = "$HOST" ]; then PATHNAME="${PATHNAME:-/app/}"; else PATHNAME="${PATHNAME:-/$REPO/app/}"; fi  # o app fica em /app/; a raiz é o site de apresentação
           fi
           echo "host=$HOST" >> "$GITHUB_OUTPUT"
           echo "path=${PATHNAME:-/}" >> "$GITHUB_OUTPUT"

@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const config = fs.readFileSync(path.join(__dirname, '..', '..', 'site', 'config.js'), 'utf8');
+const config = fs.readFileSync(path.join(__dirname, '..', '..', 'site', 'app', 'config.js'), 'utf8');
 const urlSupabase = (config.match(/https:\/\/[a-z0-9]+\.supabase\.co/) || [])[0];
 const ref = new URL(urlSupabase).hostname.split('.')[0];
 const USUARIO = '11111111-1111-1111-1111-111111111111';
@@ -112,7 +112,7 @@ async function entrar(page) {
   // confirmações (window.confirm): por padrão o teste responde "OK"; page.responder = false cancela. As mensagens ficam em page.confirmacoes.
   page.confirmacoes = []; page.responder = true;
   page.on('dialog', async (d) => { if (d.type() !== 'confirm') return; page.confirmacoes.push(d.message()); await (page.responder ? d.accept() : d.dismiss()); });
-  await page.goto('/');
+  await page.goto('/app/');
   await page.locator('#appShell').waitFor({ state: 'visible' });
   return banco;
 }

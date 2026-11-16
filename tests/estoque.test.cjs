@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const E = require('../site/js/estoque.js');
+const E = require('../site/app/js/estoque.js');
 
 const rolo = (id, material, color, remaining_g, weight_g = 1000) => ({ id, material, color, remaining_g, weight_g });
 

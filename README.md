@@ -3,7 +3,10 @@
 Site (PWA) + app Android (TWA). O app abre o site publicado em tela cheia, então **toda atualização do site chega ao app sem gerar um APK novo**. Só é preciso compilar de novo ao mudar ícone, nome ou endereço.
 
 ```
-site/        o site publicado no GitHub Pages
+site/        o que vai para o GitHub Pages
+  index.html, assets/   site de apresentação (raiz do domínio: botão para o app e contato por WhatsApp)
+  app/                  o aplicativo (PWA) em /app/: login, orçamentos, aprovar.html, vitrine.html
+  sw.js                 só remove o service worker antigo que controlava a raiz
 android/     o app Android (Trusted Web Activity)
 tests/       testes do cálculo de orçamento  (npm test)
 supabase/    migrações do banco

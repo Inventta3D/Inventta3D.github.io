@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const zlib = require('node:zlib');
-const F = require('../site/js/fatiador.js');
+const F = require('../site/app/js/fatiador.js');
 
 // monta um zip mínimo (deflate) como o 3MF dos fatiadores
 function zip(arquivos) {
@@ -127,7 +127,7 @@ test('tempo do G-code: aceleração em reta e curva fechada freia', () => {
 });
 
 test('impressoras da tela existem nos perfis; Kiri recebe velocidades da máquina', () => {
-  const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '../site/index.html'), 'utf8');
+  const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '../site/app/index.html'), 'utf8');
   const sel = html.match(/<select[^>]*id="printerModel"[^>]*>([\s\S]*?)<\/select>/)[1];
   const nomes = [...sel.matchAll(/<option>([^<]+)<\/option>/g)].map((m) => m[1]);
   assert.deepStrictEqual(nomes, Object.keys(F.IMPRESSORAS));

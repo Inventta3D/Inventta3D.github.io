@@ -9,14 +9,14 @@ const vm = require('node:vm');
 const { execSync } = require('node:child_process');
 
 const root = path.join(__dirname, '..');
-const site = path.join(root, 'site');
+const site = path.join(root, 'site', 'app');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
-const html = read('site/index.html');
+const html = read('site/app/index.html');
 const listFiles = (dir, ext) => fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith(ext)).map((f) => `${dir}/${f}`);
-const ownJs = listFiles('site/js', '.js').filter((f) => !/qrcode-generator/.test(f));
-const ownCss = [...listFiles('site/css', '.css'), ...listFiles('site/css/modules', '.css')];
+const ownJs = listFiles('site/app/js', '.js').filter((f) => !/qrcode-generator/.test(f));
+const ownCss = [...listFiles('site/app/css', '.css'), ...listFiles('site/app/css/modules', '.css')];
 // ids de todas as páginas (index e páginas públicas como aprovar.html)
-const paginas = listFiles('site', '.html').map(read);
+const paginas = listFiles('site/app', '.html').map(read);
 const ids = paginas.flatMap((h) => [...h.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 const idSet = new Set(ids);
 const sprite = new Set([...html.matchAll(/<symbol id="([^"]+)"/g)].map((m) => m[1]));
@@ -24,7 +24,7 @@ const git = (cmd) => execSync(`git ${cmd}`, { cwd: root, stdio: ['ignore', 'pipe
 
 function carregarModulos() {
   const ctx = { window: {} };
-  vm.runInNewContext(read('site/js/modules.js'), ctx);
+  vm.runInNewContext(read('site/app/js/modules.js'), ctx);
   return ctx.window.INVENTTA_MODULES;
 }
 
@@ -81,7 +81,7 @@ test('arquivos: tudo que o index.html carrega existe', () => {
 });
 
 test('service worker: pré-carrega todo CSS/JS do index.html e os arquivos existem', () => {
-  const sw = read('site/sw.js');
+  const sw = read('site/app/sw.js');
   const shell = [...sw.matchAll(/'(\.\/[^']+)'/g)].map((m) => m[1]);
   const carregados = [...html.matchAll(/(?:href|src)="(\.\/[^"#?]+\.(?:css|js))"/g)].map((m) => m[1]);
   const fora = carregados.filter((c) => !shell.includes(c));
@@ -100,8 +100,8 @@ test('service worker: quem altera o site sobe a versão do cache', (t) => {
     faixa = sujo.length ? 'HEAD' : 'HEAD~1 HEAD';
     alterados = sujo.length ? sujo : linhas('diff --name-only HEAD~1 HEAD');
   } catch { return t.skip('sem histórico git disponível'); }
-  if (!alterados.some((f) => f.startsWith('site/') && f !== 'site/sw.js')) return;
-  const diff = git(`diff ${faixa} -- site/sw.js`);
+  if (!alterados.some((f) => f.startsWith('site/app/') && f !== 'site/app/sw.js')) return;
+  const diff = git(`diff ${faixa} -- site/app/sw.js`);
   assert.match(diff, /^[+-].*CACHE_NAME/m, 'arquivos do site mudaram: suba o CACHE_NAME em site/sw.js');
 });
 
@@ -141,7 +141,7 @@ test('acessibilidade: botões que abrem menu apontam para o menu e iniciam fecha
 });
 
 test('cliente: texto, imagem e PDF compartilhados nunca trazem custos nem lucro', () => {
-  const src = read('site/js/app.js');
+  const src = read('site/app/js/app.js');
   for (const proibido of ['sharedCosts', "'detailed'", 'DETALHAMENTO', 'COMPOSIÇÃO DO VALOR']) {
     assert.ok(!src.includes(proibido), `app.js não pode ter "${proibido}": custos e lucro ficam só na visão interna`);
   }
@@ -150,7 +150,7 @@ test('cliente: texto, imagem e PDF compartilhados nunca trazem custos nem lucro'
 });
 
 test('CSS: sem cores soltas fora dos tokens (módulos, componentes e shell)', () => {
-  const permitido = new Set(['site/css/tokens.css', 'site/css/print.css']);
+  const permitido = new Set(['site/app/css/tokens.css', 'site/app/css/print.css']);
   const achados = [];
   for (const f of ownCss.filter((x) => !permitido.has(x))) {
     const src = read(f).replace(/\/\*[\s\S]*?\*\//g, '');
@@ -196,7 +196,7 @@ test('banco: migrações têm nomes ordenáveis e sem repetição', () => {
 test('modelo do WhatsApp: cópias iguais e versão codificada em dia', () => {
   const a = fs.readFileSync(path.join(site, 'whatsapp-template.html'));
   const b = fs.readFileSync(path.join(site, 'templates/whatsapp-template.html'));
-  assert.ok(a.equals(b), 'site/whatsapp-template.html e site/templates/whatsapp-template.html divergem');
+  assert.ok(a.equals(b), 'site/app/whatsapp-template.html e site/templates/whatsapp-template.html divergem');
   const b64 = fs.readFileSync(path.join(site, 'templates/whatsapp-template.b64'), 'utf8').trim();
   assert.equal(b64, a.toString('base64'), 'rode: python scripts/build-template.py');
 });

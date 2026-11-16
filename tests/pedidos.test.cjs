@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const P = require('../site/js/pedidos.js');
+const P = require('../site/app/js/pedidos.js');
 
 const hoje = new Date(2026, 10, 15, 10, 0); // 15/11/2026
 const ped = (extra) => ({ id: 'x', title: 'Suporte', client_name: 'Rafael Cardoso', client_phone: '(11) 98765-4321', created_at: '2026-11-10T09:00:00', ...extra });

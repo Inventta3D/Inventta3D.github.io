@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const M = require('../site/js/marketplace.js');
+const M = require('../site/app/js/marketplace.js');
 
 test('conta inversa: depois das taxas você recebe o que pediu (centavos para cima)', () => {
   const r = M.calcular(100, [[0, Infinity, 12, 5]], { imposto: 6, frete: 10 });

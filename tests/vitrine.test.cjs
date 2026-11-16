@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const V = require('../site/js/vitrine.js');
+const V = require('../site/app/js/vitrine.js');
 
 test('endereço da vitrine: só minúsculas, números e hífen, 3 a 40 caracteres, sem hífen nas pontas', () => {
   for (const ok of ['abc', 'inventta3d', 'loja-do-joao', 'a'.repeat(40)]) assert.ok(V.slugValido(ok), ok);

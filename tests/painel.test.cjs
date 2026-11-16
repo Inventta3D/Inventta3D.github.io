@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const P = require('../site/js/painel.js');
-const calc = require('../site/js/calculations.js');
+const P = require('../site/app/js/painel.js');
+const calc = require('../site/app/js/calculations.js');
 
 const dados = { quantity: 2, amount: 50, packPrice: 120, packQty: 1000, waste: 10, failure: 0, power: 100, energyRate: 1, printerCost: 0, lifeHours: 1, maintenance: 0, printHours: '01:30', setupMin: 0, finishMin: 0, laborRate: 0, packaging: 0, salesFee: 10, taxRate: 0, margin: 100 };
 const custo = calc.calculate(dados).cost; // material 13,20 + energia 0,30 = 13,50
