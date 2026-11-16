@@ -14,8 +14,13 @@ permissions:
 
 jobs:
   e2e:
+    name: e2e (${{ matrix.grupo }})
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        grupo: [celular, computador]   # dois jobs em paralelo: a suíte inteira passa de 20 minutos em um só
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 2 }
@@ -24,10 +29,10 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - run: npx playwright test --project='${{ matrix.grupo }}-*'
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: resultados-dos-testes
+          name: resultados-dos-testes-${{ matrix.grupo }}
           path: test-results
           retention-days: 7
