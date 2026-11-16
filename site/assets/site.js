@@ -27,3 +27,19 @@
   Object.values(campos).forEach((c) => c.addEventListener('input', atualizar));
   atualizar();
 })();
+
+/* peça 3D de demonstração (vaso torcido): gira sozinha e carrega só quando aparece */
+(() => {
+  const hosts = [...document.querySelectorAll('[data-peca]')];
+  if (!hosts.length) return;
+  let modulo = null;
+  const montar = async (host) => {
+    modulo ??= await import('/assets/peca.js');
+    const peca = await modulo.criarPeca(host, { interativo: host.hasAttribute('data-interativo'), paleta: host.dataset.peca, velocidade: Number(host.dataset.velocidade) || 1.6 });
+    if (!peca) return;
+    const botoes = [...document.querySelectorAll('.cor')];
+    if (host.hasAttribute('data-interativo')) botoes.forEach((b) => b.addEventListener('click', () => { botoes.forEach((o) => o.setAttribute('aria-pressed', String(o === b))); peca.paleta(b.dataset.p); }));
+  };
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { io.unobserve(e.target); montar(e.target); } }), { rootMargin: '300px' });
+  hosts.forEach((h) => io.observe(h));
+})();

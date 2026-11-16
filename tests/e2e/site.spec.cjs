@@ -43,7 +43,7 @@ test.describe('site de apresentação', () => {
       const b = await page.locator('.hero .btn-row').getByRole('link', { name: nome }).boundingBox();
       expect(b.y + b.height, `${nome} abaixo da primeira tela`).toBeLessThanOrEqual(vh);
     }
-    await expect(page.locator('.hero__window img')).toBeVisible();
+    await expect(page.locator('.hero__window .win__steps')).toBeVisible();
   });
 
   test('cada seção ocupa exatamente uma ou duas telas (e começa numa tela inteira)', async ({ page }, info) => {
@@ -79,6 +79,22 @@ test.describe('site de apresentação', () => {
     const alts = await page.locator('main img').evaluateAll((l) => l.filter((i) => i.offsetParent).map((i) => i.alt));
     expect(alts.some((a) => /R\$ 429,72/.test(a))).toBe(true);
     for (const a of alts.filter(Boolean)) expect(a.length).toBeGreaterThan(20);
+  });
+
+  test('a peça 3D do hero e a do bloco de recursos aparecem, giram, e a troca de cor funciona', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.hero .peca-tile canvas')).toBeAttached({ timeout: 15000 });
+    await page.locator('#recursos .panel--peca').scrollIntoViewIfNeeded();
+    const tela = page.locator('#recursos .peca-tile canvas');
+    await expect(tela).toBeVisible({ timeout: 15000 });
+    const natal = page.getByRole('button', { name: 'Natal' }), oceano = page.getByRole('button', { name: 'Oceano' });
+    await expect(natal).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(600);
+    const antes = await tela.screenshot();
+    await oceano.click();
+    await expect(oceano).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(600);
+    expect((await tela.screenshot()).equals(antes)).toBe(false); // a cor mudou (e a peça gira sozinha)
   });
 
   test('calculadora ao vivo: R$ 429,72 para o exemplo, e mexer no peso muda o preço (cálculo do app)', async ({ page }) => {
