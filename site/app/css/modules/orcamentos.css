@@ -91,12 +91,12 @@
 .quote-item-actions .btn{--bd:transparent;--btn-px:12px}
 .quote-item-actions .btn-outline{--fg:var(--md-sys-color-primary)}
 
-.discount-panel{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 24px;align-items:end;margin-top:20px}
+.discount-panel{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;margin-top:20px}
 .discount-mode{margin:0;padding:0;border:0;min-width:0}
 .discount-mode{display:flex;flex-wrap:wrap;align-items:center}
 .discount-mode legend{width:100%;padding:0;margin-bottom:6px;font:var(--md-sys-typescale-title-small)}
 .discount-mode span{min-height:56px}
-.discount-field{min-width:0}
+.discount-field{flex:1 1 240px;min-width:0}
 .discount-field label{display:block;margin-bottom:6px;font:var(--md-sys-typescale-title-small)}
 .discount-field .hint{display:none}
 .discount-summary{display:flex;justify-content:space-between;gap:12px;margin-top:16px;color:var(--md-sys-color-primary);font:var(--md-sys-typescale-label-large)}

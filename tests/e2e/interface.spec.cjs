@@ -1059,3 +1059,12 @@ test.describe('confirmação antes de salvar e excluir', () => {
     expect(banco.db.inventta3d_customers).toHaveLength(1);
   });
 });
+
+test('desconto do pedido: o rótulo e o campo cabem no cartão em ~960 px', async ({ page }, info) => {
+  test.skip(!ehComputador(info), 'largura intermediária do computador');
+  await page.setViewportSize({ width: 960, height: 900 });
+  await entrar(page); await gerarOrcamento(page);
+  const m = await page.evaluate(() => { const c = document.querySelector('.batch-summary').getBoundingClientRect(), f = document.querySelector('.discount-field').getBoundingClientRect(); return { dentro: f.right <= c.right && f.left >= c.left, largura: f.width }; });
+  expect(m.dentro).toBe(true);
+  expect(m.largura).toBeGreaterThan(150);
+});
