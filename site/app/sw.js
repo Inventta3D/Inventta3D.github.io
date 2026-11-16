@@ -1,4 +1,4 @@
-const CACHE_NAME='inventta3d-v92';
+const CACHE_NAME='inventta3d-v93';
 const KIRI_CACHE='inventta3d-kiri-4.7.3'; // motor de fatiamento (~9 MB): baixado só no primeiro uso e mantido entre versões do site
 const APP_SHELL=[
   './',
