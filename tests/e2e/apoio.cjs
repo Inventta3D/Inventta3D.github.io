@@ -179,7 +179,7 @@ function cuboSTL(L = 20, name = 'cubo_teste.stl') {
 }
 
 // 3MF fatiado (Bambu/Orca) com um cubo: peso 12,5 g, 1h30, PETG.
-function cubo3mfFatiado(name = 'cubo_fatiado.3mf') {
+function cubo3mfFatiado(name = 'cubo_fatiado.3mf', { colorido = false } = {}) {
   const zlib = require('node:zlib');
   const v = [[0,0,0],[10,0,0],[10,10,0],[0,10,0],[0,0,10],[10,0,10],[10,10,10],[0,10,10]];
   const f = [[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],[1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]];
@@ -189,6 +189,10 @@ function cubo3mfFatiado(name = 'cubo_fatiado.3mf') {
     '3D/3dmodel.model': modelo,
     'Metadata/slice_info.config': '<config><plate><metadata key="prediction" value="5400"/><metadata key="weight" value="12.5"/><object identify_id="1" name="a"/><filament id="1" type="PETG" used_g="12.5"/></plate></config>',
   };
+  if (colorido) { // projeto Bambu/Orca: cores dos filamentos e filamento usado pelo objeto
+    arquivos['Metadata/project_settings.config'] = JSON.stringify({ filament_colour: ['#FFFFFF', '#1E5BB8'] });
+    arquivos['Metadata/model_settings.config'] = '<config><object id="1"><metadata key="extruder" value="2"/></object></config>';
+  }
   const locais = [], central = []; let off = 0;
   for (const [nome, txt] of Object.entries(arquivos)) {
     const n = Buffer.from(nome), dado = zlib.deflateRawSync(Buffer.from(txt));
@@ -197,7 +201,7 @@ function cubo3mfFatiado(name = 'cubo_fatiado.3mf') {
     locais.push(l, n, dado); central.push(c, n); off += 30 + n.length + dado.length;
   }
   const cd = Buffer.concat(central), e = Buffer.alloc(22);
-  e.writeUInt32LE(0x06054b50, 0); e.writeUInt16LE(2, 10); e.writeUInt32LE(cd.length, 12); e.writeUInt32LE(off, 16);
+  e.writeUInt32LE(0x06054b50, 0); e.writeUInt16LE(Object.keys(arquivos).length, 10); e.writeUInt32LE(cd.length, 12); e.writeUInt32LE(off, 16);
   return { name, mimeType: 'model/3mf', buffer: Buffer.concat([...locais, cd, e]) };
 }
 

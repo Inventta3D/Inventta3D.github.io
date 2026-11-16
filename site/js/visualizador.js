@@ -68,7 +68,8 @@
     return new Blob([new Uint8Array(b)], { type: 'image/gif' });
   }
 
-  async function mostrar(caixa, tri, { cor = '', nome = 'peça', aoTrocarCor = null } = {}) {
+  async function mostrar(caixa, tri, { cor = '', nome = 'peça', aoTrocarCor = null, coresOriginais = null } = {}) {
+    const temProjeto = !!coresOriginais && coresOriginais.length === tri.length; // cor por vértice (sRGB 0–1), lida do 3MF do projeto
     const [T, { OrbitControls }] = await carregar();
     caixa.replaceChildren();
     const larg = caixa.clientWidth || 320, alt = caixa.clientHeight || 240;
@@ -111,10 +112,22 @@
     const botoes = Object.entries(CORES).map(([k, hex]) => {
       const b = document.createElement('button'), rotulo = k[0].toUpperCase() + k.slice(1);
       b.type = 'button'; b.className = 'model-cor'; b.style.background = hex; b.title = rotulo; b.setAttribute('aria-label', rotulo); b.dataset.cor = rotulo;
-      b.addEventListener('click', () => { marcar(k); material.color.set(hex); aoTrocarCor?.(rotulo); });
+      b.addEventListener('click', () => { marcar(k); usarProjeto(false); material.color.set(hex); aoTrocarCor?.(rotulo); });
       cores.append(b); return [k, b];
     });
-    const marcar = (texto) => { const t = String(texto || '').toLowerCase(), k = Object.keys(CORES).find((c) => t.includes(c)); for (const [c, b] of botoes) b.setAttribute('aria-pressed', String(c === k)); };
+    const marcar = (texto) => { const t = String(texto || '').toLowerCase(), k = Object.keys(CORES).find((c) => t.includes(c)); for (const [c, b] of botoes) b.setAttribute('aria-pressed', String(c === k)); bProjeto?.setAttribute('aria-pressed', 'false'); };
+    // "Cores do projeto": as cores originais do 3MF (filamentos do Bambu/Orca), sem fatiar
+    let bProjeto = null;
+    if (temProjeto) {
+      const unicas = [], visto = new Set();
+      for (let i = 0; i < coresOriginais.length && unicas.length < 6; i += 9) { const h = [0, 1, 2].map((k) => Math.round(coresOriginais[i + k] * 255)).join(','); if (!visto.has(h)) { visto.add(h); unicas.push(`rgb(${h})`); } }
+      const passo = 360 / unicas.length;
+      bProjeto = document.createElement('button');
+      bProjeto.type = 'button'; bProjeto.className = 'model-cor model-cor-projeto'; bProjeto.title = 'Cores do projeto'; bProjeto.setAttribute('aria-label', 'Cores do projeto');
+      bProjeto.style.background = unicas.length > 1 ? `conic-gradient(${unicas.map((c, i) => `${c} ${Math.round(i * passo)}deg ${Math.round((i + 1) * passo)}deg`).join(',')})` : unicas[0];
+      bProjeto.addEventListener('click', () => { marcar(''); usarProjeto(true); });
+      cores.prepend(bProjeto);
+    }
     const botao = (texto) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'model-item'; b.textContent = texto; acoes.append(b); return b; };
     const enviar = botao('Compartilhar imagem'), enviarGif = botao('Compartilhar GIF');
     caixa.append(cores, acoes, gCor, gEnviar);
@@ -130,8 +143,14 @@
     geo.translate(-centro.x, -caixaGeo.min.y, -centro.z); // apoiada na mesa, centralizada
     const tam = caixaGeo.getSize(new T.Vector3()), raio = Math.max(tam.x, tam.y, tam.z) || 10;
 
+    if (temProjeto) { // cores por vértice em espaço linear, como o three.js espera
+      const lin = new Float32Array(coresOriginais.length), c = new T.Color();
+      for (let i = 0; i < lin.length; i += 3) { c.setRGB(coresOriginais[i], coresOriginais[i + 1], coresOriginais[i + 2], T.SRGBColorSpace); lin[i] = c.r; lin[i + 1] = c.g; lin[i + 2] = c.b; }
+      geo.setAttribute('color', new T.BufferAttribute(lin, 3));
+    }
     const material = new T.MeshStandardMaterial({ color: corDe(cor), roughness: 0.55, metalness: 0.05 });
-    marcar(cor);
+    function usarProjeto(sim) { material.vertexColors = sim; if (sim) material.color.set(0xffffff); material.needsUpdate = true; bProjeto?.setAttribute('aria-pressed', String(sim)); }
+    if (temProjeto) usarProjeto(true); else marcar(cor);
     const malha = new T.Mesh(geo, material);
     malha.castShadow = true;
     cena.add(malha);
@@ -203,7 +222,7 @@
 
     return {
       imagem,
-      cor: (c) => { marcar(c); material.color.set(corDe(c)); },
+      cor: (c) => { marcar(c); usarProjeto(false); material.color.set(corDe(c)); },
       fechar: () => { vivo = false; document.removeEventListener('pointerdown', fora); ajuste.disconnect(); ctrl.dispose(); geo.dispose(); material.dispose(); renderer.dispose(); caixa.replaceChildren(); },
     };
   }

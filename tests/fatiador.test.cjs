@@ -137,3 +137,24 @@ test('impressoras da tela existem nos perfis; Kiri recebe velocidades da máquin
   assert.strictEqual(F.densidade('PLA+'), 1.24);
   assert.ok(Math.abs(F.gramasDeMm(1000, 1.24) - 2.982) < 0.001);
 });
+
+test('3MF de projeto Bambu/Orca: cor de cada parte vem do filamento (extruder), sem fatiar', async () => {
+  const cubo = (o) => '<mesh><vertices>' + [[0,0,0],[10,0,0],[10,10,0],[0,10,0],[0,0,10],[10,0,10],[10,10,10],[0,10,10]].map(([x,y,z]) => `<vertex x="${x + o}" y="${y}" z="${z}"/>`).join('') +
+    '</vertices><triangles>' + [[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],[1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]].map(([a,b,c]) => `<triangle v1="${a}" v2="${b}" v3="${c}"/>`).join('') + '</triangles></mesh>';
+  const zipado = zip({
+    '3D/Objects/o.model': `<model><resources><object id="1">${cubo(0)}</object><object id="2">${cubo(20)}</object></resources></model>`,
+    '3D/3dmodel.model': '<model><resources><object id="10"><components><component p:path="/3D/Objects/o.model" objectid="1"/><component p:path="/3D/Objects/o.model" objectid="2"/></components></object></resources><build><item objectid="10"/></build></model>',
+    'Metadata/project_settings.config': JSON.stringify({ filament_colour: ['#FF0000', '#0000FF', '#00FF00FF'] }),
+    // objeto no filamento 1; a parte 2 sobrescreve para o filamento 3 (com alfa no hex, que é ignorado)
+    'Metadata/model_settings.config': '<config><object id="10"><metadata key="extruder" value="1"/><part id="1" subtype="normal_part"></part><part id="2" subtype="normal_part"><metadata key="extruder" value="3"/></part></object></config>',
+  });
+  const [placa] = await F.lerMalha3mf(zipado);
+  assert.strictEqual(placa.cores.length, placa.tri.length);
+  assert.deepStrictEqual([...placa.cores.slice(0, 3)], [1, 0, 0]); // 1ª parte: filamento 1 (vermelho)
+  assert.deepStrictEqual([...placa.cores.slice(placa.cores.length - 3)], [0, 1, 0]); // 2ª parte: filamento 3 (verde)
+});
+
+test('3MF sem cores de filamento: não devolve cores', async () => {
+  const r = await F.lerMalha3mf(zip({ '3D/3dmodel.model': '<model><resources><object id="1"><mesh><vertices><vertex x="0" y="0" z="0"/><vertex x="1" y="0" z="0"/><vertex x="0" y="1" z="0"/></vertices><triangles><triangle v1="0" v2="1" v3="2"/></triangles></mesh></object></resources><build><item objectid="1"/></build></model>' }));
+  assert.strictEqual(r[0].cores, undefined);
+});

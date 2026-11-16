@@ -326,6 +326,30 @@ test.describe('importar STL para ver em 3D', () => {
     for (const n of ['Escolher cor', 'Compartilhar peça']) await expect(page.locator('#slicerView').getByRole('button', { name: n })).toBeVisible();
   });
 
+  test('3MF de projeto colorido: o 3D abre com as cores do projeto; escolher outra cor sai delas; voltar restaura', async ({ page }) => {
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cubo3mfFatiado('cubo_colorido.3mf', { colorido: true }));
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    const v = page.locator('#slicerView');
+    await v.getByRole('button', { name: 'Escolher cor' }).click();
+    const projeto = v.getByRole('button', { name: 'Cores do projeto' });
+    await expect(projeto).toHaveAttribute('aria-pressed', 'true');
+    await v.getByRole('button', { name: 'Vermelho' }).click();
+    await expect(projeto).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('#filamentColor')).toHaveValue('Vermelho');
+    await projeto.click();
+    await expect(projeto).toHaveAttribute('aria-pressed', 'true');
+    await expect(v.getByRole('button', { name: 'Vermelho' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('3MF sem cores de projeto (e STL): não há botão "Cores do projeto"', async ({ page }) => {
+    await entrar(page);
+    await page.locator('#slicerFile').setInputFiles(cuboSTL());
+    await expect(page.locator('#slicerView canvas')).toBeVisible();
+    await page.locator('#slicerView').getByRole('button', { name: 'Escolher cor' }).click();
+    await expect(page.locator('#slicerView').getByRole('button', { name: 'Cores do projeto' })).toHaveCount(0);
+  });
+
   test('STL: mostra a peça em 3D, sem estimar peso nem tempo; trocar a cor preenche a cor do filamento', async ({ page }) => {
     await entrar(page);
     await page.locator('#slicerFile').setInputFiles(cuboSTL());

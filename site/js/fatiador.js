@@ -116,6 +116,8 @@
     return objs;
   }
 
+  const hexParaRgb = (h) => { const m = /^#?([0-9a-f]{6})/i.exec(h || ''), n = m ? parseInt(m[1], 16) : 0xb3b3b3; return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; }; // sRGB 0–1
+
   // Lê a geometria de um 3MF (projeto ou não). Bambu/Orca: uma entrada por placa, sem peças modificadoras.
   // ponytail: modificadores do PrusaSlicer (Slic3r_PE_model.config) não são filtrados; entram como volume
   async function lerMalha3mf(bytes) {
@@ -128,23 +130,33 @@
     const modificador = new Set();
     for (const [, oid, corpo] of cfg.matchAll(/<object id="(\d+)"([\s\S]*?)<\/object>/g))
       for (const [, pid] of corpo.matchAll(/<part id="(\d+)" subtype="modifier_part"/g)) modificador.add(`${oid}:${pid}`);
+    // cores do projeto (Bambu/Orca): lista de filamentos e qual filamento cada objeto/parte usa, sem precisar fatiar
+    let filamentos = [];
+    try { const js = zip['Metadata/project_settings.config'] ? JSON.parse(await zip['Metadata/project_settings.config']()) : null; filamentos = (js?.filament_colour || []).map(hexParaRgb); } catch { /* sem cores */ }
+    const extObjeto = {}, extParte = {};
+    for (const [, oid, corpo] of cfg.matchAll(/<object id="(\d+)"([\s\S]*?)<\/object>/g)) {
+      extObjeto[oid] = (corpo.split('<part')[0].match(/key="extruder" value="(\d+)"/) || [])[1];
+      for (const [, pid, pc] of corpo.matchAll(/<part id="(\d+)"([\s\S]*?)<\/part>/g)) extParte[`${oid}:${pid}`] = (pc.match(/key="extruder" value="(\d+)"/) || [])[1];
+    }
+    const corDoExtrusor = (n) => (n && filamentos[Number(n) - 1]) || null;
+    const corPadrao = filamentos[0] || [0.7, 0.7, 0.7];
     const itens = [...raiz.matchAll(/<item\b[^>]*>/g)].map(([t]) => ({ id: atributo(t, 'objectid'), m: matriz(atributo(t, 'transform')), imprime: atributo(t, 'printable') !== '0' })).filter((i) => i.imprime);
 
-    async function emitir(arquivo, id, mats, saida, raizId) {
+    async function emitir(arquivo, id, mats, saida, raizId, cor, cores) {
       const o = (await texto(arquivo))[id];
       if (!o) return;
-      if (o.vs) for (const i of o.ts) { let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z); }
+      if (o.vs) for (const i of o.ts) { let [x, y, z] = [o.vs[i * 3], o.vs[i * 3 + 1], o.vs[i * 3 + 2]]; for (const m of mats) [x, y, z] = aplicar(m, x, y, z); saida.push(x, y, z); cores.push(...(cor || corPadrao)); }
       for (const c of o.comps) {
         if (raizId && modificador.has(`${raizId}:${c.id}`)) continue;
-        await emitir(c.caminho || arquivo, c.id, [c.m, ...mats], saida, null);
+        await emitir(c.caminho || arquivo, c.id, [c.m, ...mats], saida, null, (raizId && corDoExtrusor(extParte[`${raizId}:${c.id}`] || extObjeto[raizId])) || cor, cores);
       }
     }
     const placas = [];
     const grupos = [...cfg.matchAll(/<plate>([\s\S]*?)<\/plate>/g)].map(([, p]) => [...p.matchAll(/key="object_id" value="(\d+)"/g)].map((m) => m[1])).filter((g) => g.length);
     for (const ids of grupos.length ? grupos : [itens.map((i) => i.id)]) {
-      const saida = [];
-      for (const it of itens.filter((i) => ids.includes(i.id))) await emitir(raizNome, it.id, [it.m], saida, it.id);
-      if (saida.length) placas.push({ objetos: ids.length, tri: new Float32Array(saida) });
+      const saida = [], cores = [];
+      for (const it of itens.filter((i) => ids.includes(i.id))) await emitir(raizNome, it.id, [it.m], saida, it.id, corDoExtrusor(extObjeto[it.id]), cores);
+      if (saida.length) placas.push({ objetos: ids.length, tri: new Float32Array(saida), ...(filamentos.length ? { cores: new Float32Array(cores) } : {}) });
     }
     return placas;
   }
@@ -249,10 +261,11 @@
     vis?.fechar(); vis = null; caixa.hidden = true;
     if (!placas || !window.InventtaVisualizador) return;
     const tri = new Float32Array(placas.reduce((t, p) => t + p.tri.length, 0));
-    let o = 0; for (const p of placas) { tri.set(p.tri, o); o += p.tri.length; }
+    const cores = placas.every((p) => p.cores) ? new Float32Array(tri.length) : null; // cores do projeto (3MF Bambu/Orca)
+    let o = 0; for (const p of placas) { tri.set(p.tri, o); cores?.set(p.cores, o); o += p.tri.length; }
     caixa.hidden = false;
     // trocar a cor no 3D preenche "Cor do filamento", para o orçamento mostrar a mesma cor
-    try { vis = await window.InventtaVisualizador.mostrar(caixa, tri, { cor: $('filamentColor').value, nome: $('product').value || 'peça', aoTrocarCor: (nome) => preencher('filamentColor', nome) }); } catch { caixa.hidden = true; }
+    try { vis = await window.InventtaVisualizador.mostrar(caixa, tri, { cor: $('filamentColor').value, nome: $('product').value || 'peça', aoTrocarCor: (nome) => preencher('filamentColor', nome), coresOriginais: cores }); } catch { caixa.hidden = true; }
   }
 
   const preencher = (id, valor, evento = 'input') => { const el = $(id); el.value = valor; el.dispatchEvent(new Event(evento, { bubbles: true })); el.dispatchEvent(new Event('blur')); };
