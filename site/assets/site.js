@@ -3,7 +3,6 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-const dorme = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
 /* ---------- valores de exemplo e cálculo (o mesmo do app) ---------- */
 const BASE = { packPrice: 120, packQty: 1000, waste: 8, failure: 5, power: 120, energyRate: 0.95, printerCost: 3200, lifeHours: 5000, maintenance: 0.4, setupMin: 20, finishMin: 10, laborRate: 30, packaging: 6, salesFee: 0, taxRate: 0 };
@@ -21,88 +20,30 @@ const orcar = ({ peso, minutos, margem, qtd }) => window.InventtaCalculations.ca
 
 /* ---------- topo e barra fixa ---------- */
 (() => {
-  const topo = $('#topo-site'), barra = $('#barra-fixa'), botoes = $('.hero-botoes');
+  const topo = $('#topo-site'), barra = $('#barra-fixa'), botoes = $('.hero-botoes'), palco = $('.palco');
   const rolar = () => topo.classList.toggle('rolou', scrollY > 8);
   addEventListener('scroll', rolar, { passive: true }); rolar();
-  if (barra && botoes) new IntersectionObserver(([e]) => {
-    const passou = !e.isIntersecting && e.boundingClientRect.top < 0;
-    if (passou) barra.hidden = false;
-    requestAnimationFrame(() => barra.classList.toggle('on', passou));
-  }).observe(botoes);
+  let passou = false, noPalco = false; // a barra aparece depois dos botões do topo e some enquanto o celular das telas está à vista (não cobre o seletor)
+  const mostrar = () => { if (passou) barra.hidden = false; requestAnimationFrame(() => barra.classList.toggle('on', passou && !noPalco)); };
+  if (barra && botoes) new IntersectionObserver(([e]) => { passou = !e.isIntersecting && e.boundingClientRect.top < 0; mostrar(); }).observe(botoes);
+  if (barra && palco) new IntersectionObserver(([e]) => { noPalco = e.isIntersecting; mostrar(); }).observe(palco);
 })();
 
 /* ---------- peça 3D (carrega só quando aparece) ---------- */
 let modulo3d = null;
 const peca3d = () => (modulo3d ??= import('/assets/peca.js'));
 
-/* ---------- conversa do primeiro quadro ---------- */
+/* ---------- celular com telas reais do aplicativo (dados fictícios) ---------- */
 (() => {
-  const conversa = $('#conversa'), rever = $('#rever'), passos = (n) => $(`[data-passo="${n}"]`, conversa);
-  const demo = orcar({ peso: 38, minutos: 220, margem: 120, qtd: 12 }); // mesmos valores iniciais da calculadora abaixo
-  if (!demo) return;
-  const linhas = $$('#linhas-demo li'), total = $('#demo-total'), porpeca = $('#demo-porpeca'), total$ = $('.total', conversa);
-  $('#demo-qtd').textContent = `${demo.q} un.`;
-  let rodada = 0, peca = null, criando = null;
-
-  const entra = (el) => { el.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('entra'))); };
-  const tira = (el) => el.classList.remove('on', 'entra');
-  function contar(el, ate, ms, token) {
-    return new Promise((ok) => {
-      if (reduzir) { el.textContent = BRL.format(ate); return ok(); }
-      const t0 = performance.now();
-      (function passo(t) {
-        if (token !== rodada) return ok();
-        const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3);
-        el.textContent = BRL.format(ate * e);
-        p < 1 ? requestAnimationFrame(passo) : ok();
-      })(t0);
-    });
-  }
-  function reiniciar() {
-    $$('.msg, .digitando', conversa).forEach(tira);
-    linhas.forEach((li) => { li.classList.remove('on'); $('b', li).textContent = BRL.format(0); });
-    total$.classList.remove('on'); porpeca.classList.remove('on'); total.textContent = BRL.format(0); porpeca.textContent = '';
-    rever.hidden = true;
-  }
-  function final() {
-    $$('.msg', conversa).forEach((m) => m.classList.add('on', 'entra'));
-    tira(passos(2));
-    linhas.forEach((li) => { li.classList.add('on'); $('b', li).textContent = BRL.format(demo[li.dataset.k] || 0); });
-    total$.classList.add('on'); porpeca.classList.add('on');
-    total.textContent = BRL.format(demo.price); porpeca.textContent = `${BRL.format(demo.unitPrice)} por peça · valores de exemplo`;
-  }
-  async function preparar3d() {
-    if (peca || criando) return criando;
-    criando = peca3d().then((m) => m.criarPeca($('#peca-hero'), { paleta: 'natal', velocidade: 3.2 })).then((p) => { peca = p; });
-    return criando;
-  }
-  async function rodar() {
-    const token = ++rodada;
-    reiniciar();
-    if (reduzir) { final(); rever.hidden = true; preparar3d(); return; }
-    preparar3d();
-    await dorme(500); if (token !== rodada) return;
-    entra(passos(1));
-    await dorme(1300); if (token !== rodada) return;
-    entra(passos(2));
-    await dorme(1500); if (token !== rodada) return;
-    tira(passos(2)); entra(passos(3));
-    await dorme(900); if (token !== rodada) return;
-    for (const li of linhas) {
-      li.classList.add('on');
-      await contar($('b', li), demo[li.dataset.k] || 0, 420, token); if (token !== rodada) return;
-    }
-    total$.classList.add('on');
-    await contar(total, demo.price, 700, token); if (token !== rodada) return;
-    porpeca.textContent = `${BRL.format(demo.unitPrice)} por peça · valores de exemplo`; porpeca.classList.add('on');
-    await dorme(900); if (token !== rodada) return;
-    entra(passos(4));
-    await dorme(700); if (token !== rodada) return;
-    rever.hidden = false;
-  }
-  rever.addEventListener('click', rodar);
-  // espera as fontes para o texto não "pular" no meio da animação
-  (document.fonts?.ready || Promise.resolve()).then(rodar);
+  const telas = $$('#celular .tela'), pontos = $$('.ponto'), palco = $('.palco');
+  let atual = 0, timer = 0, escolheu = reduzir; // com "reduzir movimento" ou depois que o visitante escolhe uma tela, não troca sozinho
+  const ir = (i) => { atual = i; telas.forEach((t, k) => t.classList.toggle('on', k === i)); pontos.forEach((b, k) => b.setAttribute('aria-pressed', String(k === i))); };
+  const parar = () => clearInterval(timer);
+  const girar = () => { parar(); if (!escolheu) timer = setInterval(() => ir((atual + 1) % telas.length), 3800); };
+  pontos.forEach((b) => b.addEventListener('click', () => { escolheu = true; parar(); ir(Number(b.dataset.tela)); }));
+  palco.addEventListener('pointerenter', parar); palco.addEventListener('pointerleave', girar);
+  palco.addEventListener('focusin', parar); palco.addEventListener('focusout', girar);
+  new IntersectionObserver(([e]) => (e.isIntersecting ? girar() : parar())).observe(palco);
 })();
 
 /* ---------- calculadora ao vivo ---------- */

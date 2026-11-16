@@ -42,8 +42,9 @@
     <img class="logo-escuro" src="/app/img/logo-inventta-3d-escuro.svg" alt="" width="150" height="34">
   </a>
   <nav class="menu" aria-label="Seções da página">
-    <a href="#como">Como funciona</a>
+    <a href="#veja">O app</a>
     <a href="#recursos">Recursos</a>
+    <a href="#como">Como funciona</a>
     <a href="#perguntas">Perguntas</a>
   </nav>
   <div class="topo-acoes">
@@ -73,29 +74,48 @@
     </div>
 
     <div class="palco">
-      <p class="sr-only">Exemplo ilustrativo: o cliente pergunta quanto custa um vaso decorativo. O Inventta 3D soma material, energia, máquina, mão de obra e falhas, mostra a peça em 3D colorido e deixa o orçamento pronto para enviar pelo WhatsApp. Valores de exemplo.</p>
-      <div class="celular" aria-hidden="true">
-        <div class="celular-topo"><span class="avatar">C</span><span class="celular-nome">Cliente<small>demonstração</small></span></div>
-        <div class="conversa" id="conversa">
-          <div class="msg msg-cliente" data-passo="1">Oi! Quanto fica esse vaso decorativo? Preciso de 12.</div>
-          <div class="digitando" data-passo="2"><i></i><i></i><i></i></div>
-          <div class="msg msg-app cartao" data-passo="3">
-            <div class="cartao-titulo"><strong>Vaso decorativo</strong><span id="demo-qtd">12 un.</span></div>
-            <div class="peca-hero" id="peca-hero"></div>
-            <ul class="linhas" id="linhas-demo">
-              <li data-k="material"><span>Material</span><b>R$ 0,00</b></li>
-              <li data-k="energy"><span>Energia</span><b>R$ 0,00</b></li>
-              <li data-k="machine"><span>Máquina</span><b>R$ 0,00</b></li>
-              <li data-k="labor"><span>Mão de obra</span><b>R$ 0,00</b></li>
-              <li data-k="failureCost"><span>Falhas</span><b>R$ 0,00</b></li>
-            </ul>
-            <div class="total"><span>Preço do pedido</span><strong id="demo-total">R$ 0,00</strong></div>
-            <div class="porpeca" id="demo-porpeca"></div>
-          </div>
-          <div class="msg msg-app enviado" data-passo="4"><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg>Pronto para enviar no WhatsApp: imagem, GIF e orçamento</div>
-        </div>
+      <p class="sr-only">Telas reais do aplicativo, com dados fictícios: o cliente pergunta quanto custa um vaso decorativo; o aplicativo mostra a peça em 3D, soma os custos (R$ 429,72 para 12 unidades) e gera o orçamento para enviar pelo WhatsApp.</p>
+      <p class="balao balao-cliente">Oi! Quanto fica esse vaso decorativo? Preciso de 12.</p>
+      <div class="celular" id="celular">
+        <img class="tela on" src="/assets/img/app-preco.jpg" width="780" height="1688" alt="Aplicativo, etapa Preço: preço sugerido de R$ 429,72 para 12 unidades, com a peça em 3D e os itens do pedido.">
+        <img class="tela" src="/assets/img/app-pedido.jpg" width="780" height="1688" alt="Aplicativo, etapa Pedido: peça em 3D de um vaso vermelho, nome da peça e quantidade." loading="lazy">
+        <img class="tela" src="/assets/img/app-envio.jpg" width="780" height="1688" alt="Aplicativo, painel Compartilhar com o cliente: botão Enviar pelo WhatsApp." loading="lazy">
       </div>
-      <button class="rever" id="rever" type="button" hidden>Ver de novo</button>
+      <div class="telas-nav" role="group" aria-label="Telas do aplicativo">
+        <button type="button" class="ponto" data-tela="0" aria-pressed="true">Preço</button>
+        <button type="button" class="ponto" data-tela="1" aria-pressed="false">Pedido</button>
+        <button type="button" class="ponto" data-tela="2" aria-pressed="false">Envio</button>
+      </div>
+      <figure class="balao balao-orcamento">
+        <img src="/assets/img/orcamento-whatsapp.png" width="1080" height="929" alt="Orçamento gerado pelo aplicativo: total de R$ 429,72, cliente Marina Souza e o item Vaso decorativo, 12 unidades." loading="lazy">
+        <figcaption>Orçamento pronto para enviar</figcaption>
+      </figure>
+      <p class="palco-nota">Telas reais do aplicativo, com dados fictícios.</p>
+    </div>
+  </section>
+
+  <!-- 1b. O aplicativo por dentro: imagens reais com dados fictícios -->
+  <section class="veja" id="veja" aria-labelledby="titulo-veja">
+    <h2 id="titulo-veja">O aplicativo por dentro</h2>
+    <p class="veja-sub">Capturas reais, com dados fictícios: um vaso decorativo para a cliente Marina Souza.</p>
+    <div class="veja-grade">
+      <figure class="janela">
+        <div class="janela-barra" aria-hidden="true"><i></i><i></i><i></i><span>inventta3d.github.io/app</span></div>
+        <img src="/assets/img/app-computador.jpg" width="1920" height="1244" alt="Aplicativo no computador: a peça em 3D, os itens do pedido, o preço sugerido de R$ 429,72 e o botão Enviar pelo WhatsApp." loading="lazy">
+        <figcaption>No computador, o 3D da peça, os itens e o preço ficam lado a lado.</figcaption>
+      </figure>
+      <div class="veja-celulares">
+        <img src="/assets/img/app-pedido.jpg" width="780" height="1688" alt="Aplicativo no celular, etapa Pedido, com a peça em 3D.">
+        <img src="/assets/img/app-envio.jpg" width="780" height="1688" alt="Aplicativo no celular, painel Compartilhar com o cliente.">
+      </div>
+      <figure class="recebe recebe-orcamento">
+        <img src="/assets/img/orcamento-whatsapp.png" width="1080" height="929" alt="Imagem do orçamento: total do pedido, dados do cliente e itens." loading="lazy">
+        <figcaption>O orçamento como o cliente recebe.</figcaption>
+      </figure>
+      <figure class="recebe recebe-peca">
+        <img src="/assets/img/peca-3d.png" width="1200" height="900" alt="Imagem da peça em 3D, um vaso vermelho com camadas visíveis." loading="lazy">
+        <figcaption>E a peça em 3D, na cor escolhida.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -201,6 +221,7 @@
 
   <!-- 5. Fecho -->
   <section class="fecho" aria-labelledby="titulo-fecho">
+    <div class="fecho-texto">
     <h2 id="titulo-fecho">Pronto para orçar a próxima peça?</h2>
     <div class="fecho-botoes">
       <a class="btn btn-claro btn-grande" href="/app/"><span>Acessar o app</span><svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
@@ -209,6 +230,8 @@
       </a>
     </div>
     <p class="fecho-ig"><a href="https://www.instagram.com/3d.inventta/" target="_blank" rel="noopener"><svg class="icone" aria-hidden="true"><use href="#i-instagram"/></svg>Prefere ver os bastidores? @3d.inventta</a></p>
+    </div>
+    <div class="fecho-celular" aria-hidden="true"><img src="/assets/img/app-envio.jpg" width="780" height="1688" alt="" loading="lazy"></div>
   </section>
 </main>
 

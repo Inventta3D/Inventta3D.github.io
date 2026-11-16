@@ -33,24 +33,82 @@ test.describe('site de apresentação', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Seu cliente pergunta');
   });
 
-  test('conversa: o orçamento da demonstração usa o mesmo cálculo do app e é marcado como exemplo', async ({ browser }) => {
-    const ctx = await browser.newContext({ reducedMotion: 'reduce' });
-    const page = await ctx.newPage();
+  test('celular do topo mostra telas REAIS do app (imagens carregam, alt descritivo, aviso de dados fictícios)', async ({ page }) => {
     await page.goto('/');
-    const esperado = await calcular(page, { amount: 38, printHours: '03:40', margin: 120, quantity: 12 }, 'price');
-    await expect(page.locator('#demo-total')).toHaveText(esperado);
-    await expect(page.locator('#demo-porpeca')).toContainText('valores de exemplo');
-    await expect(page.locator('.enviado')).toBeVisible();
-    await ctx.close();
+    const telas = page.locator('#celular .tela');
+    await expect(telas).toHaveCount(3);
+    await page.waitForFunction(() => [...document.querySelectorAll('#celular .tela')].every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 15000 });
+    for (const t of await telas.all()) expect(((await t.getAttribute('alt')) || '').length).toBeGreaterThan(30);
+    await expect(page.locator('.palco-nota')).toContainText('dados fictícios');
+    await expect(page.locator('.balao-orcamento')).toBeVisible();
   });
 
-  test('conversa animada termina sozinha e permite ver de novo', async ({ page }) => {
-    test.setTimeout(60000);
+  test('o total que aparece nas imagens do app é o mesmo da calculadora (mesmos valores de exemplo)', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#rever')).toBeVisible({ timeout: 20000 });
-    await page.locator('#rever').click();
-    await expect(page.locator('#rever')).toBeHidden();
-    await expect(page.locator('#rever')).toBeVisible({ timeout: 20000 });
+    await expect(page.locator('#r-total')).toHaveText('R$ 429,72');
+    for (const t of await page.locator('#celular .tela, .balao-orcamento img').all()) {
+      const alt = await t.getAttribute('alt');
+      if (/R\$/.test(alt)) expect(alt).toContain('R$ 429,72');
+    }
+  });
+
+  test('a primeira tela do celular responde à pergunta do cliente: o preço de R$ 429,72', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('button', { name: 'Preço', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#celular .tela.on')).toHaveAttribute('alt', /R\$ 429,72/);
+  });
+
+  test('celular: a barra fixa não cobre o seletor de telas enquanto o celular das telas está à vista', async ({ page }, info) => {
+    test.skip(!ehCelular(info), 'a barra fixa é só do celular');
+    await page.goto('/');
+    await page.locator('.palco').scrollIntoViewIfNeeded();
+    await page.evaluate(() => scrollBy(0, 200));
+    await page.waitForTimeout(700);
+    await expect(page.locator('#barra-fixa')).toBeHidden();
+    await page.locator('#recursos').scrollIntoViewIfNeeded();
+    await expect(page.locator('#barra-fixa')).toBeVisible();
+  });
+
+  test('telas do celular: escolher uma tela mostra essa tela e para a troca automática', async ({ page }) => {
+    await page.goto('/');
+    const pedido = page.getByRole('button', { name: 'Pedido', exact: true });
+    await pedido.click();
+    await expect(pedido).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#celular .tela').nth(1)).toHaveClass(/on/);
+    await expect(page.locator('#celular .tela').nth(0)).not.toHaveClass(/on/);
+    await page.waitForTimeout(4600); // passou mais que o intervalo: continua na escolhida
+    await expect(page.locator('#celular .tela').nth(1)).toHaveClass(/on/);
+  });
+
+  test('telas do celular trocam sozinhas, e não trocam com "reduzir movimento"', async ({ browser }) => {
+    test.setTimeout(40000);
+    const ctx = await browser.newContext(), pg = await ctx.newPage();
+    await pg.goto('/');
+    await expect(pg.locator('#celular .tela').nth(1)).toHaveClass(/on/, { timeout: 9000 });
+    await ctx.close();
+    const quieto = await browser.newContext({ reducedMotion: 'reduce' }), pq = await quieto.newPage();
+    await pq.goto('/');
+    await pq.waitForTimeout(5500);
+    await expect(pq.locator('#celular .tela').nth(0)).toHaveClass(/on/);
+    await quieto.close();
+  });
+
+  test('seção "O aplicativo por dentro": imagens reais carregam e há aviso de dados fictícios', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#veja').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => [...document.querySelectorAll('#veja img')].filter((i) => i.offsetParent).every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 15000 }); // só as visíveis (no celular a janela do computador some)
+    await expect(page.locator('#veja img')).toHaveCount(5); // janela, orçamento, peça e as duas telas de celular (só aparecem no celular)
+    await expect(page.locator('.veja-sub')).toContainText('dados fictícios');
+  });
+
+  test('paleta: os campos grandes não são mais o vermelho da marca (o vermelho fica nos botões e destaques)', async ({ browser }) => {
+    const ctx = await browser.newContext({ colorScheme: 'light' }), pg = await ctx.newPage();
+    await pg.goto('/');
+    const cores = await pg.evaluate(() => ['.palco', '.tile-3d', '.fecho'].map((s) => getComputedStyle(document.querySelector(s)).backgroundColor));
+    for (const c of cores) expect(c).not.toBe('rgb(185, 30, 20)');
+    const botao = await pg.evaluate(() => getComputedStyle(document.querySelector('.hero .btn-cheio')).backgroundColor);
+    expect(botao).toBe('rgb(185, 30, 20)'); // o vermelho continua no botão principal
+    await ctx.close();
   });
 
   test('calculadora ao vivo: mexer no peso muda o preço, conforme o cálculo do app', async ({ page }) => {
@@ -79,15 +137,6 @@ test.describe('site de apresentação', () => {
     expect((await page.locator('#peca-tile canvas').screenshot()).equals(antes)).toBe(false);
   });
 
-  test('a conversa e a calculadora mostram o MESMO orçamento (mesmos valores iniciais)', async ({ browser }) => {
-    const ctx = await browser.newContext({ reducedMotion: 'reduce' });
-    const page = await ctx.newPage();
-    await page.goto('/');
-    await expect(page.locator('#demo-total')).toHaveText(await page.locator('#r-total').textContent());
-    await expect(page.locator('#demo-porpeca')).toContainText((await page.locator('#r-unit').textContent()).trim());
-    await ctx.close();
-  });
-
   test('peça 3D: as setas do teclado giram a peça', async ({ page }, info) => {
     test.skip(ehCelular(info), 'teclado é do computador');
     await page.goto('/');
@@ -108,6 +157,17 @@ test.describe('site de apresentação', () => {
     const cor = await item.locator('p').evaluate((p) => getComputedStyle(p).backgroundColor);
     expect(cor).not.toBe('rgba(0, 0, 0, 0)');
     expect(await item.locator('p').evaluate((p) => getComputedStyle(p).justifySelf)).toMatch(/end|flex-end/);
+  });
+
+  test('janela baixa de notebook: os dois botões do topo da página aparecem na primeira tela', async ({ page }, info) => {
+    test.skip(ehCelular(info), 'só computador');
+    await page.goto('/');
+    const h = page.viewportSize().height;
+    if (h > 780) return; // em janelas altas o título é grande e os botões já cabem
+    for (const nome of ['Acessar o app', 'Entrar em contato']) {
+      const b = await page.locator('.hero-botoes').getByRole('link', { name: nome }).boundingBox();
+      expect(b.y + b.height, `${nome} abaixo da primeira tela`).toBeLessThanOrEqual(h);
+    }
   });
 
   test('o texto do topo alinha com as demais seções', async ({ page }, info) => {
@@ -155,7 +215,7 @@ test.describe('site de apresentação', () => {
     test.skip(!ehCelular(info), 'a barra fixa é só do celular');
     await page.goto('/');
     await expect(page.locator('#barra-fixa')).toBeHidden();
-    await page.evaluate(() => scrollTo(0, 1400));
+    await page.locator('#recursos').scrollIntoViewIfNeeded();
     const barra = page.locator('#barra-fixa');
     await expect(barra).toBeVisible();
     await expect(barra.getByRole('link', { name: 'Acessar o app' })).toHaveAttribute('href', '/app/');
