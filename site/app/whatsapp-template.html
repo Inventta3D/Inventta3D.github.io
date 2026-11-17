@@ -23,7 +23,7 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--fundo); }
-  body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--grafite); }
+  body { font-family: 'Outfit', system-ui, sans-serif; color: var(--grafite); }
   .tela { width: 540px; display: flex; flex-direction: column; background: var(--fundo); }
 
   .faixa { display: flex; height: 6px; }
@@ -82,9 +82,9 @@
   .pix-valor span:first-child { font-size: 12px; color: var(--texto-2); }
   .pix-valor span:last-child { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; }
   .social { background: var(--creme); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; }
-  .social img { width: 118px; height: 118px; object-fit: contain; display: block; flex-shrink: 0; }
+  .social img { width: 118px; height: 118px; display: block; flex-shrink: 0; }
   .social .t2 { font-size: 16px; font-weight: 700; }
-  .social .t3 { font-size: 12px; color: var(--azul); margin-top: 3px; }
+  .social .t3 { font-size: 12px; color: var(--texto-2); margin-top: 3px; }
 
   footer { margin: 0 24px; border-top: 1px solid var(--linha); padding: 14px 0 22px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--texto-2); }
   footer .marca { display: flex; align-items: center; gap: 8px; }
@@ -115,8 +115,8 @@
       <h2>CLIENTE</h2>
       <div class="cliente">
         <div class="campo"><div class="rot">Nome</div><div class="val forte">{{cliente.nome}}</div></div>
-        <div class="campo"><div class="rot">Telefone</div><div class="val">{{cliente.telefone}}</div></div>
-        <div class="campo inteiro"><div class="rot">E-mail</div><div class="val">{{cliente.email}}</div></div>
+        {{#tem_telefone}}<div class="campo"><div class="rot">Telefone</div><div class="val">{{cliente.telefone}}</div></div>{{/tem_telefone}}
+        {{#tem_email}}<div class="campo inteiro"><div class="rot">E-mail</div><div class="val">{{cliente.email}}</div></div>{{/tem_email}}
       </div>
     </section>
     {{/tem_cliente}}
@@ -126,7 +126,7 @@
       <div class="lista">
         {{#itens}}
         <div class="item">
-          <div class="esq"><div class="nome">{{nome}}</div><div class="spec">{{material}} · Cor: {{cor}}</div></div>
+          <div class="esq"><div class="nome">{{nome}}</div><div class="spec">{{material}}{{#cor}} · Cor: {{cor}}{{/cor}}</div></div>
           <div class="dir"><div class="tot">{{total_fmt}}</div><div class="unit">{{qtd}} × {{valor_unit_fmt}}</div></div>
         </div>
         {{/itens}}
