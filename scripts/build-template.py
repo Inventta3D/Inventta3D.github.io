@@ -6,5 +6,7 @@ root = Path(__file__).resolve().parents[1] / "site" / "app"
 source = root / "whatsapp-template.html"
 target = root / "templates" / "whatsapp-template.b64"
 target.parent.mkdir(parents=True, exist_ok=True)
-target.write_bytes(b64encode(source.read_bytes()))
+# sempre com quebras de linha Unix (LF): o git guarda o modelo assim (no Windows a cópia local tem CRLF),
+# e o teste compara com o conteúdo normalizado
+target.write_bytes(b64encode(source.read_bytes().replace(b"\r\n", b"\n")))
 print(f"Modelo atualizado: {target.relative_to(root)}")
