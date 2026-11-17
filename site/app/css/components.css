@@ -182,6 +182,7 @@ select.control option,select.control optgroup{background:var(--md-sys-color-surf
 label small{font-size:.8125rem}
 .control{font-variant-numeric:lining-nums proportional-nums}
 @media (max-width:719px){.step-btn,.step-name{font-size:.75rem}}
+@media (max-width:359px){.step-btn,.step-name{font-size:.6875rem}}
 @media (pointer:coarse){
   .btn-sm{--btn-h:44px}
   .field-help-trigger{width:44px;height:44px}

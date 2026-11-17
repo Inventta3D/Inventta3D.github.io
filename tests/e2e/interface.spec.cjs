@@ -676,6 +676,8 @@ test.describe('link de aprovação', () => {
     await page.locator('#saveQuoteBtn').click();
     await expect.poll(() => banco.db.inventta3d_quotes.length).toBe(1);
     await page.evaluate(() => { location.hash = '#/orcamentos-salvos'; });
+    const maisAcoes = page.locator('#savedQuoteList .saved-quote-row', { hasText: 'Luminária lua' }).locator('.order-more-btn'); // no celular, "Enviar link" fica no menu "Mais"
+    if (await maisAcoes.isVisible()) await maisAcoes.click();
     await page.getByRole('button', { name: 'Link de aprovação de Luminária lua' }).click();
     await expect.poll(() => banco.db.inventta3d_quotes[0].share_token).toMatch(/^[0-9a-f-]{36}$/);
     await expect(page.locator('#accountStatus')).toContainText('Link de aprovação copiado');
