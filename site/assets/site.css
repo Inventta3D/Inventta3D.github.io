@@ -147,3 +147,5 @@
 .tema__sol { display: none; }
 .tema[aria-pressed="true"] .tema__lua { display: none; }
 .tema[aria-pressed="true"] .tema__sol { display: block; }
+/* celular: a peça do quadro do topo ocupa o espaço que o cartão de preço deixa */
+@media (max-width: 639px) { .win .peca-tile { height: clamp(140px, 30svh, 260px); } .cor { white-space: nowrap; } }

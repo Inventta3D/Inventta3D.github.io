@@ -116,7 +116,7 @@ test.describe('site de apresentação', () => {
     await page.locator('#recursos .panel--peca').scrollIntoViewIfNeeded();
     const tela = page.locator('#recursos .peca-tile canvas');
     await expect(tela).toBeVisible({ timeout: 15000 });
-    const natal = page.getByRole('button', { name: 'Natal' }), oceano = page.getByRole('button', { name: 'Oceano' });
+    const natal = page.getByRole('button', { name: 'Da marca' }), oceano = page.getByRole('button', { name: 'Vermelho' });
     await expect(natal).toHaveAttribute('aria-pressed', 'true');
     await page.waitForTimeout(600);
     const antes = await tela.screenshot();

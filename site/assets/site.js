@@ -34,7 +34,7 @@
   if (!hosts.length) return;
   let modulo = null;
   const montar = async (host) => {
-    modulo ??= await import('/assets/peca.js');
+    modulo ??= await import('/assets/logo3d.js');
     const peca = await modulo.criarPeca(host, { interativo: host.hasAttribute('data-interativo'), paleta: host.dataset.peca, velocidade: Number(host.dataset.velocidade) || 1.6 });
     if (!peca) return;
     const botoes = [...document.querySelectorAll('.cor')];
