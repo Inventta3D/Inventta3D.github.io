@@ -199,9 +199,7 @@ test('modelo do WhatsApp: cópias iguais e versão codificada em dia', () => {
   assert.ok(a.equals(b), 'site/app/whatsapp-template.html e site/templates/whatsapp-template.html divergem');
   const b64 = fs.readFileSync(path.join(site, 'templates/whatsapp-template.b64'), 'utf8').trim();
   // compara sem depender das quebras de linha da cópia local (no Windows o git entrega CRLF; no repositório é LF)
-  assert.equal(b64, Buffer.from(a.toString('utf8').replace(/
-/g, '
-')).toString('base64'), 'rode: python scripts/build-template.py');
+  assert.equal(b64, Buffer.from(a.toString('utf8').replace(/\r\n/g, '\n')).toString('base64'), 'rode: python scripts/build-template.py');
 });
 
 test('segredos: nenhum arquivo de chave de assinatura no repositório', () => {
