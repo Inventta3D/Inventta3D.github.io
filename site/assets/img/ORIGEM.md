@@ -17,3 +17,5 @@ Todas as imagens desta pasta são **capturas reais do aplicativo** (e dos arquiv
 - `compartilhar.jpg`: captura da primeira tela do site (imagem de compartilhamento).
 
 - `app-salvos.jpg`, `app-clientes.jpg`, `app-painel.jpg`, `app-impressoes.jpg` (computador) e `app-cel-clientes.jpg`, `app-cel-painel.jpg`, `app-cel-impressoes.jpg` (celular): telas de gestão do aplicativo com dados fictícios (clientes, orçamentos e impressões inventados), geradas por `node scripts/capturar-negocio.cjs`.
+
+- A peça 3D do site e do login (chaveiro com o símbolo da logo) não é imagem: é desenhada na página por `site/assets/logo3d.js` a partir de `site/app/img/logo-3d-colorido.svg`.
