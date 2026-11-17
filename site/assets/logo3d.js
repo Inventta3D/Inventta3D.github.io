@@ -10,11 +10,13 @@ const carregar = () => (tres ??= Promise.all([
 // cores por filamento: placa, e as quatro partes do símbolo na ordem do SVG (vermelho, azul, verde, bico)
 export const PALETAS = {
   marca: { placa: '#F4ECDF', partes: ['#E63B2E', '#1F5FD6', '#0F9D4B', '#1B1B1B'] },
+  // símbolo numa cor só, sobre a placa creme
   vermelho: { placa: '#F4ECDF', partes: ['#C8261B', '#C8261B', '#C8261B', '#C8261B'] },
-  grafite: { placa: '#2A2823', partes: ['#F4ECDF', '#F4ECDF', '#F4ECDF', '#E63B2E'] },
+  azul: { placa: '#F4ECDF', partes: ['#1F5FD6', '#1F5FD6', '#1F5FD6', '#1F5FD6'] },
+  verde: { placa: '#F4ECDF', partes: ['#0F9D4B', '#0F9D4B', '#0F9D4B', '#0F9D4B'] },
 };
 // nomes antigos (natal, oceano) continuam funcionando
-const ALIAS = { natal: 'marca', oceano: 'vermelho' };
+const ALIAS = { natal: 'marca', oceano: 'azul', grafite: 'verde' };
 
 // lê os caminhos do SVG (só usa M, L, H, V, Q e Z, em coordenadas absolutas)
 function lerCaminhos(T, svg) {
@@ -68,14 +70,11 @@ async function montar(T) {
   const esc = 1 / tam.y; // a peça fica com 1 de altura
   const PLACA = 0.07, RELEVO = 0.07, CAMADA = 0.0125;
 
-  // placa com cantos arredondados e o furo do chaveiro
-  const pad = 0.12, w = tam.x * esc + pad * 2, h = 1 + pad * 2, r = 0.14, x0 = -w / 2, y0 = -h / 2;
-  const placa = new T.Shape();
-  placa.moveTo(x0 + r, y0); placa.lineTo(x0 + w - r, y0); placa.quadraticCurveTo(x0 + w, y0, x0 + w, y0 + r);
-  placa.lineTo(x0 + w, y0 + h - r); placa.quadraticCurveTo(x0 + w, y0 + h, x0 + w - r, y0 + h);
-  placa.lineTo(x0 + r, y0 + h); placa.quadraticCurveTo(x0, y0 + h, x0, y0 + h - r); placa.lineTo(x0, y0 + r); placa.quadraticCurveTo(x0, y0, x0 + r, y0);
-  const furo = new T.Path(); furo.absarc(x0 + 0.13, y0 + h - 0.13, 0.055, 0, Math.PI * 2, true); placa.holes.push(furo);
-  const geoPlaca = camadas(T, new T.ExtrudeGeometry(placa, { depth: PLACA, steps: 8, bevelEnabled: false, curveSegments: 18 }), CAMADA, 0.0016);
+  // placa redonda e o furo do chaveiro perto da borda, em cima à esquerda
+  const R = 0.5 * Math.hypot(tam.x * esc, 1) + 0.07, h = 2 * R;
+  const placa = new T.Shape(); placa.absarc(0, 0, R, 0, Math.PI * 2, false);
+  const ang = (125 * Math.PI) / 180, furo = new T.Path(); furo.absarc(Math.cos(ang) * (R - 0.1), Math.sin(ang) * (R - 0.1), 0.05, 0, Math.PI * 2, true); placa.holes.push(furo);
+  const geoPlaca = camadas(T, new T.ExtrudeGeometry(placa, { depth: PLACA, steps: 8, bevelEnabled: false, curveSegments: 64 }), CAMADA, 0.0016);
 
   // símbolo em relevo, uma malha por cor (vermelho, azul, verde, bico)
   const geoPartes = caminhos.map((sp) => {
@@ -146,7 +145,7 @@ export async function criarPeca(host, { interativo = false, paleta = 'marca', ve
   const medir = () => {
     const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false); camera.aspect = w / h;
-    const tg = Math.tan((camera.fov * Math.PI) / 360), largura = altura * 0.95;
+    const tg = Math.tan((camera.fov * Math.PI) / 360), largura = altura;
     const dist = Math.max((altura / 2) / tg, (largura / 2) / (tg * camera.aspect)) * 1.45;
     const dir = camera.position.clone().sub(ctrl.target).normalize();
     camera.position.copy(ctrl.target).addScaledVector(dir, dist);

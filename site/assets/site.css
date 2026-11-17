@@ -149,3 +149,9 @@
 .tema[aria-pressed="true"] .tema__sol { display: block; }
 /* celular: a peça do quadro do topo ocupa o espaço que o cartão de preço deixa */
 @media (max-width: 639px) { .win .peca-tile { height: clamp(140px, 30svh, 260px); } .cor { white-space: nowrap; } }
+
+/* cores do chaveiro: só a bolinha de cor (o nome fica no leitor de tela e na dica) */
+.cores { justify-content: center; gap: var(--s-3); flex-wrap: nowrap; }
+.cor { width: 48px; min-width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; border-radius: 50%; flex: none !important; }
+.cor i { width: 32px; height: 32px; box-shadow: 0 0 0 2px var(--bg); }
+.cor[aria-pressed="true"] { background: var(--bg); border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
