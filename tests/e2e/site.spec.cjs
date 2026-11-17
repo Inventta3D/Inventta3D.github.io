@@ -61,6 +61,35 @@ test.describe('site de apresentação', () => {
     }
   });
 
+  test('nada vaza da própria seção nem fica por cima de outra (texto, imagens, botões)', async ({ page }) => {
+    await page.goto('/');
+    // rola a página toda para as imagens com carregamento tardio entrarem e as alturas ficarem finais
+    for (const f of [0.2, 0.4, 0.6, 0.8, 1, 0]) { await page.evaluate((x) => scrollTo(0, (document.body.scrollHeight - innerHeight) * x), f); await page.waitForTimeout(200); }
+    await page.waitForFunction(() => [...document.querySelectorAll('main img')].every((i) => i.complete), null, { timeout: 15000 });
+    const vazamentos = await page.evaluate(() => {
+      const achados = [];
+      const visivel = (e) => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && e.getClientRects().length; };
+      const blocos = [...document.querySelectorAll('main > section, footer.closing')];
+      for (const s of blocos) {
+        const caixa = s.getBoundingClientRect();
+        for (const e of s.querySelectorAll('h1, h2, h3, p, li, img, a, button, canvas, dl, .win, .panel')) {
+          if (!visivel(e) || e.closest('[aria-hidden="true"] .peca-tile')) continue;
+          // o que um ancestral corta (overflow escondido, como a moldura da janela do topo) não aparece: conta só a parte visível
+          let r = e.getBoundingClientRect(), top = r.top, bottom = r.bottom;
+          for (let a = e.parentElement; a && a !== s; a = a.parentElement) {
+            const o = getComputedStyle(a);
+            if (/hidden|clip/.test(o.overflowY) || /hidden|clip/.test(o.overflow)) { const ar = a.getBoundingClientRect(); top = Math.max(top, ar.top); bottom = Math.min(bottom, ar.bottom); }
+          }
+          if (bottom - top <= 1) continue;
+          r = { top, bottom, height: bottom - top };
+          if (r.bottom > caixa.bottom + 1 || r.top < caixa.top - 1) achados.push(`${s.id || s.className.split(' ')[0]}: ${e.tagName.toLowerCase()} "${(e.textContent || e.alt || '').trim().slice(0, 30)}" vai de ${Math.round(r.top - caixa.top)} a ${Math.round(r.bottom - caixa.top)} numa seção de ${Math.round(caixa.height)}`);
+        }
+      }
+      return achados;
+    });
+    expect(vazamentos).toEqual([]);
+  });
+
   test('bordas iguais: logo, títulos e rodapé começam na mesma linha e nada passa da direita', async ({ page }) => {
     await page.goto('/');
     const lados = await page.evaluate(() => {

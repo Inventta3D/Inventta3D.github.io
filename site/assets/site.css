@@ -11,7 +11,6 @@
 
 /* telas inteiras do celular, em moldura, com o contexto ao lado */
 #app, #negocio { --h: 1; --hm: 1; }
-@media (max-width: 1279px) { #app, #negocio { --h: 2; } }
 .telas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gutter); margin-top: var(--s-7); min-height: 0; }
 .tela { grid-column: span 4; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-4); align-items: start; min-height: 0; transition: transform var(--dur, .2s) var(--ease, ease); }
 .tela:hover { transform: translateY(-4px); }
@@ -66,7 +65,7 @@
 .duvida { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-5); }
 @media (max-width: 639px) { .footer__col:not(:last-child) { display: none; } }
 @media (max-width: 639px) { #como .t-lead { display: none; } .barra { height: 96px; } }
-@media (max-width: 359px) { .nav__bar > .nav__actions { display: none; } .etapa p { display: none; } }
+@media (max-width: 359px) { header.nav > .wrap.nav__bar > .nav__actions { display: none; } .etapa p { display: none; } }
 @media (max-width: 359px) { .hero--centred .hero__window { min-height: 150px; } }
 @media (max-width: 639px) { #faq .faq > .faq__item { padding: var(--s-4) 0; } }
 
@@ -122,3 +121,16 @@
 }
 @media (max-width: 1279px) { .telas.fill { flex: none; min-height: auto; } .tela { min-height: auto; } }
 @media (max-width: 639px) { .telas { grid-auto-rows: auto; } .tela img { height: auto !important; } }
+
+/* celular e tablet: os blocos com telas inteiras não podem encolher para caber numa tela (o kit faz .fill encolher;
+   aqui a seção cresce com o conteúdo, senão as telas vazam por cima da seção seguinte). Seletor tão forte quanto o do kit. */
+@media (max-width: 1279px) {
+  main > section#app > .wrap > .fill, main > section#negocio > .wrap > .fill, main > section#como > .wrap > .fill { flex: none; min-height: auto; }
+}
+/* janelas baixas de notebook (1366 x 657, 1280 x 720): as telas inteiras diminuem para caber na tela da seção */
+@media (min-width: 1280px) {
+  .tela img { max-height: min(470px, calc(100svh - 400px)); }
+  #recursos .panel--tela .frame__img { max-height: calc(100svh - 330px); width: auto; max-width: 100%; margin-inline: auto; }
+}
+@media (max-height: 760px) { .hero--centred .hero__window { min-height: 150px; } }
+.footer__col a[data-contato] { white-space: nowrap; }
