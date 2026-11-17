@@ -586,6 +586,14 @@ test.describe('estoque de filamento', () => {
 });
 
 test.describe('pedidos (status, entrega, retorno e etiqueta)', () => {
+  // no computador os filtros são botões; no celular, um seletor "Status: ..."
+  const filtrar = async (page, nome) => {
+    const chip = page.getByRole('button', { name: nome, exact: true });
+    if (await chip.isVisible()) return chip.click();
+    await page.getByRole('combobox', { name: 'Filtrar pedidos por status' }).selectOption({ label: `Status: ${nome}` });
+  };
+  // no celular as ações secundárias ficam no menu "Mais"
+  const mais = async (linha) => { const b = linha.locator('.order-more-btn'); if (await b.isVisible()) await b.click(); };
   const antigo = (dias, extra = {}) => ({ id: 'ped-antigo', owner_id: 'x', title: 'Vaso geométrico', client_name: 'Marina Souza', client_email: '', client_phone: '(21) 99876-5432', items: [{ data: { product: 'Vaso geométrico', quantity: 2 } }], share_mode: 'summary', discount_mode: 'percent', discount_input: 0, subtotal: 80, discount_amount: 0, discount_percent: 0, total: 80, created_at: new Date(Date.now() - dias * 86400000).toISOString(), ...extra });
 
   test('mudar status grava no banco, filtra e marca atraso pela data de entrega', async ({ page }) => {
@@ -599,14 +607,14 @@ test.describe('pedidos (status, entrega, retorno e etiqueta)', () => {
     await linha.getByRole('combobox', { name: /Status de/ }).selectOption('imprimindo');
     await expect.poll(() => banco.db.inventta3d_quotes[0].status).toBe('imprimindo');
     expect(banco.db.inventta3d_quotes[0].status_at).toBeTruthy();
-    await page.getByRole('button', { name: 'Orçados' }).click();
+    await filtrar(page, 'Orçados');
     await expect(page.locator('#savedQuoteList .saved-quote-row')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Em produção' }).click();
+    await filtrar(page, 'Em produção');
     await expect(linha).toBeVisible();
     await linha.getByLabel(/Entrega de/).fill('2020-01-10');
     await expect.poll(() => banco.db.inventta3d_quotes[0].due_date).toBe('2020-01-10');
     await expect(linha.locator('.order-chip', { hasText: 'Atrasado' })).toBeVisible();
-    await page.getByRole('button', { name: 'Atrasados' }).click();
+    await filtrar(page, 'Atrasados');
     await expect(page.locator('#savedQuoteList .saved-quote-row')).toHaveCount(1);
   });
 
@@ -619,6 +627,7 @@ test.describe('pedidos (status, entrega, retorno e etiqueta)', () => {
     expect(await auditar(page, '#savedQuotes')).toEqual([]); // 5 botões na linha não podem se sobrepor
     const lembrar = linha.getByRole('link', { name: 'Lembrar Marina Souza pelo WhatsApp' });
     await expect(lembrar).toHaveAttribute('href', /^https:\/\/wa\.me\/5521998765432\?text=Ol%C3%A1%2C%20Marina!/);
+    await mais(linha);
     await linha.getByRole('button', { name: 'Etiqueta de Vaso geométrico' }).click();
     await expect(page.locator('#labelDialog')).toBeVisible();
     await expect(page.locator('#labelSheet svg')).toBeVisible();

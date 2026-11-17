@@ -51,5 +51,11 @@
   // o evento pode ter passado antes deste arquivo carregar: confere também ao terminar de abrir a página
   const inicial = () => { if (app()?.user()) verificar(); };
   if (document.readyState === 'complete') setTimeout(inicial, 0); else window.addEventListener('load', () => setTimeout(inicial, 0));
+  // tela de login: a peça de demonstração gira ao lado do preço (só no computador, onde a coluna aparece; carrega sob demanda)
+  const pecaLogin = document.querySelector('[data-login-peca]');
+  if (pecaLogin && matchMedia('(min-width: 900px)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const montarPeca = () => { if (getComputedStyle(pecaLogin).display === 'none' || pecaLogin.dataset.pronta) return; pecaLogin.dataset.pronta = '1'; import('/assets/peca.js').then((m) => m.criarPeca(pecaLogin, { paleta: 'natal', velocidade: 1.4 })).catch(() => { /* sem a peça, o quadro continua com o preço */ }); };
+    if (document.readyState === 'complete') setTimeout(montarPeca, 300); else window.addEventListener('load', () => setTimeout(montarPeca, 300));
+  }
   document.addEventListener('inventta:auth', () => { if (app()?.user()) verificar(); else { verificando++; esconder(); } });
 })();

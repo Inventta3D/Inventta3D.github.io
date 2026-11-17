@@ -15,6 +15,7 @@
 <link rel="apple-touch-icon" href="/app/icons/apple-touch-icon.png">
 <meta name="theme-color" content="#fff8ef">
 <link rel="canonical" href="https://inventta3d.github.io/">
+<script>try{var t=localStorage.getItem('inventta-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <meta name="site-kind" content="software">
 <meta name="page-type" content="software">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,13 +42,19 @@
 }
 /* tema escuro do sistema (o mesmo do aplicativo: creme e grafite) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --p-bg: #16130b; --p-surface: #211d13; --p-ink: #fff8ef; --p-muted: #b3ac9f;
     --p-accent: #ff8f84; --p-accent-ink: #16130b; --p-action: #c62c1e; --p-action-ink: #fff8ef;
     --p-inv-bg: #fff8ef; --p-inv-surface: #f2ebe2; --p-inv-ink: #1e1b13; --p-inv-muted: #6b665d;
     --p-inv-accent: #b91e14; --p-inv-accent-ink: #fff8ef; --p-inv-action: #b91e14; --p-inv-action-ink: #fff8ef;
   }
 }
+:root[data-theme="dark"] {
+    --p-bg: #16130b; --p-surface: #211d13; --p-ink: #fff8ef; --p-muted: #b3ac9f;
+    --p-accent: #ff8f84; --p-accent-ink: #16130b; --p-action: #c62c1e; --p-action-ink: #fff8ef;
+    --p-inv-bg: #fff8ef; --p-inv-surface: #f2ebe2; --p-inv-ink: #1e1b13; --p-inv-muted: #6b665d;
+    --p-inv-accent: #b91e14; --p-inv-accent-ink: #fff8ef; --p-inv-action: #b91e14; --p-inv-action-ink: #fff8ef;
+  }
 </style>
 <link rel="stylesheet" href="assets/ui/base.css">
 <link rel="stylesheet" href="assets/ui/checklist/fragment.css">
@@ -69,7 +76,7 @@
 <header class="nav nav--centre">
   <div class="wrap nav__bar">
     <a class="skip-link" href="#top">Pular para o conteúdo</a>
-    <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><picture><source media="(prefers-color-scheme: dark)" srcset="/app/img/logo-inventta-3d-escuro.svg"><img class="logo" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"></picture></a>
+    <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><img class="logo logo--claro" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"><img class="logo logo--escuro" src="/app/img/logo-inventta-3d-escuro.svg" alt="" width="109" height="24"></a>
     <nav class="nav__links" aria-label="Principal">
       <div class="nav__item"><a class="nav__link" href="#app">Aplicativo</a></div>
       <div class="nav__item"><a class="nav__link" href="#recursos">Recursos</a></div>
@@ -78,6 +85,7 @@
       <div class="nav__item"><a class="nav__link" href="#faq">Perguntas</a></div>
     </nav>
     <div class="nav__actions">
+      <button class="tema" type="button" data-tema aria-label="Usar tema escuro" aria-pressed="false"><svg class="tema__lua" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="tema__sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></button>
       <a class="nav__link" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Falar no WhatsApp</a>
       <a class="btn btn--primary" href="/app/">Acessar o app</a>
     </div>
@@ -264,7 +272,7 @@
     <div class="closing__links">
       <div class="grid">
         <div class="span-4 stack-4">
-          <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><picture><source media="(prefers-color-scheme: dark)" srcset="/app/img/logo-inventta-3d-escuro.svg"><img class="logo" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"></picture></a>
+          <a class="nav__logo" href="#top" aria-label="Inventta 3D, início"><img class="logo logo--claro" src="/app/img/logo-inventta-3d-colorido.svg" alt="Inventta 3D" width="109" height="24"><img class="logo logo--escuro" src="/app/img/logo-inventta-3d-escuro.svg" alt="" width="109" height="24"></a>
           <p class="footer__lede">Orçamentos de impressão 3D com custo real, 3D colorido e envio pelo WhatsApp.</p>
         </div>
         <div class="span-2 start-7 footer__col"><h3>Produto</h3><ul><li><a href="#app">Aplicativo</a></li><li><a href="#recursos">Recursos</a></li><li><a href="#como">Como funciona</a></li></ul></div>

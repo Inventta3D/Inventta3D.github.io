@@ -85,12 +85,18 @@
     desenhar();
   }
 
-  function bloco(rotulo, valor, detalhe) {
-    const b = el('div', 'dash-kpi');
+  function bloco(rotulo, valor, detalhe, { destaque = false, atual = null, anterior = null, mesAnterior = '' } = {}) {
+    const b = el('div', 'dash-kpi' + (destaque ? ' destaque' : ''));
     b.append(el('span', 'dash-kpi-label', rotulo), el('strong', 'dash-kpi-value', valor));
+    // variação contra o mês anterior (só quando o mês anterior teve valor)
+    if (atual !== null && anterior > 0) {
+      const v = Math.round(((atual - anterior) / anterior) * 100);
+      b.append(el('span', `dash-kpi-var ${v > 0 ? 'sobe' : v < 0 ? 'desce' : ''}`, `${v > 0 ? '+' : ''}${v}% em relação a ${mesAnterior}`));
+    }
     if (detalhe) b.append(el('span', 'dash-kpi-detail', detalhe));
     return b;
   }
+  const compacto = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 1 });
 
   function lista(titulo, itens, fmt, vazio) {
     const s = el('section', 'dash-card'), ol = el('ol', 'dash-rank');
@@ -109,10 +115,10 @@
     dados.forEach((d, i) => {
       const col = el('div', 'dash-col' + (i === dados.length - 1 ? ' atual' : ''));
       const barra = el('div', 'dash-bar');
-      barra.style.height = max ? `${Math.max(2, (d.valor / max) * 100)}%` : '2px';
+      barra.style.setProperty('--p', max ? Math.max(0.012, d.valor / max) : 0.012);
       const dica = el('span', 'dash-tip', real.format(d.valor));
       col.tabIndex = 0;
-      col.append(dica, barra, el('span', 'dash-col-label', d.rotulo));
+      col.append(dica, el('span', 'dash-val', d.valor ? compacto.format(d.valor) : '—'), barra, el('span', 'dash-col-label', d.rotulo));
       barras.append(col);
     });
     s.append(barras);
@@ -127,11 +133,13 @@
     corpo.replaceChildren();
     if (!carregado) return;
     const r = P.resumoMes(orcs, imps, ano, mes, window.InventtaCalculations);
+    const pa = mes === 0 ? ano - 1 : ano, pm = mes === 0 ? 11 : mes - 1, ant = P.resumoMes(orcs, imps, pa, pm, window.InventtaCalculations);
+    const comp = (a, b) => ({ atual: a, anterior: b, mesAnterior: NOMES[pm] });
     const kpis = el('div', 'dash-kpis');
     kpis.append(
-      bloco('Valor orçado', real.format(r.valor), `${r.orcamentos} ${r.orcamentos === 1 ? 'orçamento' : 'orçamentos'}`),
-      bloco('Valor fechado', real.format(r.fechado), `${r.fechados} ${r.fechados === 1 ? 'pedido aprovado' : 'pedidos aprovados'}`),
-      bloco('Lucro estimado', real.format(r.lucro), 'Se todos forem fechados'),
+      bloco('Lucro estimado', real.format(r.lucro), 'Se todos forem fechados', { destaque: true, ...comp(r.lucro, ant.lucro) }),
+      bloco('Valor orçado', real.format(r.valor), `${r.orcamentos} ${r.orcamentos === 1 ? 'orçamento' : 'orçamentos'}`, comp(r.valor, ant.valor)),
+      bloco('Valor fechado', real.format(r.fechado), `${r.fechados} ${r.fechados === 1 ? 'pedido aprovado' : 'pedidos aprovados'}`, comp(r.fechado, ant.fechado)),
       bloco('Ticket médio', real.format(r.ticket)),
       bloco('Filamento orçado', peso(r.gramas), `${num(r.horas, 1)} h de impressão`),
       bloco('Pedidos registrados', String(r.pedidos), `${r.unidades} ${r.unidades === 1 ? 'peça' : 'peças'} · ${real.format(r.custoImpressao)} de impressão`),

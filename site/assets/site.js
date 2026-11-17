@@ -43,3 +43,14 @@
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { io.unobserve(e.target); montar(e.target); } }), { rootMargin: '300px' });
   hosts.forEach((h) => io.observe(h));
 })();
+
+/* tema: o botão alterna claro/escuro e grava a escolha (a mesma chave do aplicativo, inventta-theme) */
+(() => {
+  const raiz = document.documentElement, mq = matchMedia('(prefers-color-scheme: dark)'), meta = document.querySelector('meta[name="theme-color"]'), botao = document.querySelector('[data-tema]');
+  if (!botao) return;
+  const escuro = () => (raiz.dataset.theme || (mq.matches ? 'dark' : 'light')) === 'dark';
+  const pintar = () => { const d = escuro(); botao.setAttribute('aria-pressed', String(d)); botao.setAttribute('aria-label', d ? 'Usar tema claro' : 'Usar tema escuro'); if (meta) meta.content = d ? '#16130b' : '#fff8ef'; };
+  botao.addEventListener('click', () => { raiz.dataset.theme = escuro() ? 'light' : 'dark'; try { localStorage.setItem('inventta-theme', raiz.dataset.theme); } catch { /* sem armazenamento */ } pintar(); });
+  mq.addEventListener('change', pintar);
+  pintar();
+})();

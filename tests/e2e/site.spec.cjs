@@ -149,7 +149,7 @@ test.describe('site de apresentação', () => {
     const ctx = await browser.newContext({ colorScheme: 'dark' }), pg = await ctx.newPage();
     await pg.goto('/');
     expect(await pg.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(22, 19, 11)');
-    await expect(pg.locator('.nav__logo img').first()).toBeVisible();
+    await expect(pg.locator('.nav__logo .logo--escuro').first()).toBeVisible();
     await ctx.close();
   });
 
@@ -158,6 +158,20 @@ test.describe('site de apresentação', () => {
     await pg.goto('/');
     expect(await pg.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(255, 248, 239)');
     expect(await pg.evaluate(() => getComputedStyle(document.querySelector('.hero .btn--primary')).backgroundColor)).toBe('rgb(185, 30, 20)');
+    await ctx.close();
+  });
+
+  test('tema: o botão alterna claro e escuro e grava a escolha (a mesma do app)', async ({ browser }) => {
+    const ctx = await browser.newContext({ colorScheme: 'light' }), pg = await ctx.newPage();
+    await pg.goto('/');
+    const botao = pg.getByRole('button', { name: /Usar tema/ });
+    test.skip(!(await botao.isVisible()), 'na tela de 320 px o botão fica no menu');
+    await botao.click();
+    await expect.poll(() => pg.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(22, 19, 11)');
+    expect(await pg.evaluate(() => localStorage.getItem('inventta-theme'))).toBe('dark');
+    await expect(pg.locator('.nav__logo .logo--escuro').first()).toBeVisible();
+    await pg.reload();
+    expect(await pg.evaluate(() => document.documentElement.dataset.theme)).toBe('dark');
     await ctx.close();
   });
 

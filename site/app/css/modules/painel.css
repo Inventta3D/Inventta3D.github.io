@@ -30,3 +30,17 @@
 .dash-rank strong{font-variant-numeric:tabular-nums;white-space:nowrap}
 .dash-empty{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
 @media (prefers-reduced-motion:reduce){.dash-bar,.dash-tip{transition:none}}
+
+/* auditoria: lucro em destaque, variação contra o mês anterior e o valor de cada mês sempre à vista */
+.dash-kpi.destaque{background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)}
+.dash-kpi.destaque :is(.dash-kpi-label,.dash-kpi-detail){color:inherit;opacity:.85}
+.dash-kpi-var{font:var(--md-sys-typescale-label-medium);color:var(--md-sys-color-on-surface-variant)}
+.dash-kpi-var.sobe{color:var(--md-ext-success)}
+.dash-kpi-var.desce{color:var(--md-sys-color-error)}
+.dash-kpi.destaque .dash-kpi-var{color:inherit}
+.dash-bars{height:200px;padding-top:8px}
+.dash-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.dash-bar{height:calc(var(--p,0) * (100% - 44px));min-height:3px}
+.dash-val{font:var(--md-sys-typescale-label-medium);color:var(--md-sys-color-on-surface-variant);white-space:nowrap;font-variant-numeric:tabular-nums}
+.dash-col.atual .dash-val{color:var(--md-sys-color-on-surface)}
+.dash-tip{display:none}

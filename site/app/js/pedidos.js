@@ -53,6 +53,10 @@
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt !== undefined) e.textContent = txt; return e; };
   const destaque = new URLSearchParams(location.search).get('pedido');
   let filtro = 'todos', rolou = false;
+  const pequeno = matchMedia('(max-width: 719px)');
+  pequeno.addEventListener('change', () => document.querySelectorAll('.order-more').forEach((d) => { d.open = !pequeno.matches; }));
+  // no celular, tocar fora fecha o menu "Mais"
+  document.addEventListener('click', (e) => { if (!pequeno.matches) return; document.querySelectorAll('.order-more[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });
 
   async function gravar(r, campos, msg) {
     const { error } = await app().client().from('inventta3d_quotes').update(campos).eq('id', r.id);
@@ -97,6 +101,12 @@
     etq.type = 'button'; etq.setAttribute('aria-label', `Etiqueta de ${r.title || 'pedido'}`);
     etq.addEventListener('click', () => etiqueta(r));
     acoes.insertBefore(etq, acoes.lastElementChild);
+    // ações secundárias num menu "Mais" no celular (no computador o menu fica aberto e some o botão)
+    const mais = el('details', 'order-more'), sum = el('summary', 'btn btn-sm btn-outline order-more-btn', 'Mais');
+    sum.setAttribute('aria-label', `Mais ações de ${r.title || 'pedido'}`);
+    const lista = el('div', 'order-more-list');
+    [...acoes.children].filter((b) => !/^(Abrir|Lembrar)$/.test(b.textContent.trim())).forEach((b) => lista.append(b));
+    if (lista.children.length) { mais.append(sum, lista); acoes.append(mais); mais.open = !pequeno.matches; }
     if (destaque && r.id === destaque) {
       row.classList.add('order-destaque');
       if (!rolou) { rolou = true; requestAnimationFrame(() => row.scrollIntoView({ block: 'center' })); }
@@ -130,11 +140,18 @@
     $('labelDialog').showModal();
   }
 
+  // no celular os filtros viram um seletor (seis botões não cabem numa linha)
+  const selFiltro = el('select', 'control order-filter-select');
+  selFiltro.setAttribute('aria-label', 'Filtrar pedidos por status');
+  $('savedFilter').querySelectorAll('button[data-filtro]').forEach((b) => { const o = el('option', '', `Status: ${b.textContent.trim()}`); o.value = b.dataset.filtro; selFiltro.append(o); });
+  selFiltro.addEventListener('change', () => $('savedFilter').querySelector(`button[data-filtro="${selFiltro.value}"]`)?.click());
+  $('savedFilter').after(selFiltro);
+
   // filtros (chips) acima da lista
   $('savedFilter').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-filtro]');
     if (!b) return;
-    filtro = b.dataset.filtro;
+    filtro = b.dataset.filtro; selFiltro.value = filtro;
     $('savedFilter').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     app().renderSaved?.();
   });

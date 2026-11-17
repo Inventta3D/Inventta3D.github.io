@@ -63,3 +63,13 @@
 .acesso-card h1{margin:0;font:var(--md-sys-typescale-headline-small)}
 .acesso-texto{margin:0;color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-large)}
 .acesso-botoes{display:flex;flex-wrap:wrap;gap:8px}
+
+/* login: o produto à mostra (a peça 3D girando ao lado do preço, como no site) */
+.login-demo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:12px;width:min(520px,100%);margin:0 auto;padding:12px;border-radius:var(--shape-surface);background:var(--md-sys-color-surface-container-lowest);box-shadow:var(--md-sys-elevation-1)}
+.login-peca{position:relative;min-height:200px;border-radius:var(--shape-nested);background:var(--md-sys-color-surface-container)}
+.login-peca canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.login-preco{display:grid;align-content:center;gap:6px;padding:12px}
+.login-preco strong{font:var(--md-sys-typescale-headline-large);color:var(--md-ext-success);font-variant-numeric:tabular-nums}
+.login-preco-rot{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
+.login-zap{justify-self:start;margin-top:6px;padding:8px 14px;border-radius:var(--shape-control);background:var(--md-ext-whatsapp);color:var(--md-ext-on-whatsapp);font:var(--md-sys-typescale-label-large)}
+.login-footnote{font-size:.875rem}

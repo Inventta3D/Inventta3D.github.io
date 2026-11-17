@@ -134,3 +134,16 @@
 }
 @media (max-height: 760px) { .hero--centred .hero__window { min-height: 150px; } }
 .footer__col a[data-contato] { white-space: nowrap; }
+
+/* tema claro/escuro: segue o sistema ou a escolha do botão (a mesma do aplicativo) */
+.logo--escuro { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo--claro { display: none; } :root:not([data-theme="light"]) .logo--escuro { display: block; } }
+:root[data-theme="dark"] .logo--claro { display: none; }
+:root[data-theme="dark"] .logo--escuro { display: block; }
+.tema { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-strong); border-radius: var(--r-btn, 8px); background: transparent; color: var(--ink); cursor: pointer; transition: background-color var(--dur, .2s) var(--ease, ease); }
+.tema:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.tema:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tema svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tema__sol { display: none; }
+.tema[aria-pressed="true"] .tema__lua { display: none; }
+.tema[aria-pressed="true"] .tema__sol { display: block; }

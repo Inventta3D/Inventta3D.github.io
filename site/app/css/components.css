@@ -175,3 +175,16 @@ select.control option,select.control optgroup{background:var(--md-sys-color-surf
   .btn,.control,.control-wrap,.discount-choice span,.field-help-trigger,.menu-item{border:1px solid ButtonText}
   .field-help-bubble{border:1px solid CanvasText;background:Canvas;color:CanvasText}
 }
+
+/* auditoria de UI (2026-11-16): contraste das etapas futuras, nenhum texto abaixo de 12 px, alvos de toque de 44 px no celular
+   e algarismos proporcionais nos campos (os tabulares da Outfit desenham o "1" com serifa) */
+.step-btn:disabled{color:var(--md-sys-color-on-surface-variant)}
+label small{font-size:.8125rem}
+.control{font-variant-numeric:lining-nums proportional-nums}
+@media (max-width:719px){.step-btn,.step-name{font-size:.75rem}}
+@media (pointer:coarse){
+  .btn-sm{--btn-h:44px}
+  .field-help-trigger{width:44px;height:44px}
+  .control-wrap .calc-open{--btn-h:44px}
+  .btn-link{min-height:44px}
+}
