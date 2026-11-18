@@ -189,3 +189,6 @@ label small{font-size:.8125rem}
   .control-wrap .calc-open{--btn-h:44px}
   .btn-link{min-height:44px}
 }
+
+/* seletor Porcentagem / Valor fixo / Valor final: o rótulo inteiro é clicável (verificação da skill ui-ux-pro-max) */
+.discount-choice,.discount-choice span{cursor:pointer}
