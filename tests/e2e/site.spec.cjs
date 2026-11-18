@@ -46,6 +46,21 @@ test.describe('site de apresentação', () => {
     await expect(page.locator('.hero .palco')).toBeVisible();
   });
 
+  test('hero: etapas, preço e selo não ficam um por cima do outro (e, no celular, nada cobre a peça)', async ({ page }, info) => {
+    await page.goto('/');
+    await page.waitForTimeout(1500);
+    for (const espera of [0, 4300]) { // o selo e as etapas se movem: confere no começo e no meio do ciclo
+      await page.waitForTimeout(espera);
+      const cruzam = await page.evaluate((celular) => {
+        const r = (s) => { const e = document.querySelector(s); if (!e || getComputedStyle(e).display === 'none') return null; const b = e.getBoundingClientRect(); return { s, l: b.left, r: b.right, t: b.top, b: b.bottom }; };
+        const itens = ['.palco__passos', '.palco__preco', '.palco__zap', ...(celular ? ['.palco .peca-tile'] : [])].map(r).filter(Boolean), out = [];
+        for (let i = 0; i < itens.length; i++) for (let j = i + 1; j < itens.length; j++) { const a = itens[i], b = itens[j]; if (a.l < b.r - 1 && b.l < a.r - 1 && a.t < b.b - 1 && b.t < a.b - 1) out.push(`${a.s} cobre ${b.s}`); }
+        return out;
+      }, ehCelular(info));
+      expect(cruzam).toEqual([]);
+    }
+  });
+
   test('cada seção ocupa exatamente uma ou duas telas (e começa numa tela inteira)', async ({ page }, info) => {
     await page.goto('/');
     await page.waitForTimeout(500);

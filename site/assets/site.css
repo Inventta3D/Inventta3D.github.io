@@ -142,14 +142,18 @@
 .hero--split .hero__facts dd { white-space: nowrap; }
 @media (max-width: 1023px) { .palco { min-height: 420px; } }
 @media (max-width: 639px) {
-  .palco { min-height: 380px; }
-  .palco__passos { top: var(--s-3); left: var(--s-3); right: var(--s-3); gap: 6px; }
-  .palco__passos li { height: 30px; padding: 0 10px 0 4px; font-size: 0; gap: 0; }
+  /* celular: nada fica por cima da peça; etapas em cima, a peça no meio e o preço com o selo embaixo, cada um no seu lugar */
+  .palco { display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-3); min-height: 300px; }
+  .palco .peca-tile { position: relative; inset: auto; flex: 1 1 150px; min-height: 150px; order: 2; }
+  .palco__passos { position: static; order: 1; flex-wrap: nowrap; justify-content: space-between; gap: 6px; }
+  .palco__passos li { height: 30px; padding: 0 10px 0 4px; font-size: 0; gap: 0; flex: none; }
   .palco__passos i { width: 22px; height: 22px; }
-  .palco__preco { left: var(--s-3); bottom: var(--s-3); padding: var(--s-3) var(--s-4); }
+  .palco__preco { position: static; order: 3; flex: none; padding: var(--s-3) var(--s-4); animation: none; }
   .palco__preco strong { font-size: 30px; }
-  .palco__zap { right: var(--s-3); top: 56px; bottom: auto; height: 34px; font-size: 12px; }
+  .palco__preco span { display: none; }
+  .palco__zap { display: none; }
   .hero__facts { display: none; }
+}
 }
 /* imagens vizinhas no mesmo tamanho: as duas telas da segunda linha de recursos têm a mesma altura, com a imagem inteira no centro */
 @media (min-width: 1280px) and (min-height: 860px) { #recursos .panel.panel--tela { --p-h: 540px; min-height: 540px; display: grid; place-items: center; } #recursos .panel--tela .frame__img { height: auto; max-height: 540px; width: auto; max-width: 100%; } }
@@ -225,4 +229,12 @@
 @media (min-width: 1280px) {
   .telas { margin-top: var(--s-5); }
   .tela img { max-height: min(560px, calc(100svh - 330px)); }
+}
+/* notebook (1024 a 1439): palco mais estreito, então as etapas ficam numa linha só e o selo sobe para a direita da peça */
+@media (min-width: 640px) and (max-width: 1439px) {
+  .palco__passos { gap: 6px; flex-wrap: nowrap; }
+  .palco__passos li { height: 32px; padding: 0 10px 0 4px; font-size: 13px; gap: 6px; flex: none; }
+  .palco__passos i { width: 22px; height: 22px; font-size: 11px; }
+  .palco__zap { bottom: auto; top: calc(var(--s-5) + 52px); right: var(--s-5); }
+  .palco__preco strong { font-size: 38px; }
 }
