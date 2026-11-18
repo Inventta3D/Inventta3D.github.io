@@ -101,7 +101,7 @@ test.describe('site de apresentação', () => {
     expect(lados.direita).toBeLessThanOrEqual(lados.larg - lados.logo + 1);
   });
 
-  test('as imagens reais do aplicativo carregam (telas, peça em 3D, orçamento e barra de etapas)', async ({ page }) => {
+  test('as imagens reais do aplicativo carregam (telas, orçamento e gestão)', async ({ page }) => {
     await page.goto('/');
     for (const y of [0, 0.25, 0.5, 0.75, 1]) { await page.evaluate((f) => scrollTo(0, (document.body.scrollHeight - innerHeight) * f), y); await page.waitForTimeout(250); }
     await page.waitForFunction(() => [...document.querySelectorAll('main img')].filter((i) => i.offsetParent).every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 15000 });
@@ -134,6 +134,21 @@ test.describe('site de apresentação', () => {
     await expect(page.locator('#o-peso')).toHaveText('200 g');
     expect(await page.locator('#r-unit').textContent()).not.toBe(antes);
     await expect(page.locator('#r-unit')).toHaveText(await calcular(page, { amount: 200, printHours: '03:40', margin: 120, quantity: 12 }, 'unitPrice'));
+  });
+
+  test('como funciona: tocar numa etapa mostra o preço se formando, e a última mostra o total do cálculo do app', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#como').scrollIntoViewIfNeeded();
+    const passos = page.locator('#como .passo');
+    await expect(passos).toHaveCount(5);
+    await passos.nth(1).click();
+    await expect(passos.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#como li[data-parte="material"]')).toHaveClass(/on/);
+    await expect(page.locator('#como li[data-parte="lucro"]')).not.toHaveClass(/on/);
+    await passos.nth(4).click();
+    await expect(page.locator('#co-total')).toHaveText('R$ 289,00', { timeout: 5000 });
+    await expect(page.locator('#como li.on')).toHaveCount(6);
+    await expect(page.locator('#co-un')).toContainText('R$ 5,78');
   });
 
   test('perguntas: todas as respostas abertas, sem promessas que o produto não confirmou', async ({ page }) => {

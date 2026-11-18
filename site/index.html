@@ -96,9 +96,8 @@
   <section class="hero hero--split" data-enter aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5" data-moment="liquid-type">
-        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>Para quem imprime em 3D e vende peças</p>
         <h1 id="hero-h">Orçamento de impressão 3D</h1>
-        <p class="hero__lead">Calcule o custo real de cada peça, mostre o 3D colorido ao cliente e mande o orçamento pronto pelo WhatsApp.</p>
+        <p class="hero__lead">Para quem imprime em 3D e vende peças: calcule o custo real de cada uma, mostre o 3D colorido ao cliente e mande o orçamento pronto pelo WhatsApp.</p>
         <div class="btn-row">
           <a class="btn btn--primary" href="/app/">Acessar o app<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           <a class="link" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Falar no WhatsApp</a>
@@ -222,19 +221,30 @@
 
   <section class="section ground-inverse" id="como" style="--h: 1" aria-labelledby="como-h">
     <div class="wrap">
-      <div class="grid grid--top">
-        <div class="section-head span-5"><h2 id="como-h">Do pedido ao preço em cinco etapas</h2></div>
-        <p class="t-lead span-6 start-7">Cada etapa vira uma tela do aplicativo. Você preenche o que sabe, e o preço sugerido aparece pronto para enviar.</p>
-      </div>
-      <div class="fill passos">
-        <img class="barra" src="assets/img/app-etapas.jpg" alt="Barra de etapas do aplicativo: pedido, material, impressão e trabalho concluídos, e a etapa 5, preço" width="1474" height="120">
-        <ol class="etapas">
-          <li class="etapa"><h3>Pedido</h3><p>Peça, quantidade e dados do cliente.</p></li>
-          <li class="etapa"><h3>Material</h3><p>Tipo, cor, consumo e preço do rolo.</p></li>
-          <li class="etapa"><h3>Impressão</h3><p>Tempo, energia e desgaste da impressora.</p></li>
-          <li class="etapa"><h3>Trabalho</h3><p>Preparo, acabamento, falhas e margem.</p></li>
-          <li class="etapa"><h3>Preço</h3><p>Preço sugerido e desconto, pronto para enviar.</p></li>
-        </ol>
+      <div class="grid grid--top fill como">
+        <div class="span-5 como__texto">
+          <div class="section-head"><h2 id="como-h">Do pedido ao preço em cinco etapas</h2><p>Cada etapa vira uma tela do aplicativo. Toque numa etapa e veja o preço se formar.</p></div>
+          <ol class="como__passos">
+            <li><button type="button" class="passo" data-k="0" aria-pressed="true"><i aria-hidden="true">1</i><span><b>Pedido</b><em>Peça, quantidade e dados do cliente.</em></span></button></li>
+            <li><button type="button" class="passo" data-k="1" aria-pressed="false"><i aria-hidden="true">2</i><span><b>Material</b><em>Tipo, cor, consumo e preço do rolo.</em></span></button></li>
+            <li><button type="button" class="passo" data-k="2" aria-pressed="false"><i aria-hidden="true">3</i><span><b>Impressão</b><em>Tempo, energia e desgaste da impressora.</em></span></button></li>
+            <li><button type="button" class="passo" data-k="3" aria-pressed="false"><i aria-hidden="true">4</i><span><b>Trabalho</b><em>Preparo, acabamento, falhas e margem.</em></span></button></li>
+            <li><button type="button" class="passo" data-k="4" aria-pressed="false"><i aria-hidden="true">5</i><span><b>Preço</b><em>Preço sugerido e desconto, pronto para enviar.</em></span></button></li>
+          </ol>
+        </div>
+        <div class="span-6 start-7 construcao" id="construcao">
+          <p class="construcao__titulo">50 chaveiros de 9 g, PLA, 40 min cada</p>
+          <div class="construcao__barra" role="img" aria-label="Composição do preço: material, energia, desgaste da impressora, mão de obra, falhas e margem"><i data-parte="material"></i><i data-parte="energia"></i><i data-parte="maquina"></i><i data-parte="trabalho"></i><i data-parte="falhas"></i><i data-parte="lucro"></i></div>
+          <ul class="construcao__linhas">
+            <li data-parte="material"><i aria-hidden="true"></i><span>Material e desperdício</span><b>R$ 0,00</b></li>
+            <li data-parte="energia"><i aria-hidden="true"></i><span>Energia</span><b>R$ 0,00</b></li>
+            <li data-parte="maquina"><i aria-hidden="true"></i><span>Desgaste da impressora</span><b>R$ 0,00</b></li>
+            <li data-parte="trabalho"><i aria-hidden="true"></i><span>Mão de obra e embalagem</span><b>R$ 0,00</b></li>
+            <li data-parte="falhas"><i aria-hidden="true"></i><span>Reserva para falhas</span><b>R$ 0,00</b></li>
+            <li data-parte="lucro"><i aria-hidden="true"></i><span>Margem</span><b>R$ 0,00</b></li>
+          </ul>
+          <div class="construcao__total"><span id="co-rotulo">Soma até agora</span><strong id="co-total" aria-live="polite">R$ 0,00</strong><small id="co-un"></small></div>
+        </div>
       </div>
     </div>
   </section>
@@ -243,7 +253,11 @@
     <div class="wrap">
       <div class="grid grid--top">
         <div class="section-head span-5"><h2 id="faq-h">Perguntas antes do primeiro orçamento</h2>
-          <p class="duvida"><span class="ic-tile ic-tile--48" aria-hidden="true"><img class="ic" src="assets/ui/icons/whatsapp.svg" alt="" width="28" height="28"></span><a class="link" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato>Outra dúvida? Chame no WhatsApp</a></p></div>
+          <div class="contato">
+            <p class="contato__titulo">Outra dúvida? Fale com a equipe.</p>
+            <a class="contato__item" href="https://wa.me/5511946641992?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Inventta%203D%20e%20quero%20saber%20mais." data-contato><span class="ic-tile ic-tile--48" aria-hidden="true"><img class="ic" src="assets/ui/icons/whatsapp.svg" alt="" width="28" height="28"></span><span><b>WhatsApp</b><em>(11) 94664-1992</em></span></a>
+            <a class="contato__item" href="https://www.instagram.com/3d.inventta/" rel="noopener" data-instagram><span class="contato__ig" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg></span><span><b>Instagram</b><em>@3d.inventta</em></span></a>
+          </div></div>
         <div class="faq span-6 start-7">
           <div class="faq__item"><h3>Preciso instalar alguma coisa?</h3><p>Não. Abre no navegador do celular ou do computador e pode ir para a tela inicial.</p></div>
           <div class="faq__item"><h3>Como eu entro?</h3><p>Com a sua conta Google.</p></div>
