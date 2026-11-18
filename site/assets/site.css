@@ -2,12 +2,6 @@
 .logo { display: block; height: 24px; width: auto; }
 
 /* a janela do aplicativo no computador, dentro do quadro do hero */
-.hero--centred .hero__window { background: color-mix(in srgb, var(--accent) 11%, var(--bg)); }
-.win { border-radius: var(--r-md); overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line), 0 28px 60px -28px rgb(30 27 19 / .4); }
-.win__bar { display: flex; align-items: center; gap: var(--s-3); height: 36px; padding: 0 var(--s-4); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
-.win__dots { display: flex; gap: 6px; }
-.win__dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
-.win img { display: block; width: 100%; height: auto; }
 
 /* telas inteiras do celular, em moldura, com o contexto ao lado */
 #app, #negocio { --h: 1; --hm: 1; }
@@ -66,23 +60,8 @@
 @media (max-width: 639px) { .footer__col:not(:last-child) { display: none; } }
 @media (max-width: 639px) { #como .t-lead { display: none; } .barra { height: 96px; } }
 @media (max-width: 359px) { header.nav > .wrap.nav__bar > .nav__actions { display: none; } .etapa p { display: none; } }
-@media (max-width: 359px) { .hero--centred .hero__window { min-height: 150px; } }
 @media (max-width: 639px) { #faq .faq > .faq__item { padding: var(--s-4) 0; } }
 
-/* a janela do hero: o aplicativo em HTML, com a peça girando */
-.win__steps { list-style: none; margin: 0; padding: var(--s-3) var(--s-5) var(--s-2); display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s-3); border-bottom: 2px solid var(--accent); font-size: 14px; font-weight: 500; }
-.win__steps li { display: flex; align-items: center; gap: 8px; color: var(--ink); }
-.win__steps li::before { content: "\2713"; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: #0b6b35; color: #fff; }
-.win__steps li.on::before { content: "5"; background: var(--accent); }
-.win__body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--s-4); padding: var(--s-4) var(--s-5); }
-.win .peca-tile { height: 210px; border-radius: var(--r-md); background: color-mix(in srgb, var(--ink) 5%, var(--bg)); }
-.win__price { display: grid; align-content: start; gap: 6px; padding: var(--s-4); border-radius: var(--r-md); background: #fff; box-shadow: 0 0 0 1px var(--line); color: #1e1b13; }
-.win__eyebrow { font-size: 13px; color: #6b665d; }
-.win__total { font: 500 40px/1.05 var(--font-display); letter-spacing: var(--display-tracking); color: #0b6b35; }
-.win__chips { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
-.win__chips span { padding: 3px 10px; border-radius: 99px; box-shadow: 0 0 0 1px var(--line-strong); }
-.win__send { margin-top: 4px; padding: 8px 12px; border-radius: 99px; background: #1d7a46; color: #fff; font-size: 13px; font-weight: 500; text-align: center; }
-@media (max-width: 639px) { .win__steps { padding-inline: var(--s-3); font-size: 0; gap: 6px; } .win__steps li::before { margin-inline: auto; } .win__body { grid-template-columns: 1fr; padding: var(--s-3); } .win .peca-tile { height: 120px; } .win__price { display: none; } }
 
 /* peça 3D viva */
 .peca-tile { position: relative; }
@@ -132,7 +111,6 @@
   .tela img { max-height: min(470px, calc(100svh - 400px)); }
   #recursos .panel--tela .frame__img { max-height: calc(100svh - 330px); width: auto; max-width: 100%; margin-inline: auto; }
 }
-@media (max-height: 760px) { .hero--centred .hero__window { min-height: 150px; } }
 .footer__col a[data-contato] { white-space: nowrap; }
 
 /* tema claro/escuro: segue o sistema ou a escolha do botão (a mesma do aplicativo) */
@@ -148,10 +126,60 @@
 .tema[aria-pressed="true"] .tema__lua { display: none; }
 .tema[aria-pressed="true"] .tema__sol { display: block; }
 /* celular: a peça do quadro do topo ocupa o espaço que o cartão de preço deixa */
-@media (max-width: 639px) { .win .peca-tile { height: clamp(140px, 30svh, 260px); } .cor { white-space: nowrap; } }
 
 /* cores do chaveiro: só a bolinha de cor (o nome fica no leitor de tela e na dica) */
 .cores { justify-content: center; gap: var(--s-3); flex-wrap: nowrap; }
 .cor { width: 48px; min-width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; border-radius: 50%; flex: none !important; }
 .cor i { width: 32px; height: 32px; box-shadow: 0 0 0 2px var(--bg); }
 .cor[aria-pressed="true"] { background: var(--bg); border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+
+/* hero: o palco com o chaveiro 3D grande, as cinco etapas acendendo em sequência e o preço flutuando */
+.palco { background: radial-gradient(120% 90% at 50% 38%, color-mix(in srgb, var(--accent) 16%, var(--bg)) 0%, color-mix(in srgb, var(--accent) 7%, var(--bg)) 70%); isolation: isolate; }
+.palco .peca-tile { position: absolute; inset: 0; z-index: 1; background: none; border-radius: 0; }
+.palco__passos { position: absolute; z-index: 3; top: var(--s-5); left: var(--s-5); right: var(--s-5); display: flex; flex-wrap: wrap; gap: var(--s-2); list-style: none; margin: 0; padding: 0; }
+.palco__passos li { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 6px; border-radius: 999px; background: var(--bg); box-shadow: 0 0 0 1px var(--line); font-size: 14px; font-weight: 500; animation: passo 9s ease-in-out infinite; animation-delay: calc(var(--i) * .9s); }
+.palco__passos i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 500 12px/1 var(--font-text); font-style: normal; background: var(--line-strong); color: var(--ink); animation: passo-n 9s ease-in-out infinite; animation-delay: calc(var(--i) * .9s); }
+@keyframes passo { 0%, 6% { transform: none; } 12%, 80% { transform: translateY(-3px); } 90%, 100% { transform: none; } }
+@keyframes passo-n { 0%, 6% { background: var(--line-strong); color: var(--ink); } 12%, 80% { background: #0b6b35; color: #fff; } 90%, 100% { background: var(--line-strong); color: var(--ink); } }
+.palco__preco { position: absolute; z-index: 3; left: var(--s-5); bottom: var(--s-5); display: grid; gap: 2px; padding: var(--s-4) var(--s-5); border-radius: var(--r-md); background: var(--bg); box-shadow: 0 0 0 1px var(--line), 0 24px 48px -24px rgb(30 27 19 / .45); animation: flutua 5.5s ease-in-out infinite alternate; }
+.palco__preco small { font-size: 13px; color: var(--muted); }
+.palco__preco strong { font: var(--display-weight) 44px/1.05 var(--font-display); letter-spacing: var(--display-tracking); color: #0b6b35; font-variant-numeric: tabular-nums; }
+.palco__preco span { font-size: 14px; color: var(--muted); }
+:root[data-theme="dark"] .palco__preco strong { color: #7bdc9c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .palco__preco strong { color: #7bdc9c; } }
+.palco__zap { position: absolute; z-index: 3; right: var(--s-5); bottom: calc(var(--s-5) + 24px); display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; background: #1d7a46; color: #fff; font-size: 14px; font-weight: 500; box-shadow: 0 16px 32px -16px rgb(0 0 0 / .5); animation: zap 9s ease-in-out infinite; }
+@keyframes flutua { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+@keyframes zap { 0%, 58% { opacity: 0; transform: translateY(10px) scale(.96); } 66%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .palco__passos li, .palco__passos i, .palco__preco, .palco__zap { animation: none; } .palco__zap { opacity: 1; } .palco__passos i { background: #0b6b35; color: #fff; } }
+.hero--split .hero__text { align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+.hero--split .hero__facts { display: flex; gap: var(--s-7); margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line); }
+.hero--split .hero__facts > div { grid-column: auto; }
+.hero--split .hero__facts dd { white-space: nowrap; }
+@media (max-width: 1023px) { .palco { min-height: 420px; } }
+@media (max-width: 639px) {
+  .palco { min-height: 380px; }
+  .palco__passos { top: var(--s-3); left: var(--s-3); right: var(--s-3); gap: 6px; }
+  .palco__passos li { height: 30px; padding: 0 10px 0 4px; font-size: 0; gap: 0; }
+  .palco__passos i { width: 22px; height: 22px; }
+  .palco__preco { left: var(--s-3); bottom: var(--s-3); padding: var(--s-3) var(--s-4); }
+  .palco__preco strong { font-size: 30px; }
+  .palco__zap { right: var(--s-3); top: 56px; bottom: auto; height: 34px; font-size: 12px; }
+  .hero__facts { display: none; }
+}
+/* imagens vizinhas no mesmo tamanho: as duas telas da segunda linha de recursos têm a mesma altura, com a imagem inteira no centro */
+@media (min-width: 1280px) and (min-height: 860px) { #recursos .panel.panel--tela { --p-h: 540px; min-height: 540px; display: grid; place-items: center; } #recursos .panel--tela .frame__img { height: auto; max-height: 540px; width: auto; max-width: 100%; } }
+@media (max-width: 639px) { .hero--split .hero__facts { display: none; } header.nav .tema { display: none; } }
+/* celular de tela baixa: o hero continua numa tela só (sem a linha de apoio, texto menor e palco mais baixo) */
+@media (max-width: 639px) and (max-height: 780px) {
+  .hero--split .hero__kicker { display: none; }
+  .hero--split .hero__lead { font-size: 16px; line-height: 1.45; }
+  .hero--split .btn-row { gap: var(--s-3); }
+  .palco { min-height: 200px; }
+  .palco__passos li { height: 26px; }
+  .palco__preco { padding: var(--s-2) var(--s-3); }
+  .palco__preco strong { font-size: 24px; }
+  .palco__preco span { display: none; }
+}
+@media (max-width: 359px) { .hero--split .hero__text h1 { font-size: 32px; } .hero--split .hero__lead { font-size: 15px; } .hero--split .hero__media.palco { min-height: 170px; } }
+@media (max-width: 639px) and (max-height: 780px) { .hero--split .hero__media.palco { min-height: 200px; } }
+@media (max-width: 359px) and (max-height: 780px) { .hero--split .hero__media.palco { min-height: 180px; } .hero--split .hero__lead { margin-top: var(--s-3); } }

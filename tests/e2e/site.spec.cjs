@@ -43,7 +43,7 @@ test.describe('site de apresentação', () => {
       const b = await page.locator('.hero .btn-row').getByRole('link', { name: nome }).boundingBox();
       expect(b.y + b.height, `${nome} abaixo da primeira tela`).toBeLessThanOrEqual(vh);
     }
-    await expect(page.locator('.hero__window .win__steps')).toBeVisible();
+    await expect(page.locator('.hero .palco')).toBeVisible();
   });
 
   test('cada seção ocupa exatamente uma ou duas telas (e começa numa tela inteira)', async ({ page }, info) => {

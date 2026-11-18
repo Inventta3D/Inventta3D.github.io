@@ -54,3 +54,13 @@
   mq.addEventListener('change', pintar);
   pintar();
 })();
+
+/* preço do hero: conta de zero até o valor uma vez, ao abrir a página (parado com "reduzir movimento") */
+(() => {
+  const el = document.getElementById('hero-total');
+  if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const fim = 289, BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }), t0 = performance.now() + 500;
+  el.textContent = BRL.format(0);
+  const passo = (agora) => { const k = Math.min(1, Math.max(0, (agora - t0) / 1400)); el.textContent = BRL.format(fim * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+})();
