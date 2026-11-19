@@ -4,7 +4,7 @@
 Ajudar quem vende impressão 3D a calcular o custo de cada peça, montar orçamentos e enviá-los ao cliente, mantendo clientes e orçamentos salvos na própria conta.
 
 ## Usuário
-Pequeno produtor de impressão 3D (hoje, o próprio dono). Usa no computador e no celular (app Android instalado).
+Pequeno produtor de impressão 3D (hoje, o próprio dono). Usa no computador e no celular (PWA instalada).
 
 ## Escopo atual
 1. **Orçamento em 5 etapas**: pedido, material, impressão, trabalho, preço. Vários itens por pedido. Desconto por porcentagem, valor fixo ou valor final.
@@ -12,7 +12,7 @@ Pequeno produtor de impressão 3D (hoje, o próprio dono). Usa no computador e n
 3. **Orçamentos salvos**: buscar, abrir, editar, excluir (com desfazer).
 4. **Clientes**: cadastrar, consultar, editar, excluir; escolher cliente salvo no orçamento; salvar cliente a partir do orçamento sem duplicar.
 5. **Conta**: login com e-mail e senha ou Google, recuperação de senha, tema claro/escuro, foto do Google no avatar.
-6. **Instalação**: PWA e app Android (APK/AAB assinados) que abre o site sem barra de endereço.
+6. **Instalação**: PWA, instalada direto do navegador (Chrome/Edge: "Instalar app"; Safari no iPhone: "Adicionar à Tela de Início"), sem APK e sem loja de aplicativos.
 
 ## Fora do escopo (por enquanto)
 Estoque de filamentos, vários usuários por conta, pagamentos, nota fiscal.
@@ -23,4 +23,4 @@ Estoque de filamentos, vários usuários por conta, pagamentos, nota fiscal.
 - Entrar com Google, sair da conta e entrar de novo funciona sem mensagem de erro.
 - O formulário de cada etapa cabe numa tela de 860 px de altura, sem barra de rolagem; sem rolagem horizontal no celular.
 - `npm test` passa.
-- O APK instala e abre o app em tela cheia (verificação ainda pendente, ver PLANO).
+- O app instala pelo navegador (PWA) e abre em tela cheia, no celular e no computador.

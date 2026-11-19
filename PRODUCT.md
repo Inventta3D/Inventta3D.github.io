@@ -20,7 +20,7 @@ Inventta 3D transforma os custos reais de uma impressão em um orçamento pronto
 
 ## Positioning
 
-Orçamento de impressão 3D com custo real (material, energia, desgaste da máquina, mão de obra, falhas, margem, taxas e impostos) e com a peça em 3D, nas cores do projeto, para o cliente ver: imagem ou GIF girando enviados pelo WhatsApp junto com o orçamento. Feito para o celular e instalável no Android.
+Orçamento de impressão 3D com custo real (material, energia, desgaste da máquina, mão de obra, falhas, margem, taxas e impostos) e com a peça em 3D, nas cores do projeto, para o cliente ver: imagem ou GIF girando enviados pelo WhatsApp junto com o orçamento. Feito para o celular e instalável como PWA.
 
 ## Operating Context
 
@@ -31,7 +31,7 @@ Fluxo do aplicativo em 5 etapas (Pedido, Material, Impressão, Trabalho, Preço)
 - Contato do site: WhatsApp (11) 94664-1992 e Instagram @3d.inventta (https://www.instagram.com/3d.inventta/).
 - Botões obrigatórios no site: "Acessar o app" (/app/) e "Entrar em contato" (WhatsApp).
 - O app não fatia peças: o fatiamento foi retirado; só o 3D da peça e a leitura de números de arquivos já fatiados.
-- Login apenas com Google. Aplicativo instalável (PWA) e APK Android (TWA).
+- Login apenas com Google. Aplicativo instalável como PWA (sem app nativo).
 - Não afirmar preço, plano gratuito, prazos, número de clientes, depoimentos ou integrações que o produto não tem.
 
 ## Brand Commitments

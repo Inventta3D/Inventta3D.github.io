@@ -1,9 +1,3 @@
-android/.gradle/
-android/build/
-android/app/build/
-android/local.properties
-*.jks
-*.keystore
 node_modules/
 dist/
 test-results/

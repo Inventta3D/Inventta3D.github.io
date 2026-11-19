@@ -33,3 +33,4 @@
 | D30 | Status da impressora ao vivo (feature 13) NÃO implementado | O site é HTTPS e a impressora fica na rede local: o navegador bloqueia o acesso direto. Exige uma ponte local (programa no PC ou Raspberry Pi) ou integração com a nuvem do fabricante, que a Bambu não abre oficialmente. Projeto à parte, com decisão do usuário |
 | D31 | Abas em Impressões com nomes curtos (Peças, Filamento, Máquinas, Vitrine) e colunas iguais | Quatro abas precisam caber em 320 px |
 | D10 | Operações do GitHub usam o terminal do usuário | O shell do agente enxerga outra conta do `gh` |
+| D32 | App Android (TWA) removido; só PWA (supersede D3). Apagados `android/`, `.github/workflows/android.yml`, `site/.well-known/assetlinks.json` e os segredos `ANDROID_*` do GitHub (remover manualmente em Settings > Secrets) | Decisão do usuário: manter só o modo de instalação pelo navegador, sem keystore, sem build Gradle e sem loja |
