@@ -78,13 +78,15 @@
     N.STATUS.forEach(([v, t]) => { const o = el('option', '', t); o.value = v; sel.append(o); });
     sel.value = st;
     sel.addEventListener('change', () => gravar(r, { status: sel.value, status_at: new Date().toISOString() }, `Pedido marcado como ${nomes[sel.value].toLowerCase()}.`));
+    const dataLabel = el('label', 'order-date-label', 'Entrega');
     const data = el('input', 'control order-date');
     data.type = 'date'; data.value = r.due_date || '';
+    data.id = `order-date-${r.id}`; dataLabel.htmlFor = data.id;
     data.setAttribute('aria-label', `Entrega de ${r.title || 'pedido'}`);
     data.addEventListener('change', () => gravar(r, { due_date: data.value || null }, data.value ? 'Data de entrega salva.' : 'Data de entrega removida.'));
     if (r.client_response === 'aprovado') linha.prepend(el('span', 'order-chip st-entregue', 'Cliente aprovou'));
     if (r.client_response === 'ajuste') linha.prepend(el('span', 'order-chip st-aguardando', 'Cliente pediu ajuste'));
-    linha.append(sel, data);
+    linha.append(sel, dataLabel, data);
     info.append(linha);
     if (r.client_response === 'ajuste' && r.client_note) info.append(el('small', 'order-note', `“${r.client_note}”`));
     if (st === 'orcado') {

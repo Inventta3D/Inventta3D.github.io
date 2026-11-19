@@ -263,6 +263,8 @@
 .order-chip.st-entregue{background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)}
 .order-chip:is(.st-atrasado,.st-aguardando){background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container)}
 .order-line .control{width:auto;min-height:40px;--ctl-h:40px;padding-block:0;font:var(--md-sys-typescale-body-medium)}
+.order-line .order-date{min-width:132px}
+.order-date-label{color:var(--md-sys-color-on-surface-variant);font:var(--md-sys-typescale-body-medium)}
 .order-destaque{outline:2px solid var(--md-sys-color-primary);outline-offset:4px;border-radius:var(--shape-nested)}
 .label-sheet{display:flex;gap:16px;align-items:center;padding:16px;border:1px dashed var(--md-sys-color-outline);border-radius:var(--shape-field);background:var(--md-sys-color-surface)}
 .label-qr svg{display:block;width:112px;height:112px}
