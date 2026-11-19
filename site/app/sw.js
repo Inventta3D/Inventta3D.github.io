@@ -1,4 +1,4 @@
-const CACHE_NAME='inventta3d-v100';
+const CACHE_NAME='inventta3d-v101';
 const KIRI_CACHE='inventta3d-kiri-4.7.3'; // motor de fatiamento (~9 MB): baixado só no primeiro uso e mantido entre versões do site
 const APP_SHELL=[
   './',
@@ -18,9 +18,7 @@ const APP_SHELL=[
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './fonts/dm-sans-latin-wght-normal.woff2',
   './fonts/outfit-latin-wght-normal.woff2',
-  './fonts/outfit-latin-ext-wght-normal.woff2',
   './img/inventta-3d-mark.png',
   './img/logo-inventta-3d-colorido.svg',
   './img/logo-inventta-3d-escuro.svg',
