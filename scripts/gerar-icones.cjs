@@ -1,4 +1,4 @@
-/* Gera os ícones a partir da logo "3D" (site/app/img/logo-3d-colorido.svg): ícones do site e do PWA, launcher do Android
+/* Gera os ícones a partir da logo "3D" (site/app/img/logo-3d-colorido.svg): ícones do site, do PWA
    e a marca em PNG. O meio do "3D" (e não o bico) fica no centro do ícone: é o que a logo nova já traz na própria caixa.
    Uso:  node scripts/gerar-icones.cjs */
 const { chromium } = require('playwright');
@@ -20,10 +20,6 @@ const ALVOS = [
   ['site/app/icons/icon-512.png', 512, {}],
   ['site/app/icons/apple-touch-icon.png', 180, {}],
   ['site/app/img/inventta-3d-mark.png', 1024, { fundo: false, altura: 1 }],
-  ...[['mdpi', 48], ['hdpi', 72], ['xhdpi', 96], ['xxhdpi', 144], ['xxxhdpi', 192]].flatMap(([d, t]) => [
-    [`android/app/src/main/res/mipmap-${d}/ic_launcher.png`, t, {}],
-    [`android/app/src/main/res/mipmap-${d}/ic_launcher_round.png`, t, { redondo: true }],
-  ]),
 ];
 
 (async () => {
